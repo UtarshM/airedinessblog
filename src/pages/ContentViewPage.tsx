@@ -1,0 +1,444 @@
+import { useEffect, useState, useCallback } from "react";
+import { useParams, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { ArrowLeft, Loader2, Copy, Check, Pencil, Eye, Globe, RefreshCw, BarChart3 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+
+interface ContentItem {
+  id: string;
+  main_keyword: string;
+  h1: string;
+  status: string;
+  word_count_target: number;
+  generated_title: string | null;
+  generated_content: string | null;
+  current_section: string | null;
+  sections_completed: number | null;
+  total_sections: number | null;
+  tone: string;
+  target_country: string;
+  secondary_keywords: string[] | null;
+  h2_list: string[];
+  h3_list: string[] | null;
+  created_at: string;
+}
+
+// --- SEO SCORE LOGIC ---
+function computeSEOScore(content: ContentItem) {
+  const text = content.generated_content || "";
+  const words = text.split(/\s+/).filter(Boolean);
+  const wordCount = words.length;
+  const keyword = content.main_keyword.toLowerCase();
+  const lowerText = text.toLowerCase();
+
+  const checks: { label: string; pass: boolean; tip: string }[] = [];
+  let totalScore = 0;
+  const maxScore = 6;
+
+  // 1. Title length
+  const titleLen = (content.generated_title || "").length;
+  const titleOk = titleLen >= 30 && titleLen <= 70;
+  checks.push({ label: "Title Length", pass: titleOk, tip: titleOk ? `${titleLen} chars (good)` : `${titleLen} chars (aim 30-70)` });
+  if (titleOk) totalScore++;
+
+  // 2. Word count vs target
+  const wcRatio = wordCount / content.word_count_target;
+  const wcOk = wcRatio >= 0.75 && wcRatio <= 1.35;
+  checks.push({ label: "Word Count", pass: wcOk, tip: `${wordCount} / ${content.word_count_target} target` });
+  if (wcOk) totalScore++;
+
+  // 3. Keyword in title
+  const kwInTitle = (content.generated_title || "").toLowerCase().includes(keyword);
+  checks.push({ label: "Keyword in Title", pass: kwInTitle, tip: kwInTitle ? "Present" : "Missing" });
+  if (kwInTitle) totalScore++;
+
+  // 4. Keyword density
+  const kwCount = (lowerText.match(new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi")) || []).length;
+  const density = wordCount > 0 ? (kwCount / wordCount) * 100 : 0;
+  const densityOk = density >= 0.5 && density <= 3;
+  checks.push({ label: "Keyword Density", pass: densityOk, tip: `${density.toFixed(1)}% (aim 0.5-3%)` });
+  if (densityOk) totalScore++;
+
+  // 5. Has H2 headings
+  const h2Matches = text.match(/^## /gm) || [];
+  const hasH2 = h2Matches.length >= 2;
+  checks.push({ label: "H2 Headings", pass: hasH2, tip: `${h2Matches.length} found` });
+  if (hasH2) totalScore++;
+
+  // 6. Readability (avg sentence length)
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 5);
+  const avgSentenceLen = sentences.length > 0 ? words.length / sentences.length : 0;
+  const readabilityOk = avgSentenceLen >= 10 && avgSentenceLen <= 25;
+  checks.push({ label: "Readability", pass: readabilityOk, tip: `~${avgSentenceLen.toFixed(0)} words/sentence` });
+  if (readabilityOk) totalScore++;
+
+  return { score: Math.round((totalScore / maxScore) * 100), checks, totalScore, maxScore };
+}
+
+const ContentViewPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const [content, setContent] = useState<ContentItem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [editContent, setEditContent] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [regeneratingSection, setRegeneratingSection] = useState<string | null>(null);
+  const [showSEO, setShowSEO] = useState(false);
+
+  const fetchContent = useCallback(async () => {
+    if (!id) return;
+    const { data, error } = await supabase
+      .from("content_items")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      toast.error("Failed to load content");
+    } else {
+      setContent(data as unknown as ContentItem);
+      if (!editing) setEditContent(data?.generated_content || "");
+    }
+    setLoading(false);
+  }, [id, editing]);
+
+  useEffect(() => {
+    fetchContent();
+    if (!id) return;
+    const channel = supabase
+      .channel(`content-${id}`)
+      .on("postgres_changes", {
+        event: "UPDATE",
+        schema: "public",
+        table: "content_items",
+        filter: `id=eq.${id}`,
+      }, (payload) => {
+        const updated = payload.new as unknown as ContentItem;
+        setContent(updated);
+        if (!editing) setEditContent(updated.generated_content || "");
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [id, fetchContent]);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(content?.generated_content || "");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast.success("Copied to clipboard");
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const { error } = await supabase
+      .from("content_items")
+      .update({ generated_content: editContent })
+      .eq("id", id!);
+    if (error) toast.error("Failed to save");
+    else {
+      toast.success("Saved");
+      setEditing(false);
+    }
+    setSaving(false);
+  };
+
+  const handlePublish = async () => {
+    setPublishing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('publish-to-wordpress', {
+        body: { contentId: id }
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      toast.success("Published to WordPress!");
+      fetchContent();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to publish");
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const handleRegenerateSection = async (sectionHeading: string) => {
+    if (!content) return;
+    setRegeneratingSection(sectionHeading);
+    try {
+      const currentContent = content.generated_content || "";
+
+      // Find the section boundaries in the markdown
+      const h2Regex = /^## .+$/gm;
+      const sections: { heading: string; start: number; end: number }[] = [];
+      let match;
+      while ((match = h2Regex.exec(currentContent)) !== null) {
+        if (sections.length > 0) {
+          sections[sections.length - 1].end = match.index;
+        }
+        sections.push({ heading: match[0].replace("## ", ""), start: match.index, end: currentContent.length });
+      }
+
+      const targetSection = sections.find(s => s.heading.trim() === sectionHeading.trim());
+      if (!targetSection) {
+        toast.error("Section not found");
+        return;
+      }
+
+      // Call AI to regenerate just this section
+      const { data, error } = await supabase.functions.invoke("generate-blog", {
+        body: {
+          contentId: content.id,
+          step: "regenerate_section",
+          sectionHeading: sectionHeading,
+          currentMarkdown: currentContent,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success(`Regenerated "${sectionHeading}"`);
+      fetchContent();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to regenerate section");
+    } finally {
+      setRegeneratingSection(null);
+    }
+  };
+
+  const renderMarkdown = (md: string) => {
+    return md
+      .replace(/^### (.+)$/gm, '<h3 class="text-lg font-semibold mt-6 mb-2">$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold mt-8 mb-3">$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mt-6 mb-4">$1</h1>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/_(.*?)_/g, '<em>$1</em>')
+      .replace(/^\s*-\s+(.+)$/gm, '<li class="ml-4 list-disc">$1</li>')
+      .replace(/\n\n/g, '</p><p class="mb-4 leading-relaxed">')
+      .replace(/^/, '<p class="mb-4 leading-relaxed">')
+      .concat("</p>");
+  };
+
+  // Extract H2 headings for regeneration buttons
+  const extractH2Headings = (md: string): string[] => {
+    const matches = md.match(/^## (.+)$/gm);
+    return matches ? matches.map(m => m.replace("## ", "")) : [];
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!content) {
+    return (
+      <div className="p-8">
+        <p>Content not found.</p>
+        <Button asChild variant="outline" className="mt-4">
+          <Link to="/dashboard">Back to Dashboard</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  const isGenerating = content.status === "generating";
+  const wordCount = (content.generated_content || "").split(/\s+/).filter(Boolean).length;
+  const seoResult = content.status === "completed" || content.status === "published" ? computeSEOScore(content) : null;
+  const h2Headings = extractH2Headings(content.generated_content || "");
+
+  return (
+    <div className="p-8 max-w-4xl">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <Button asChild variant="ghost" size="icon">
+          <Link to="/dashboard"><ArrowLeft className="h-4 w-4" /></Link>
+        </Button>
+        <div className="flex-1">
+          <h1 className="text-xl font-bold">{content.generated_title || content.h1}</h1>
+          <p className="text-sm text-muted-foreground">{content.main_keyword} · {wordCount} words</p>
+        </div>
+        <Badge
+          variant="secondary"
+          className={
+            content.status === "completed"
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+              : content.status === "generating"
+                ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                : content.status === "published"
+                  ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                  : content.status === "failed"
+                    ? "bg-red-500/10 text-red-600 dark:text-red-400"
+                    : ""
+          }
+        >
+          {isGenerating
+            ? `Generating ${content.sections_completed || 0}/${content.total_sections || "?"}`
+            : content.status}
+        </Badge>
+      </div>
+
+      {/* Generation progress */}
+      {isGenerating && (
+        <div className="mb-6 p-4 rounded-xl border bg-card">
+          <div className="flex items-center gap-2 mb-2">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            <span className="text-sm font-medium">Writing: {content.current_section || "..."}</span>
+          </div>
+          <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+            <div
+              className="h-full gradient-primary rounded-full transition-all duration-500"
+              style={{
+                width: `${((content.sections_completed || 0) / (content.total_sections || 1)) * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* SEO Score Card */}
+      {seoResult && (
+        <div className="mb-6">
+          <button
+            onClick={() => setShowSEO(!showSEO)}
+            className="flex items-center gap-2 w-full p-4 rounded-xl border bg-card hover:shadow-md transition-all"
+          >
+            <BarChart3 className="h-5 w-5 text-primary" />
+            <span className="font-semibold">SEO Score</span>
+            <div className="ml-auto flex items-center gap-3">
+              {/* Score Circle */}
+              <div className="relative h-12 w-12">
+                <svg className="h-12 w-12 -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="hsl(var(--muted))"
+                    strokeWidth="3"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke={seoResult.score >= 80 ? "#10b981" : seoResult.score >= 50 ? "#f59e0b" : "#ef4444"}
+                    strokeWidth="3"
+                    strokeDasharray={`${seoResult.score}, 100`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-sm font-bold">
+                  {seoResult.score}
+                </span>
+              </div>
+              <span className="text-sm text-muted-foreground">{showSEO ? "Hide" : "Show"} Details</span>
+            </div>
+          </button>
+
+          {showSEO && (
+            <div className="mt-2 p-4 rounded-xl border bg-card/50 space-y-2 animate-slide-in">
+              {seoResult.checks.map((check, i) => (
+                <div key={i} className="flex items-center justify-between py-1.5 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className={`h-2 w-2 rounded-full ${check.pass ? "bg-emerald-500" : "bg-red-500"}`} />
+                    <span>{check.label}</span>
+                  </div>
+                  <span className="text-muted-foreground text-xs">{check.tip}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Actions */}
+      {(content.status === "completed" || content.status === "published") && (
+        <div className="flex gap-2 mb-6 flex-wrap">
+          <Button variant="outline" size="sm" onClick={handleCopy}>
+            {copied ? <Check className="mr-1 h-3 w-3" /> : <Copy className="mr-1 h-3 w-3" />}
+            {copied ? "Copied" : "Copy Markdown"}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setEditing(!editing)}
+          >
+            {editing ? <Eye className="mr-1 h-3 w-3" /> : <Pencil className="mr-1 h-3 w-3" />}
+            {editing ? "Preview" : "Edit"}
+          </Button>
+          {editing && (
+            <Button size="sm" onClick={handleSave} disabled={saving}>
+              {saving && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
+              Save
+            </Button>
+          )}
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handlePublish}
+            disabled={publishing || content.status === "published"}
+            className="ml-auto"
+          >
+            {publishing ? (
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+            ) : (
+              <Globe className="mr-1 h-3 w-3" />
+            )}
+            {content.status === "published" ? "Published" : "Publish to WP"}
+          </Button>
+        </div>
+      )}
+
+      {/* Regenerate Section Buttons */}
+      {!editing && (content.status === "completed" || content.status === "published") && h2Headings.length > 0 && (
+        <div className="mb-6 p-4 rounded-xl border bg-card/50">
+          <p className="text-sm font-medium mb-3 flex items-center gap-2">
+            <RefreshCw className="h-4 w-4 text-primary" />
+            Regenerate a Section
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {h2Headings.map((heading) => (
+              <Button
+                key={heading}
+                variant="outline"
+                size="sm"
+                onClick={() => handleRegenerateSection(heading)}
+                disabled={!!regeneratingSection}
+                className="text-xs"
+              >
+                {regeneratingSection === heading ? (
+                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                ) : (
+                  <RefreshCw className="mr-1 h-3 w-3" />
+                )}
+                {heading}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="border rounded-xl bg-card p-8">
+        {editing ? (
+          <Textarea
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            className="min-h-[500px] font-mono text-sm resize-y"
+          />
+        ) : (
+          <article
+            className="prose prose-sm max-w-none dark:prose-invert"
+            dangerouslySetInnerHTML={{
+              __html: renderMarkdown(content.generated_content || ""),
+            }}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ContentViewPage;
