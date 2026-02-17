@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, Copy, Check, Pencil, Eye, Globe, RefreshCw, BarChart3 } from "lucide-react";
+import { ArrowLeft, Loader2, Copy, Check, Pencil, Eye, Globe, RefreshCw, BarChart3, Send } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 interface ContentItem {
   id: string;
@@ -90,6 +91,8 @@ const ContentViewPage = () => {
   const [regeneratingSection, setRegeneratingSection] = useState<string | null>(null);
   const [showSEO, setShowSEO] = useState(false);
   const [retrying, setRetrying] = useState(false);
+  const [refinePrompt, setRefinePrompt] = useState("");
+  const [refining, setRefining] = useState(false);
 
   const fetchContent = useCallback(async () => {
     if (!id) return;
@@ -235,6 +238,25 @@ const ContentViewPage = () => {
       toast.error(e.message || "Failed to regenerate section");
     } finally {
       setRegeneratingSection(null);
+    }
+  };
+
+  const handleRefineContent = async () => {
+    if (!id || !refinePrompt.trim()) return;
+    setRefining(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("refine-content", {
+        body: { contentId: id, prompt: refinePrompt.trim() },
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      toast.success("Content updated!");
+      setRefinePrompt("");
+      fetchContent();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to refine content");
+    } finally {
+      setRefining(false);
     }
   };
 
@@ -464,6 +486,42 @@ const ContentViewPage = () => {
                 {heading}
               </Button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* AI Prompt Box for content refinement */}
+      {!editing && (content.status === "completed" || content.status === "published") && (
+        <div className="mb-6 p-4 rounded-xl border bg-card/50">
+          <p className="text-sm font-medium mb-2 flex items-center gap-2">
+            <Send className="h-4 w-4 text-primary" />
+            AI Quick Edit
+          </p>
+          <p className="text-xs text-muted-foreground mb-3">
+            Type a prompt to edit content. E.g. "Replace CompanyX with CompanyY" or "Remove all mentions of XYZ"
+          </p>
+          <div className="flex gap-2">
+            <Input
+              value={refinePrompt}
+              onChange={(e) => setRefinePrompt(e.target.value)}
+              placeholder='e.g. "Replace BrandName with NewBrand everywhere"'
+              className="flex-1 text-sm"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey && refinePrompt.trim()) {
+                  e.preventDefault();
+                  handleRefineContent();
+                }
+              }}
+              disabled={refining}
+            />
+            <Button
+              size="sm"
+              onClick={handleRefineContent}
+              disabled={refining || !refinePrompt.trim()}
+            >
+              {refining ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Send className="mr-1 h-3 w-3" />}
+              {refining ? "Applying..." : "Apply"}
+            </Button>
           </div>
         </div>
       )}

@@ -50,7 +50,7 @@ STRICT RULES:
 
 3. SIMPLE WORDS: Use everyday, common language. 7th-grade reading level. If a simpler word exists, always use it. No complex or academic vocabulary.
 
-4. KEYWORD CONTROL: Use the exact main keyword only 1-2 times per section. For the rest, use natural variations, synonyms, and related phrases. NEVER repeat the same keyword phrase 3+ times in one section.
+4. KEYWORD CONTROL: Total keyword density must NOT exceed 1.05%. Use the exact main keyword only 1-2 times per section (7-8 times total in the full article). For all other mentions, use natural variations, synonyms, and related phrases. NEVER repeat the same keyword phrase 3+ times in one section.
 
 5. TRANSITION WORDS: Start paragraphs with: However, Therefore, Additionally, Moreover, Furthermore, As a result, In contrast, Meanwhile, Consequently.
 
