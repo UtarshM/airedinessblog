@@ -59,11 +59,19 @@ execute processes
 
 6. STRUCTURE: Each section should follow problem → consequence → solution flow.
 
-7. FORBIDDEN PHRASES: Never use: "In today's world", "It's important to note", "In conclusion", "Let's dive in", "When it comes to", "At the end of the day", "studies show", "research indicates", "experts say".
+7. LISTS FORMAT IN MARKDOWN: When writing lists, put EACH item on its OWN LINE with a blank line before and after the list block. Use actual newline characters. Example:
 
-8. DO NOT include any headings (h1, h2, h3, ###) in your response — write only body content.
+manage operations
+control data
+execute processes
 
-9. Write like you are explaining reality to a CEO who already knows the industry. No hand-holding.`;
+NOT: "manage operations control data execute processes" on one line.
+
+8. FORBIDDEN PHRASES: Never use: "In today's world", "It's important to note", "In conclusion", "Let's dive in", "When it comes to", "At the end of the day", "studies show", "research indicates", "experts say".
+
+9. DO NOT include any headings (h1, h2, h3, ###) in your response — write only body content.
+
+10. Write like you are explaining reality to a CEO who already knows the industry. No hand-holding.`;
 
 // Ordered by preference — if one is rate-limited, try the next
 const FREE_MODELS = [
@@ -154,9 +162,27 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     }
 
     const { main_keyword, secondary_keywords, word_count_target, tone, h1, h2_list, h3_list } = content;
-    const h2s = h2_list || [];
+    let h2s: string[] = h2_list || [];
     const h3s = h3_list || [];
     const secondaryKw = (secondary_keywords || []).join(", ");
+
+    // Auto-generate real H2 headings if placeholders are detected
+    const hasPlaceholders = h2s.some((h: string) =>
+      /Top Pick #|\[Item|^Step \d|^\d+\. \[/.test(h)
+    );
+    if (hasPlaceholders && h2s.length > 0) {
+      const generatedHeadings = await callAI([
+        { role: "system", content: "You generate SEO-optimized section headings for blog posts. Return ONLY the headings, one per line, no numbering, no explanation." },
+        { role: "user", content: `Generate exactly ${h2s.length} unique, specific H2 section headings for a blog about "${main_keyword}". Each heading should be descriptive and SEO-friendly. Return one heading per line, nothing else.` },
+      ], apiKey);
+      const newH2s = generatedHeadings.split("\n").map((h: string) => h.replace(/^#+\s*/, "").replace(/^\d+\.?\s*/, "").trim()).filter(Boolean);
+      if (newH2s.length >= h2s.length) {
+        h2s = newH2s.slice(0, h2s.length);
+      }
+      // Update in DB so the user sees real headings
+      await supabase.from("content_items").update({ h2_list: h2s }).eq("id", contentId);
+    }
+
     const dist = calculateWordDistribution(word_count_target, h2s.length, h3s.length);
     const totalSections = 1 + 1 + h2s.length + h3s.length + 1 + 1;
 

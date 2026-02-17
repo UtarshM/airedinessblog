@@ -37,7 +37,7 @@ const TEMPLATES = [
     icon: ListOrdered,
     color: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
     description: "Top N lists & roundups",
-    h2s: ["1. [Item One]", "2. [Item Two]", "3. [Item Three]", "4. [Item Four]", "5. [Item Five]"],
+    h2s: ["Top Pick #1", "Top Pick #2", "Top Pick #3", "Top Pick #4", "Top Pick #5"],
     h3s: [],
   },
   {
