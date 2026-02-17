@@ -74,8 +74,9 @@ execute processes
 
 // Ordered by preference — if one is rate-limited, try the next
 const FREE_MODELS = [
-  "deepseek/deepseek-v3-0324:free",
-  "deepseek/deepseek-r1:free",
+  "deepseek/deepseek-r1-0528:free",
+  "nousresearch/hermes-3-llama-3.1-405b:free",
+  "openai/gpt-oss-120b:free",
   "meta-llama/llama-3.3-70b-instruct:free",
   "mistralai/mistral-small-3.1-24b-instruct:free",
 ];
