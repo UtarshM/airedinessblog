@@ -40,33 +40,43 @@ function calculateEstimatedCredits(wordCount: number, hasH3: boolean, hasFAQ: bo
   return credits;
 }
 
-const SYSTEM_PROMPT = `You are a strategic domain expert and industry architect.
+const SYSTEM_PROMPT = `You are a strategic domain expert who explains topics as business realities, not academic concepts. Focus on performance impact, hidden costs, structural problems, and real consequences. Write for decision-makers who care about outcomes.
 
-You write for decision-makers and professionals who care about impact and structure.
+STRICT RULES:
 
-FOLLOW THESE RULES STRICTLY:
+1. PARAGRAPHS: 2-4 sentences each. Never 1 sentence alone. Never 5+ sentences.
 
-1. PARAGRAPH LENGTH: Each paragraph must be 2-4 sentences. Not 1 sentence. Not 5+. Always 2 to 4 sentences per paragraph.
+2. SENTENCES: 15-20 words each. Short, clear, direct.
 
-2. SENTENCE LENGTH: Keep sentences between 15-20 words. Short, clear, direct. No long complex sentences.
+3. SIMPLE WORDS: Use everyday, common language. 7th-grade reading level. If a simpler word exists, always use it. No complex or academic vocabulary.
 
-3. SIMPLE LANGUAGE: Use simple, common, everyday words. Write at a 7th-grade reading level. Avoid complex or academic words. If a simpler word exists, use it.
+4. KEYWORD CONTROL: Use the exact main keyword only 1-2 times per section. For the rest, use natural variations, synonyms, and related phrases. NEVER repeat the same keyword phrase 3+ times in one section.
 
-4. TRANSITION WORDS: Use transitions between paragraphs: However, Therefore, Additionally, Moreover, Furthermore, As a result, In contrast, Meanwhile, Consequently.
+5. TRANSITION WORDS: Start paragraphs with: However, Therefore, Additionally, Moreover, Furthermore, As a result, In contrast, Meanwhile, Consequently.
 
-5. ACTIVE VOICE: Write in active voice. Avoid passive voice completely. Say "Companies use this" not "This is used by companies."
+6. ACTIVE VOICE ONLY: No passive voice. Say "Teams build this" not "This is built by teams."
 
-6. KEYWORD DENSITY: Naturally include the main keyword in 0.5-3% of total words. Spread it evenly across sections. Do not stuff keywords.
+7. BOLD: Use **bold** for key terms and important concepts.
 
-7. BOLD: Use **bold** for key terms, product names, and important concepts.
+8. LISTS: Use dashes (-) for bullet points. NEVER use asterisks (*). Format: - Item one - Item two
 
-8. NO HEADINGS: Do NOT include any headings (h1, h2, h3, ###) in your output. Write only body content.
+9. NO HEADINGS in body content. No h1, h2, h3, or ### in your output.
 
-9. NO FAKE DATA: Never invent statistics, percentages, dollar figures, or study citations.
+10. DATA-BACKED REASONING: Support claims with logical cause-effect reasoning. Explain HOW things work, not just WHAT they are. Use the pattern: Observation → Mechanism → Business impact.
 
-10. NARRATIVE FLOW: Follow cause → effect explanations. Explain how things work, not just what they are. Show the problem, then the solution, then the impact.
+11. NO FAKE DATA: Never invent statistics, percentages, or citations. Instead, explain logical consequences and observable patterns.
 
-11. BANNED PHRASES: Never use: "In today's world", "It's important to note", "In conclusion", "Let's dive in", "When it comes to", "At the end of the day", "studies show", "research indicates", "it goes without saying".`;
+12. STRUCTURAL THINKING: Treat every topic as either an operational foundation, performance constraint, structural bottleneck, or scalability limiter. Explain WHY.
+
+13. BANNED PHRASES: Never use: "In today's", "It's important", "In conclusion", "Let's dive", "When it comes to", "At the end of the day", "studies show", "research indicates".
+
+14. RHETORICAL PATTERNS to use naturally:
+- "Small friction at scale becomes massive cost."
+- "Surface improvement vs structural change."
+- "The real question is not ___ but ___."
+- Explain hidden costs that compound over time.
+- Show why surface fixes fail and structural fixes succeed.
+- Connect systems → behavior → results.`;
 
 // Groq model mapping per task
 const GROQ_MODELS = {
@@ -183,18 +193,18 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
 
     // 1. TITLE
     const title = await callGroq([
-      { role: "system", content: "You generate SEO-optimized blog titles. Return ONLY the title text. No quotes, no explanation, nothing else." },
+      { role: "system", content: "You generate SEO blog titles. Return ONLY the title text. No quotes, no explanation." },
       {
         role: "user", content: `Create an SEO title for the keyword: "${main_keyword}".
 
-RULES:
-- MUST contain the exact keyword "${main_keyword}"
-- Length: 50-70 characters (STRICT)
+STRICT RULES:
+- MUST contain the exact keyword "${main_keyword}" once
+- Length: 50-70 characters maximum (STRICT - count carefully)
 - Word count: 6-12 words
-- Use simple, clear words
+- Use simple, everyday words only
 - Make it specific and valuable (e.g. "How to...", "Why...", "Best...")
-- No clickbait, no all-caps
-- Return ONLY the title text` },
+- No clickbait, no all-caps, no complex words
+- Return ONLY the title text, nothing else` },
     ], GROQ_MODELS.title);
 
     completed = 1;
@@ -208,21 +218,25 @@ RULES:
     const intro = await callGroq([
       { role: "system", content: SYSTEM_PROMPT },
       {
-        role: "user", content: `Write the introduction for a blog titled "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Include these keywords naturally: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.introWords} words.
+        role: "user", content: `Write the introduction for a blog titled "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Also reference: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.introWords} words.
 
-Follow this structure:
-1. Start with the current reality — state the problem or situation clearly in 2-3 sentences.
-2. Explain why existing approaches fall short. What is the gap?
-3. Introduce what this article will cover as the structural solution.
+STRUCTURE (follow this order):
+1. REALITY DISRUPTION: Break the reader's assumption. Show why what seems fine is actually harmful or inefficient. Use a concrete operational example.
+2. HIDDEN COST: Explain how small inefficiencies compound into real business cost. Show the gap between current approach and what actually works.
+3. BRIDGE: Introduce what this article covers as the structural fix — not a surface tip.
 
-Remember:
-- Use the keyword "${main_keyword}" at least 2 times naturally.
-- Paragraphs must be 2-4 sentences each.
-- Sentences must be 15-20 words each.
-- Use simple, everyday words.
+KEYWORD RULES:
+- Use the exact phrase "${main_keyword}" only 1-2 times in this section.
+- For other mentions, use natural variations like "this tool", "this approach", "the platform", or related synonyms.
+- NEVER repeat the exact keyword phrase in back-to-back sentences.
+
+FORMAT RULES:
+- Paragraphs: 2-4 sentences each.
+- Sentences: 15-20 words. Simple everyday words.
 - Use transition words between paragraphs.
-- Active voice only. No passive voice.
-- Do NOT include any headings.` },
+- Active voice only. No passive.
+- If using a list, use dashes (-) never asterisks (*).
+- No headings in output.` },
     ], GROQ_MODELS.section);
 
     completed++;
@@ -237,23 +251,27 @@ Remember:
       const h2Content = await callGroq([
         { role: "system", content: SYSTEM_PROMPT },
         {
-          role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.h2Words} words.
+          role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Reference: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.h2Words} words.
 
-Follow this narrative flow:
-1. State the core point of this section clearly.
-2. Explain the mechanism — how it works, why it matters.
-3. Show real-world application or practical impact.
-4. Include a bullet list with **bold titles** followed by a short explanation.
-5. End with the consequence or outcome.
+STRUCTURE (follow this order):
+1. CORE POINT: State what this section is about in plain terms. Challenge a common assumption if possible.
+2. ROOT CAUSE: Explain the underlying mechanism — how it works, why problems persist, what most people miss.
+3. REAL-WORLD IMPACT: Show practical consequences. Connect to cost, speed, quality, or risk using cause → effect logic.
+4. ACTION LIST: Include a short list (3-5 items) using dashes (-) with **bold labels** followed by a brief explanation.
+5. OUTCOME: End with the business consequence — what changes when this is done right vs wrong.
 
-Remember:
-- Use the keyword "${main_keyword}" at least once naturally.
-- Paragraphs: 2-4 sentences each.
-- Sentences: 15-20 words each.
-- Simple, common words only.
-- Use transition words (However, Therefore, Additionally, Moreover).
+KEYWORD RULES:
+- Use the exact phrase "${main_keyword}" only ONCE in this entire section.
+- Use natural variations everywhere else: "this solution", "the platform", "this approach", synonyms, or pronouns.
+- NEVER repeat the exact keyword in consecutive sentences.
+
+FORMAT RULES:
+- Paragraphs: 2-4 sentences. Sentences: 15-20 words.
+- Simple, everyday words only. No complex vocabulary.
+- Start paragraphs with transition words (However, Therefore, Additionally, Moreover).
 - Active voice only.
 - Use **bold** for key terms.
+- Use dashes (-) for lists. NEVER use asterisks (*).
 - Do NOT include the section heading.` },
       ], GROQ_MODELS.section);
 
@@ -274,29 +292,31 @@ Remember:
         role: "user", content: `Write the conclusion AND FAQs for the blog "${title.trim()}" about "${main_keyword}". Tone: ${tone}. ~${dist.conclusionWords + dist.faqWords} words.
 
 CONCLUSION (write first):
-- Summarize the structural shift or key insight in 2-3 paragraphs (2-4 sentences each).
-- Explain what changes going forward.
-- End with a clear, forward-looking statement.
-- Use the keyword "${main_keyword}" at least once.
-- Do NOT write "In conclusion" or "To sum up".
+- Frame the topic as a strategic choice: maintain current approach OR build future capability. No neutral option.
+- Explain the cost of delay — what happens if organizations wait. Show compounding difficulty and widening gaps.
+- End with an irreversible truth: frame the topic as a structural competitiveness issue, not an optional improvement.
+- 2-3 paragraphs, 2-4 sentences each.
+- Use the exact keyword "${main_keyword}" only once. Use variations for other mentions.
+- Do NOT start with "In conclusion" or "To sum up" or "To summarize".
 
-Then write the FAQs:
+Then write FAQs:
 
 ## Frequently Asked Questions
 
 ### 1. [Practical question about ${main_keyword}]?
-[2-3 sentence answer. Use simple words. Include **bold** key terms.]
+[2-3 sentence answer. Data-backed reasoning. Simple words. Use **bold** for key terms.]
 
-### 2. [Another practical question]?
-[Answer.]
+### 2. [How/Why question about the topic]?
+[Answer with cause → effect logic.]
 
-### 3. [Another question]?
-[Answer.]
+### 3. [Common concern or misconception]?
+[Answer that addresses the root issue.]
 
-Remember:
+FORMAT RULES:
 - Paragraphs: 2-4 sentences. Sentences: 15-20 words.
 - Simple words. Active voice. Transition words.
-- No fake statistics.` },
+- Use dashes (-) for any lists. NEVER use asterisks (*).
+- No fake statistics. Use logical reasoning instead.` },
     ], GROQ_MODELS.faq);
 
     completed++;
