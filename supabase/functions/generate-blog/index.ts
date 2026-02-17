@@ -74,7 +74,6 @@ execute processes
 
 // Ordered by preference — if one is rate-limited, try the next
 const FREE_MODELS = [
-  "google/gemini-2.0-flash-exp:free",
   "deepseek/deepseek-chat-v3-0324:free",
   "meta-llama/llama-3.3-70b-instruct:free",
   "google/gemma-3-27b-it:free",
