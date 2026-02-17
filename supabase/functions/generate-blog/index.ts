@@ -40,38 +40,37 @@ function calculateEstimatedCredits(wordCount: number, hasH3: boolean, hasFAQ: bo
   return credits;
 }
 
-const SYSTEM_PROMPT = `You are a direct, authoritative industry expert writing long-form SEO content.
+const SYSTEM_PROMPT = `You are a blunt, authoritative industry expert.
 
-CRITICAL STYLE RULES — follow these exactly:
+OBEY THESE RULES WITH ZERO EXCEPTIONS:
 
-1. PARAGRAPH LENGTH: Almost every paragraph must be a SINGLE SENTENCE. Occasionally use 2 sentences max. Never write 3+ sentence paragraphs. Each sentence gets its own line.
+1. EVERY paragraph is exactly ONE sentence. ONE. Not two, not three. ONE sentence, then a blank line. This is the most important rule.
 
-2. TONE: Assertive, declarative, confrontational. State facts like an insider. No hedging, no "may", no "can potentially". Say what IS, not what MIGHT BE.
+CORRECT:
+This changes everything.
 
-3. NO FABRICATED STATISTICS: Do NOT invent percentages, dollar figures, or study citations. Instead of "30% increase", write assertive statements like "The difference is structural, not incremental."
+Most companies still don't understand the difference.
 
-4. LISTS: Use plain text lists — one item per line, no bullet markers, no numbering. Just the item text on its own line. Example:
+The gap between knowing and executing is where revenue dies.
+
+WRONG:
+This changes everything. Most companies still don't understand the difference. The gap between knowing and executing is where revenue dies.
+
+2. TONE: Declarative. Assertive. No hedging. No "may", "might", "could", "can potentially". State what IS.
+
+3. ZERO fake stats. No invented percentages, dollar amounts, or citations.
+
+4. BOLD: Use **bold** for key terms and product names.
+
+5. LISTS: Each item on its own line. No bullets, no numbers, no dashes. Just text.
+
 manage operations
 control data
 execute processes
 
-5. BOLD: Use **bold** for key concepts, product names, and strategic terms.
+6. NO headings (h1, h2, h3, ###) in your output. Body content only.
 
-6. STRUCTURE: Each section should follow problem → consequence → solution flow.
-
-7. LISTS FORMAT IN MARKDOWN: When writing lists, put EACH item on its OWN LINE with a blank line before and after the list block. Use actual newline characters. Example:
-
-manage operations
-control data
-execute processes
-
-NOT: "manage operations control data execute processes" on one line.
-
-8. FORBIDDEN PHRASES: Never use: "In today's world", "It's important to note", "In conclusion", "Let's dive in", "When it comes to", "At the end of the day", "studies show", "research indicates", "experts say".
-
-9. DO NOT include any headings (h1, h2, h3, ###) in your response — write only body content.
-
-10. Write like you are explaining reality to a CEO who already knows the industry. No hand-holding.`;
+7. BANNED phrases: "In today's", "It's important", "In conclusion", "Let's dive", "When it comes to", "At the end of the day", "studies show".`;
 
 // Ordered by preference — if one is rate-limited, try the next
 const FREE_MODELS = [
@@ -97,7 +96,7 @@ async function callAI(messages: any[], apiKey: string): Promise<string> {
             "X-Title": "BlogForge",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ model, messages, max_tokens: 3000 }),
+          body: JSON.stringify({ model, messages, max_tokens: 2000 }),
         });
 
         if (response.status === 429) {
@@ -166,28 +165,31 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     const h3s = h3_list || [];
     const secondaryKw = (secondary_keywords || []).join(", ");
 
-    // Auto-generate real H2 headings if placeholders are detected
-    const hasPlaceholders = h2s.some((h: string) =>
+    // Auto-generate 4 H2 headings if empty, placeholder, or too many
+    const hasPlaceholders = h2s.length === 0 || h2s.some((h: string) =>
       /Top Pick #|\[Item|^Step \d|^\d+\. \[/.test(h)
     );
-    if (hasPlaceholders && h2s.length > 0) {
+    if (hasPlaceholders) {
+      const targetCount = Math.min(h2s.length || 4, 4);
       const generatedHeadings = await callAI([
-        { role: "system", content: "You generate SEO-optimized section headings for blog posts. Return ONLY the headings, one per line, no numbering, no explanation." },
-        { role: "user", content: `Generate exactly ${h2s.length} unique, specific H2 section headings for a blog about "${main_keyword}". Each heading should be descriptive and SEO-friendly. Return one heading per line, nothing else.` },
+        { role: "system", content: "Generate SEO blog section headings. Return ONLY headings, one per line. No numbering, no explanation, no quotes." },
+        { role: "user", content: `Generate exactly ${targetCount} H2 headings for a blog about "${main_keyword}". Short, specific, SEO-friendly. One per line.` },
       ], apiKey);
       const newH2s = generatedHeadings.split("\n").map((h: string) => h.replace(/^#+\s*/, "").replace(/^\d+\.?\s*/, "").trim()).filter(Boolean);
-      if (newH2s.length >= h2s.length) {
-        h2s = newH2s.slice(0, h2s.length);
+      if (newH2s.length >= targetCount) {
+        h2s = newH2s.slice(0, targetCount);
       }
-      // Update in DB so the user sees real headings
       await supabase.from("content_items").update({ h2_list: h2s }).eq("id", contentId);
     }
+    // Cap at 4 H2s max for speed
+    if (h2s.length > 4) h2s = h2s.slice(0, 4);
 
-    const dist = calculateWordDistribution(word_count_target, h2s.length, h3s.length);
-    const totalSections = 1 + 1 + h2s.length + h3s.length + 1 + 1;
+    const dist = calculateWordDistribution(word_count_target, h2s.length, 0);
+    // Total: Title + Intro + H2s + Conclusion/FAQs = fewer calls
+    const totalSections = 1 + 1 + h2s.length + 1;
 
     // Credit lock
-    const estimatedCredits = calculateEstimatedCredits(word_count_target, h3s.length > 0, true);
+    const estimatedCredits = calculateEstimatedCredits(word_count_target, false, true);
     await lockCredits(supabase, userId, contentId, estimatedCredits);
 
     await updateProgress(supabase, contentId, {
@@ -215,17 +217,11 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     const intro = await callAI([
       { role: "system", content: SYSTEM_PROMPT },
       {
-        role: "user", content: `Write the introduction for "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Weave in: ${secondaryKw}.` : ""} Tone: ${tone}.
+        role: "user", content: `Write the introduction for "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Weave in: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.introWords} words.
 
-~${dist.introWords} words.
+Remember: EVERY paragraph = exactly ONE sentence. Then blank line. Then next sentence.
 
-Structure it EXACTLY like this pattern:
-- Line 1: A blunt, confrontational opening statement (e.g. "Let's be brutally honest.")
-- Next 3-5 single-sentence paragraphs: State the core problem. Each sentence on its own line.
-- Then a plain-text list of what the subject does or solves (one item per line, no bullets)
-- Close with 2-3 assertive single-sentence paragraphs establishing why this matters.
-
-Every paragraph = one sentence. No multi-sentence paragraphs. No fabricated statistics. No generic openers.` },
+Start with a confrontational opening. State the problem in 3-5 one-sentence paragraphs. No generic openers.` },
     ], apiKey);
 
     completed++;
@@ -240,93 +236,56 @@ Every paragraph = one sentence. No multi-sentence paragraphs. No fabricated stat
       const h2Content = await callAI([
         { role: "system", content: SYSTEM_PROMPT },
         {
-          role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}.
+          role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.h2Words} words.
 
-~${dist.h2Words} words.
+EVERY paragraph = exactly ONE sentence. Then blank line. Then next sentence. NO multi-sentence paragraphs.
 
-Structure:
-- Open with 2-3 single-sentence paragraphs stating the core point of this section.
-- Include a plain-text list (items on separate lines, NO bullet markers, NO numbers) explaining sub-points.
-- After the list, add 2-4 single-sentence paragraphs that reinforce the point.
-- Optionally include a second list if the section covers multiple dimensions.
-- Close with a punchy single-sentence statement.
-
-Remember: every paragraph = one sentence. No fabricated statistics. Use **bold** for key terms. Do NOT include the heading.` },
+Use **bold** for key terms. Include a plain-text list if relevant (items on separate lines, no bullets). Do NOT include the heading.` },
       ], apiKey);
 
       completed++;
       markdown += `## ${h2s[i]}\n\n${h2Content.trim()}\n\n`;
-      const nextSection = i < h2s.length - 1 ? h2s[i + 1] : (h3s.length > 0 ? h3s[0] : "Conclusion");
+      const nextSection = i < h2s.length - 1 ? h2s[i + 1] : "Conclusion";
       await updateProgress(supabase, contentId, {
         generated_content: markdown, sections_completed: completed, current_section: nextSection,
       });
     }
 
-    // 4. H3 SECTIONS
-    for (let i = 0; i < h3s.length; i++) {
-      const h3Content = await callAI([
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user", content: `Write the subsection "${h3s[i]}" about "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}.
+    // 4. H3 SECTIONS (removed as per instruction)
 
-~${dist.h3Words} words.
-
-Single-sentence paragraphs only. Be assertive and direct. Use **bold** for key terms. Include a short plain-text list if relevant (no bullets, no numbers). No fabricated statistics. Do NOT include the heading.` },
-      ], apiKey);
-
-      completed++;
-      markdown += `### ${h3s[i]}\n\n${h3Content.trim()}\n\n`;
-      const nextSection = i < h3s.length - 1 ? h3s[i + 1] : "Conclusion";
-      await updateProgress(supabase, contentId, {
-        generated_content: markdown, sections_completed: completed, current_section: nextSection,
-      });
-    }
-
-    // 5. CONCLUSION
-    const conclusion = await callAI([
+    // 5. CONCLUSION + FAQs (combined into one call for speed)
+    const closingContent = await callAI([
       { role: "system", content: SYSTEM_PROMPT },
       {
-        role: "user", content: `Write the conclusion for "${title.trim()}" about "${main_keyword}". Tone: ${tone}.
+        role: "user", content: `Write the conclusion AND FAQs for "${title.trim()}" about "${main_keyword}". Tone: ${tone}. ~${dist.conclusionWords + dist.faqWords} words.
 
-~${dist.conclusionWords} words.
+First write 4-5 one-sentence conclusion paragraphs. No "In conclusion". Use **bold** for key terms.
 
-Structure:
-- Open with a single-sentence statement about the fundamental truth of this topic.
-- 3-4 single-sentence paragraphs reinforcing the core message.
-- End with one bold, forward-looking statement.
+Then write exactly this:
 
-Single-sentence paragraphs only. No "In conclusion". No fabricated stats. Use **bold** for key terms. Do NOT include the heading.` },
-    ], apiKey);
+## Frequently Asked Questions
 
-    completed++;
-    markdown += `## Conclusion\n\n${conclusion.trim()}\n\n`;
-    await updateProgress(supabase, contentId, {
-      generated_content: markdown, sections_completed: completed, current_section: "FAQs",
-    });
-
-    // 6. FAQS
-    const faqs = await callAI([
-      { role: "system", content: SYSTEM_PROMPT },
-      {
-        role: "user", content: `Write 5 FAQs about "${main_keyword}". ~${dist.faqWords} words.
-
-Format:
 ### 1. [Specific question]?
-[2-3 sentence answer. Direct, assertive. **Bold** key terms.]
+[2-3 sentence answer with **bold** key terms.]
 
-Make questions strategic and expert-level, not basic "What is X?" questions. Answers should be direct — start with the answer, no preamble. No fabricated statistics.` },
+### 2. [Another question]?
+[Answer.]
+
+### 3. [Another question]?
+[Answer.]
+
+EVERY paragraph = ONE sentence. No filler.` },
     ], apiKey);
 
     completed++;
-    markdown += `## Frequently Asked Questions\n\n${faqs.trim()}\n`;
-
+    markdown += `## Conclusion\n\n${closingContent.trim()}\n\n`;
     await updateProgress(supabase, contentId, {
-      generated_content: markdown, sections_completed: completed,
-      current_section: null, status: "completed",
+      generated_content: markdown, sections_completed: completed, current_section: "Done",
+      status: "completed",
     });
 
     // Finalize credits
-    const finalCredits = calculateEstimatedCredits(word_count_target, h3s.length > 0, true);
+    const finalCredits = calculateEstimatedCredits(word_count_target, false, true); // h3s.length > 0 is now false
     await finalizeCredits(supabase, userId, contentId, finalCredits);
 
     console.log(`Blog generation completed for ${contentId}`);
