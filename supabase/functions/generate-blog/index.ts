@@ -40,37 +40,33 @@ function calculateEstimatedCredits(wordCount: number, hasH3: boolean, hasFAQ: bo
   return credits;
 }
 
-const SYSTEM_PROMPT = `You are a blunt, authoritative industry expert.
+const SYSTEM_PROMPT = `You are a strategic domain expert and industry architect.
 
-OBEY THESE RULES WITH ZERO EXCEPTIONS:
+You write for decision-makers and professionals who care about impact and structure.
 
-1. EVERY paragraph is exactly ONE sentence. ONE. Not two, not three. ONE sentence, then a blank line. This is the most important rule.
+FOLLOW THESE RULES STRICTLY:
 
-CORRECT:
-This changes everything.
+1. PARAGRAPH LENGTH: Each paragraph must be 2-4 sentences. Not 1 sentence. Not 5+. Always 2 to 4 sentences per paragraph.
 
-Most companies still don't understand the difference.
+2. SENTENCE LENGTH: Keep sentences between 15-20 words. Short, clear, direct. No long complex sentences.
 
-The gap between knowing and executing is where revenue dies.
+3. SIMPLE LANGUAGE: Use simple, common, everyday words. Write at a 7th-grade reading level. Avoid complex or academic words. If a simpler word exists, use it.
 
-WRONG:
-This changes everything. Most companies still don't understand the difference. The gap between knowing and executing is where revenue dies.
+4. TRANSITION WORDS: Use transitions between paragraphs: However, Therefore, Additionally, Moreover, Furthermore, As a result, In contrast, Meanwhile, Consequently.
 
-2. TONE: Declarative. Assertive. No hedging. No "may", "might", "could", "can potentially". State what IS.
+5. ACTIVE VOICE: Write in active voice. Avoid passive voice completely. Say "Companies use this" not "This is used by companies."
 
-3. ZERO fake stats. No invented percentages, dollar amounts, or citations.
+6. KEYWORD DENSITY: Naturally include the main keyword in 0.5-3% of total words. Spread it evenly across sections. Do not stuff keywords.
 
-4. BOLD: Use **bold** for key terms and product names.
+7. BOLD: Use **bold** for key terms, product names, and important concepts.
 
-5. LISTS: Each item on its own line. No bullets, no numbers, no dashes. Just text.
+8. NO HEADINGS: Do NOT include any headings (h1, h2, h3, ###) in your output. Write only body content.
 
-manage operations
-control data
-execute processes
+9. NO FAKE DATA: Never invent statistics, percentages, dollar figures, or study citations.
 
-6. NO headings (h1, h2, h3, ###) in your output. Body content only.
+10. NARRATIVE FLOW: Follow cause → effect explanations. Explain how things work, not just what they are. Show the problem, then the solution, then the impact.
 
-7. BANNED phrases: "In today's", "It's important", "In conclusion", "Let's dive", "When it comes to", "At the end of the day", "studies show".`;
+11. BANNED PHRASES: Never use: "In today's world", "It's important to note", "In conclusion", "Let's dive in", "When it comes to", "At the end of the day", "studies show", "research indicates", "it goes without saying".`;
 
 // Groq model mapping per task
 const GROQ_MODELS = {
@@ -187,8 +183,18 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
 
     // 1. TITLE
     const title = await callGroq([
-      { role: "system", content: "You generate powerful, direct SEO blog titles. Return ONLY the title text, nothing else. No quotes, no explanations." },
-      { role: "user", content: `Create a bold, authoritative SEO title (55-65 chars) for: "${main_keyword}". Make it sound like an industry insider wrote it. Use power words that demand attention. No clickbait. Return only the title.` },
+      { role: "system", content: "You generate SEO-optimized blog titles. Return ONLY the title text. No quotes, no explanation, nothing else." },
+      {
+        role: "user", content: `Create an SEO title for the keyword: "${main_keyword}".
+
+RULES:
+- MUST contain the exact keyword "${main_keyword}"
+- Length: 50-70 characters (STRICT)
+- Word count: 6-12 words
+- Use simple, clear words
+- Make it specific and valuable (e.g. "How to...", "Why...", "Best...")
+- No clickbait, no all-caps
+- Return ONLY the title text` },
     ], GROQ_MODELS.title);
 
     completed = 1;
@@ -202,11 +208,21 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
     const intro = await callGroq([
       { role: "system", content: SYSTEM_PROMPT },
       {
-        role: "user", content: `Write the introduction for "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Weave in: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.introWords} words.
+        role: "user", content: `Write the introduction for a blog titled "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Include these keywords naturally: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.introWords} words.
 
-Remember: EVERY paragraph = exactly ONE sentence. Then blank line. Then next sentence.
+Follow this structure:
+1. Start with the current reality — state the problem or situation clearly in 2-3 sentences.
+2. Explain why existing approaches fall short. What is the gap?
+3. Introduce what this article will cover as the structural solution.
 
-Start with a confrontational opening. State the problem in 3-5 one-sentence paragraphs. No generic openers.` },
+Remember:
+- Use the keyword "${main_keyword}" at least 2 times naturally.
+- Paragraphs must be 2-4 sentences each.
+- Sentences must be 15-20 words each.
+- Use simple, everyday words.
+- Use transition words between paragraphs.
+- Active voice only. No passive voice.
+- Do NOT include any headings.` },
     ], GROQ_MODELS.section);
 
     completed++;
@@ -223,9 +239,22 @@ Start with a confrontational opening. State the problem in 3-5 one-sentence para
         {
           role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.h2Words} words.
 
-EVERY paragraph = exactly ONE sentence. Then blank line. Then next sentence. NO multi-sentence paragraphs.
+Follow this narrative flow:
+1. State the core point of this section clearly.
+2. Explain the mechanism — how it works, why it matters.
+3. Show real-world application or practical impact.
+4. Include a bullet list with **bold titles** followed by a short explanation.
+5. End with the consequence or outcome.
 
-Use **bold** for key terms. Include a plain-text list if relevant (items on separate lines, no bullets). Do NOT include the heading.` },
+Remember:
+- Use the keyword "${main_keyword}" at least once naturally.
+- Paragraphs: 2-4 sentences each.
+- Sentences: 15-20 words each.
+- Simple, common words only.
+- Use transition words (However, Therefore, Additionally, Moreover).
+- Active voice only.
+- Use **bold** for key terms.
+- Do NOT include the section heading.` },
       ], GROQ_MODELS.section);
 
       completed++;
@@ -242,24 +271,32 @@ Use **bold** for key terms. Include a plain-text list if relevant (items on sepa
     const closingContent = await callGroq([
       { role: "system", content: SYSTEM_PROMPT },
       {
-        role: "user", content: `Write the conclusion AND FAQs for "${title.trim()}" about "${main_keyword}". Tone: ${tone}. ~${dist.conclusionWords + dist.faqWords} words.
+        role: "user", content: `Write the conclusion AND FAQs for the blog "${title.trim()}" about "${main_keyword}". Tone: ${tone}. ~${dist.conclusionWords + dist.faqWords} words.
 
-First write 4-5 one-sentence conclusion paragraphs. No "In conclusion". Use **bold** for key terms.
+CONCLUSION (write first):
+- Summarize the structural shift or key insight in 2-3 paragraphs (2-4 sentences each).
+- Explain what changes going forward.
+- End with a clear, forward-looking statement.
+- Use the keyword "${main_keyword}" at least once.
+- Do NOT write "In conclusion" or "To sum up".
 
-Then write exactly this:
+Then write the FAQs:
 
 ## Frequently Asked Questions
 
-### 1. [Specific question]?
-[2-3 sentence answer with **bold** key terms.]
+### 1. [Practical question about ${main_keyword}]?
+[2-3 sentence answer. Use simple words. Include **bold** key terms.]
 
-### 2. [Another question]?
+### 2. [Another practical question]?
 [Answer.]
 
 ### 3. [Another question]?
 [Answer.]
 
-EVERY paragraph = ONE sentence. No filler.` },
+Remember:
+- Paragraphs: 2-4 sentences. Sentences: 15-20 words.
+- Simple words. Active voice. Transition words.
+- No fake statistics.` },
     ], GROQ_MODELS.faq);
 
     completed++;
