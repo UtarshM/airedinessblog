@@ -40,20 +40,30 @@ function calculateEstimatedCredits(wordCount: number, hasH3: boolean, hasFAQ: bo
   return credits;
 }
 
-const SYSTEM_PROMPT = `You are an elite SEO content strategist who writes like a direct, no-BS industry expert.
+const SYSTEM_PROMPT = `You are a direct, authoritative industry expert writing long-form SEO content.
 
-Your writing style rules:
-- Write VERY SHORT paragraphs. Most paragraphs should be 1-2 sentences. Some can be a single punchy line.
-- Be direct and confrontational. No fluff, no filler, no generic statements.
-- Use **bold** for every key term, product name, and important concept.
-- Use bullet lists with **bold titles** where appropriate to break down complex points.
-- Include specific facts, numbers, and concrete details. Never be vague.
-- Use rhetorical structure: state the problem bluntly, then present the solution.
-- Write like you are speaking to a smart executive who has no patience for BS.
-- Every sentence must add value. If a sentence could be removed without losing meaning, remove it.
-- Do NOT include any headings (h1, h2, h3) in your response — only body content.
-- Do NOT use phrases like "In today's world", "In conclusion", "It's important to note", or any generic opener.
-- Start sections with a bold, attention-grabbing statement or a blunt truth.`;
+CRITICAL STYLE RULES — follow these exactly:
+
+1. PARAGRAPH LENGTH: Almost every paragraph must be a SINGLE SENTENCE. Occasionally use 2 sentences max. Never write 3+ sentence paragraphs. Each sentence gets its own line.
+
+2. TONE: Assertive, declarative, confrontational. State facts like an insider. No hedging, no "may", no "can potentially". Say what IS, not what MIGHT BE.
+
+3. NO FABRICATED STATISTICS: Do NOT invent percentages, dollar figures, or study citations. Instead of "30% increase", write assertive statements like "The difference is structural, not incremental."
+
+4. LISTS: Use plain text lists — one item per line, no bullet markers, no numbering. Just the item text on its own line. Example:
+manage operations
+control data
+execute processes
+
+5. BOLD: Use **bold** for key concepts, product names, and strategic terms.
+
+6. STRUCTURE: Each section should follow problem → consequence → solution flow.
+
+7. FORBIDDEN PHRASES: Never use: "In today's world", "It's important to note", "In conclusion", "Let's dive in", "When it comes to", "At the end of the day", "studies show", "research indicates", "experts say".
+
+8. DO NOT include any headings (h1, h2, h3, ###) in your response — write only body content.
+
+9. Write like you are explaining reality to a CEO who already knows the industry. No hand-holding.`;
 
 // Ordered by preference — if one is rate-limited, try the next
 const FREE_MODELS = [
@@ -179,17 +189,17 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     const intro = await callAI([
       { role: "system", content: SYSTEM_PROMPT },
       {
-        role: "user", content: `Write a powerful introduction for a blog post titled "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Naturally weave in these keywords: ${secondaryKw}.` : ""} Tone: ${tone}.
+        role: "user", content: `Write the introduction for "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Weave in: ${secondaryKw}.` : ""} Tone: ${tone}.
 
 ~${dist.introWords} words.
 
-Rules:
-- Open with a bold, confrontational statement that challenges conventional thinking (e.g. "Let's be brutally honest." or "Most companies get this completely wrong.").
-- State the core problem bluntly in 2-3 short paragraphs.
-- Then introduce what this article covers as the solution.
-- Use single-sentence paragraphs for impact.
-- Use **bold** for key terms.
-- No generic openers like "In today's digital world" — start with something that punches.` },
+Structure it EXACTLY like this pattern:
+- Line 1: A blunt, confrontational opening statement (e.g. "Let's be brutally honest.")
+- Next 3-5 single-sentence paragraphs: State the core problem. Each sentence on its own line.
+- Then a plain-text list of what the subject does or solves (one item per line, no bullets)
+- Close with 2-3 assertive single-sentence paragraphs establishing why this matters.
+
+Every paragraph = one sentence. No multi-sentence paragraphs. No fabricated statistics. No generic openers.` },
     ], apiKey);
 
     completed++;
@@ -204,18 +214,18 @@ Rules:
       const h2Content = await callAI([
         { role: "system", content: SYSTEM_PROMPT },
         {
-          role: "user", content: `Write detailed content for the section "${h2s[i]}" in a blog about "${main_keyword}".${secondaryKw ? ` Naturally include: ${secondaryKw}.` : ""} Tone: ${tone}.
+          role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}.
 
 ~${dist.h2Words} words.
 
-Rules:
-- Start with a bold opening statement — no transition phrases.
-- Use very short paragraphs (1-3 sentences each). Many single-sentence paragraphs.
-- Include a bullet list with **bold item titles** followed by a brief explanation (1-2 sentences each).
-- Use **bold** for every key term and important concept.
-- Include specific details, examples, or data points — no vague generalities.
-- End the section with a punchy statement that ties back to the main topic.
-- Do NOT include the heading itself — only body content.` },
+Structure:
+- Open with 2-3 single-sentence paragraphs stating the core point of this section.
+- Include a plain-text list (items on separate lines, NO bullet markers, NO numbers) explaining sub-points.
+- After the list, add 2-4 single-sentence paragraphs that reinforce the point.
+- Optionally include a second list if the section covers multiple dimensions.
+- Close with a punchy single-sentence statement.
+
+Remember: every paragraph = one sentence. No fabricated statistics. Use **bold** for key terms. Do NOT include the heading.` },
       ], apiKey);
 
       completed++;
@@ -231,16 +241,11 @@ Rules:
       const h3Content = await callAI([
         { role: "system", content: SYSTEM_PROMPT },
         {
-          role: "user", content: `Write content for subsection "${h3s[i]}" under the topic "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}.
+          role: "user", content: `Write the subsection "${h3s[i]}" about "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}.
 
 ~${dist.h3Words} words.
 
-Rules:
-- Very short paragraphs (1-2 sentences). Be punchy and direct.
-- Use **bold** for key terms.
-- Include specific examples or actionable details.
-- No filler sentences. Every line must deliver value.
-- Do NOT include the heading itself — only body content.` },
+Single-sentence paragraphs only. Be assertive and direct. Use **bold** for key terms. Include a short plain-text list if relevant (no bullets, no numbers). No fabricated statistics. Do NOT include the heading.` },
       ], apiKey);
 
       completed++;
@@ -255,17 +260,16 @@ Rules:
     const conclusion = await callAI([
       { role: "system", content: SYSTEM_PROMPT },
       {
-        role: "user", content: `Write a powerful conclusion for the blog "${title.trim()}" about "${main_keyword}". Tone: ${tone}.
+        role: "user", content: `Write the conclusion for "${title.trim()}" about "${main_keyword}". Tone: ${tone}.
 
 ~${dist.conclusionWords} words.
 
-Rules:
-- Open with a direct statement about the core truth of the topic.
-- Summarize 3-4 key takeaways in short, punchy paragraphs.
-- End with a bold call to action or forward-looking statement.
-- Use **bold** for key terms.
-- No phrases like "In conclusion" or "To sum up". Start directly.
-- Do NOT include the heading.` },
+Structure:
+- Open with a single-sentence statement about the fundamental truth of this topic.
+- 3-4 single-sentence paragraphs reinforcing the core message.
+- End with one bold, forward-looking statement.
+
+Single-sentence paragraphs only. No "In conclusion". No fabricated stats. Use **bold** for key terms. Do NOT include the heading.` },
     ], apiKey);
 
     completed++;
@@ -280,15 +284,11 @@ Rules:
       {
         role: "user", content: `Write 5 FAQs about "${main_keyword}". ~${dist.faqWords} words.
 
-Format each FAQ exactly like this:
-### 1. [Specific, practical question]?
-[Direct answer in 2-3 sentences. No filler. Include **bold** key terms.]
+Format:
+### 1. [Specific question]?
+[2-3 sentence answer. Direct, assertive. **Bold** key terms.]
 
-Rules:
-- Questions should be specific and practical, not generic.
-- Answers should be direct — start with the answer, not background.
-- Use **bold** for important terms in answers.
-- No questions like "What is X?" — ask questions that show expertise.` },
+Make questions strategic and expert-level, not basic "What is X?" questions. Answers should be direct — start with the answer, no preamble. No fabricated statistics.` },
     ], apiKey);
 
     completed++;
