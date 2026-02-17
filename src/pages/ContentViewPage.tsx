@@ -89,6 +89,7 @@ const ContentViewPage = () => {
   const [publishing, setPublishing] = useState(false);
   const [regeneratingSection, setRegeneratingSection] = useState<string | null>(null);
   const [showSEO, setShowSEO] = useState(false);
+  const [retrying, setRetrying] = useState(false);
 
   const fetchContent = useCallback(async () => {
     if (!id) return;
@@ -162,6 +163,34 @@ const ContentViewPage = () => {
       toast.error(e.message || "Failed to publish");
     } finally {
       setPublishing(false);
+    }
+  };
+
+  const handleRetry = async () => {
+    if (!id) return;
+    setRetrying(true);
+    try {
+      const { error: updateError } = await supabase.from("content_items").update({
+        status: "generating",
+        sections_completed: 0,
+        total_sections: null,
+        current_section: null,
+        generated_content: null,
+        generated_title: null,
+      }).eq("id", id);
+
+      if (updateError) throw updateError;
+
+      supabase.functions.invoke("generate-blog", {
+        body: { contentId: id },
+      }).catch((err: any) => console.error("Retry invoke error:", err));
+
+      toast.success("Retrying generation...");
+      fetchContent();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to retry");
+    } finally {
+      setRetrying(false);
     }
   };
 
@@ -286,9 +315,15 @@ const ContentViewPage = () => {
       {/* Generation progress */}
       {isGenerating && (
         <div className="mb-6 p-4 rounded-xl border bg-card">
-          <div className="flex items-center gap-2 mb-2">
-            <Loader2 className="h-4 w-4 animate-spin text-primary" />
-            <span className="text-sm font-medium">Writing: {content.current_section || "..."}</span>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <span className="text-sm font-medium">Writing: {content.current_section || "..."}</span>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleRetry} disabled={retrying}>
+              {retrying ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <RefreshCw className="mr-1 h-3 w-3" />}
+              Restart
+            </Button>
           </div>
           <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
             <div
@@ -297,6 +332,19 @@ const ContentViewPage = () => {
                 width: `${((content.sections_completed || 0) / (content.total_sections || 1)) * 100}%`,
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Failed state */}
+      {content.status === "failed" && (
+        <div className="mb-6 p-4 rounded-xl border border-red-500/20 bg-red-500/5">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-red-600 dark:text-red-400">Generation failed</span>
+            <Button variant="outline" size="sm" onClick={handleRetry} disabled={retrying}>
+              {retrying ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <RefreshCw className="mr-1 h-3 w-3" />}
+              Retry Generation
+            </Button>
           </div>
         </div>
       )}

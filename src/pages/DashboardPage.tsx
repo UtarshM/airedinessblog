@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, FileText, Trash2, TrendingUp, Zap, BookOpen } from "lucide-react";
+import { PlusCircle, FileText, Trash2, TrendingUp, Zap, BookOpen, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { SkeletonDashboard } from "@/components/SkeletonCard";
 
@@ -78,6 +78,32 @@ const DashboardPage = () => {
     else {
       setItems(prev => prev.filter(i => i.id !== id));
       toast.success("Deleted");
+    }
+  };
+
+  const handleRetry = async (id: string) => {
+    try {
+      // Reset the content item
+      const { error: updateError } = await supabase.from("content_items").update({
+        status: "generating",
+        sections_completed: 0,
+        total_sections: null,
+        current_section: null,
+        generated_content: null,
+        generated_title: null,
+      }).eq("id", id);
+
+      if (updateError) throw updateError;
+
+      // Re-trigger generation
+      supabase.functions.invoke("generate-blog", {
+        body: { contentId: id },
+      }).catch((err: any) => console.error("Retry invoke error:", err));
+
+      toast.success("Retrying generation...");
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to retry");
     }
   };
 
@@ -179,12 +205,23 @@ const DashboardPage = () => {
                     {item.main_keyword} · {item.word_count_target.toLocaleString()} words · {new Date(item.created_at).toLocaleDateString()}
                   </p>
                 </div>
-                <button
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(item.id); }}
-                  className="opacity-0 group-hover:opacity-100 p-2 text-muted-foreground hover:text-destructive transition-all rounded-lg hover:bg-destructive/10"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  {(item.status === "generating" || item.status === "failed") && (
+                    <button
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRetry(item.id); }}
+                      className="opacity-0 group-hover:opacity-100 p-2 text-muted-foreground hover:text-primary transition-all rounded-lg hover:bg-primary/10"
+                      title="Retry generation"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(item.id); }}
+                    className="opacity-0 group-hover:opacity-100 p-2 text-muted-foreground hover:text-destructive transition-all rounded-lg hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </Link>
             );
           })}

@@ -40,7 +40,20 @@ function calculateEstimatedCredits(wordCount: number, hasH3: boolean, hasFAQ: bo
   return credits;
 }
 
-const SYSTEM_PROMPT = `You are an expert SEO blog writer. Write SHORT paragraphs (2-3 sentences max). Use **bold** for key terms. Use numbered lists with bold titles where appropriate. Include specific facts and details. No generic filler. Do NOT include any headings in your response.`;
+const SYSTEM_PROMPT = `You are an elite SEO content strategist who writes like a direct, no-BS industry expert.
+
+Your writing style rules:
+- Write VERY SHORT paragraphs. Most paragraphs should be 1-2 sentences. Some can be a single punchy line.
+- Be direct and confrontational. No fluff, no filler, no generic statements.
+- Use **bold** for every key term, product name, and important concept.
+- Use bullet lists with **bold titles** where appropriate to break down complex points.
+- Include specific facts, numbers, and concrete details. Never be vague.
+- Use rhetorical structure: state the problem bluntly, then present the solution.
+- Write like you are speaking to a smart executive who has no patience for BS.
+- Every sentence must add value. If a sentence could be removed without losing meaning, remove it.
+- Do NOT include any headings (h1, h2, h3) in your response — only body content.
+- Do NOT use phrases like "In today's world", "In conclusion", "It's important to note", or any generic opener.
+- Start sections with a bold, attention-grabbing statement or a blunt truth.`;
 
 // Ordered by preference — if one is rate-limited, try the next
 const FREE_MODELS = [
@@ -66,7 +79,7 @@ async function callAI(messages: any[], apiKey: string): Promise<string> {
             "X-Title": "BlogForge",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ model, messages, max_tokens: 1500 }),
+          body: JSON.stringify({ model, messages, max_tokens: 3000 }),
         });
 
         if (response.status === 429) {
@@ -103,14 +116,14 @@ async function callAI(messages: any[], apiKey: string): Promise<string> {
 }
 
 function calculateWordDistribution(totalWords: number, h2Count: number, h3Count: number) {
-  const introWords = Math.round(totalWords * 0.1);
-  const conclusionWords = Math.round(totalWords * 0.1);
-  const faqWords = Math.round(totalWords * 0.15);
+  const introWords = Math.round(totalWords * 0.12);
+  const conclusionWords = Math.round(totalWords * 0.08);
+  const faqWords = Math.round(totalWords * 0.12);
   const remainingWords = totalWords - introWords - conclusionWords - faqWords;
   const h2Words = h2Count > 0
-    ? (h3Count > 0 ? Math.round(remainingWords * 0.7 / h2Count) : Math.round(remainingWords / h2Count))
+    ? (h3Count > 0 ? Math.round(remainingWords * 0.75 / h2Count) : Math.round(remainingWords / h2Count))
     : 0;
-  const h3Words = h3Count > 0 ? Math.round(remainingWords * 0.3 / h3Count) : 0;
+  const h3Words = h3Count > 0 ? Math.round(remainingWords * 0.25 / h3Count) : 0;
   return { introWords, h2Words, h3Words, conclusionWords, faqWords };
 }
 
@@ -151,8 +164,8 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
 
     // 1. TITLE
     const title = await callAI([
-      { role: "system", content: "Generate a single SEO blog title. Return ONLY the title, nothing else." },
-      { role: "user", content: `Create a clickable, SEO-friendly title (55-65 chars) for: "${main_keyword}". Use power words. Return only the title.` },
+      { role: "system", content: "You generate powerful, direct SEO blog titles. Return ONLY the title text, nothing else. No quotes, no explanations." },
+      { role: "user", content: `Create a bold, authoritative SEO title (55-65 chars) for: "${main_keyword}". Make it sound like an industry insider wrote it. Use power words that demand attention. No clickbait. Return only the title.` },
     ], apiKey);
 
     completed = 1;
@@ -165,7 +178,18 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     // 2. INTRODUCTION
     const intro = await callAI([
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: `Write an introduction for "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.introWords} words. Hook the reader, explain why this matters, preview the article. Short paragraphs only.` },
+      {
+        role: "user", content: `Write a powerful introduction for a blog post titled "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Naturally weave in these keywords: ${secondaryKw}.` : ""} Tone: ${tone}.
+
+~${dist.introWords} words.
+
+Rules:
+- Open with a bold, confrontational statement that challenges conventional thinking (e.g. "Let's be brutally honest." or "Most companies get this completely wrong.").
+- State the core problem bluntly in 2-3 short paragraphs.
+- Then introduce what this article covers as the solution.
+- Use single-sentence paragraphs for impact.
+- Use **bold** for key terms.
+- No generic openers like "In today's digital world" — start with something that punches.` },
     ], apiKey);
 
     completed++;
@@ -179,7 +203,19 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     for (let i = 0; i < h2s.length; i++) {
       const h2Content = await callAI([
         { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: `Write content for section "${h2s[i]}" about "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.h2Words} words. Use short paragraphs, bold key terms, lists where helpful. No heading.` },
+        {
+          role: "user", content: `Write detailed content for the section "${h2s[i]}" in a blog about "${main_keyword}".${secondaryKw ? ` Naturally include: ${secondaryKw}.` : ""} Tone: ${tone}.
+
+~${dist.h2Words} words.
+
+Rules:
+- Start with a bold opening statement — no transition phrases.
+- Use very short paragraphs (1-3 sentences each). Many single-sentence paragraphs.
+- Include a bullet list with **bold item titles** followed by a brief explanation (1-2 sentences each).
+- Use **bold** for every key term and important concept.
+- Include specific details, examples, or data points — no vague generalities.
+- End the section with a punchy statement that ties back to the main topic.
+- Do NOT include the heading itself — only body content.` },
       ], apiKey);
 
       completed++;
@@ -194,7 +230,17 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     for (let i = 0; i < h3s.length; i++) {
       const h3Content = await callAI([
         { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: `Write content for subsection "${h3s[i]}" about "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.h3Words} words. Short paragraphs, specific details, bold terms. No heading.` },
+        {
+          role: "user", content: `Write content for subsection "${h3s[i]}" under the topic "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}.
+
+~${dist.h3Words} words.
+
+Rules:
+- Very short paragraphs (1-2 sentences). Be punchy and direct.
+- Use **bold** for key terms.
+- Include specific examples or actionable details.
+- No filler sentences. Every line must deliver value.
+- Do NOT include the heading itself — only body content.` },
       ], apiKey);
 
       completed++;
@@ -208,7 +254,18 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     // 5. CONCLUSION
     const conclusion = await callAI([
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: `Write a conclusion for "${title.trim()}" about "${main_keyword}". Tone: ${tone}. ~${dist.conclusionWords} words. Summarize takeaways, add a call to action. Short paragraphs. No heading.` },
+      {
+        role: "user", content: `Write a powerful conclusion for the blog "${title.trim()}" about "${main_keyword}". Tone: ${tone}.
+
+~${dist.conclusionWords} words.
+
+Rules:
+- Open with a direct statement about the core truth of the topic.
+- Summarize 3-4 key takeaways in short, punchy paragraphs.
+- End with a bold call to action or forward-looking statement.
+- Use **bold** for key terms.
+- No phrases like "In conclusion" or "To sum up". Start directly.
+- Do NOT include the heading.` },
     ], apiKey);
 
     completed++;
@@ -220,7 +277,18 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     // 6. FAQS
     const faqs = await callAI([
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: `Write 4-5 FAQs about "${main_keyword}". ~${dist.faqWords} words. Format: ### 1. Question?\nAnswer (2-3 sentences). Specific, practical questions.` },
+      {
+        role: "user", content: `Write 5 FAQs about "${main_keyword}". ~${dist.faqWords} words.
+
+Format each FAQ exactly like this:
+### 1. [Specific, practical question]?
+[Direct answer in 2-3 sentences. No filler. Include **bold** key terms.]
+
+Rules:
+- Questions should be specific and practical, not generic.
+- Answers should be direct — start with the answer, not background.
+- Use **bold** for important terms in answers.
+- No questions like "What is X?" — ask questions that show expertise.` },
     ], apiKey);
 
     completed++;
