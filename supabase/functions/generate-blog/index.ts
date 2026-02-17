@@ -74,11 +74,10 @@ execute processes
 
 // Ordered by preference — if one is rate-limited, try the next
 const FREE_MODELS = [
-  "deepseek/deepseek-chat-v3-0324:free",
+  "deepseek/deepseek-v3-0324:free",
+  "deepseek/deepseek-r1:free",
   "meta-llama/llama-3.3-70b-instruct:free",
-  "google/gemma-3-27b-it:free",
   "mistralai/mistral-small-3.1-24b-instruct:free",
-  "qwen/qwen3-next-80b-a3b-instruct:free",
 ];
 
 async function callAI(messages: any[], apiKey: string): Promise<string> {
