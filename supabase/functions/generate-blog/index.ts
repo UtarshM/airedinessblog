@@ -52,7 +52,7 @@ STRICT RULES:
 
 4. KEYWORD CONTROL: Total keyword density must NOT exceed 1.05%. Use the exact main keyword only 1-2 times per section (7-8 times total in the full article). For all other mentions, use natural variations, synonyms, and related phrases. NEVER repeat the same keyword phrase 3+ times in one section.
 
-5. TRANSITION WORDS: Start paragraphs with: However, Therefore, Additionally, Moreover, Furthermore, As a result, In contrast, Meanwhile, Consequently.
+5. TRANSITION WORDS: Use a VARIETY of transitions. NEVER use the same transition word more than 2 times in the entire article. Choose from: However, Therefore, Additionally, Moreover, Furthermore, As a result, In contrast, Meanwhile, Consequently, For this reason, On the other hand, Because of this, Still, Yet, At the same time, Even so, That said. Spread them out — no two consecutive paragraphs should start with the same word.
 
 6. ACTIVE VOICE ONLY: No passive voice. Say "Teams build this" not "This is built by teams."
 
