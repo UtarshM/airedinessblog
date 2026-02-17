@@ -72,64 +72,49 @@ execute processes
 
 7. BANNED phrases: "In today's", "It's important", "In conclusion", "Let's dive", "When it comes to", "At the end of the day", "studies show".`;
 
-// Ordered by preference — if one is rate-limited, try the next
-const FREE_MODELS = [
-  "deepseek/deepseek-r1-0528:free",
-  "nousresearch/hermes-3-llama-3.1-405b:free",
-  "openai/gpt-oss-120b:free",
-  "meta-llama/llama-3.3-70b-instruct:free",
-  "mistralai/mistral-small-3.1-24b-instruct:free",
-];
+// Groq model mapping per task
+const GROQ_MODELS = {
+  title: "llama-3.1-8b-instant",
+  outline: "llama-3.3-70b-versatile",
+  section: "llama-3.3-70b-versatile",
+  faq: "llama-3.1-8b-instant",
+} as const;
 
-async function callAI(messages: any[], apiKey: string): Promise<string> {
-  let lastError = "";
+async function callGroq(messages: any[], model: string): Promise<string> {
+  const groqKey = Deno.env.get("GROQ_API_KEY");
+  if (!groqKey) throw new Error("GROQ_API_KEY not configured");
 
-  for (const model of FREE_MODELS) {
-    // Try each model, retry once on 429
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "HTTP-Referer": "https://blogforge.app",
-            "X-Title": "BlogForge",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ model, messages, max_tokens: 2000 }),
-        });
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${groqKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ model, messages, max_tokens: 2000, temperature: 0.7 }),
+    });
 
-        if (response.status === 429) {
-          lastError = `Rate limited on ${model}`;
-          console.warn(`429 on ${model}, attempt ${attempt + 1}`);
-          // Wait 3 seconds before retry/next model
-          await new Promise(r => setTimeout(r, 3000));
-          continue;
-        }
-
-        if (!response.ok) {
-          const text = await response.text();
-          lastError = `AI error ${response.status}: ${text}`;
-          console.error(`Error on ${model}:`, response.status, text);
-          break; // Try next model on non-429 errors
-        }
-
-        const data = await response.json();
-        const content = data.choices?.[0]?.message?.content || "";
-        if (content) {
-          console.log(`Generated with ${model}`);
-          return content;
-        }
-        break; // Empty response, try next model
-      } catch (e) {
-        lastError = e instanceof Error ? e.message : String(e);
-        console.error(`Exception on ${model}:`, lastError);
-        break;
-      }
+    if (response.status === 429) {
+      console.warn(`Rate limited on ${model}, attempt ${attempt + 1}`);
+      await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+      continue;
     }
-  }
 
-  throw new Error(`All models failed. Last error: ${lastError}`);
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Groq error ${response.status}: ${text}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || "";
+    if (content) {
+      console.log(`Generated with ${model}`);
+      // DeepSeek R1 and thinking models wrap output in <think> tags — strip them
+      return content.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+    }
+    throw new Error("Empty response from Groq");
+  }
+  throw new Error(`Rate limited on ${model} after 3 attempts`);
 }
 
 function calculateWordDistribution(totalWords: number, h2Count: number, h3Count: number) {
@@ -149,7 +134,7 @@ async function updateProgress(supabase: any, contentId: string, updates: any) {
 }
 
 // Background generation — runs after response is sent
-async function generateBlog(supabase: any, contentId: string, userId: string, apiKey: string) {
+async function generateBlog(supabase: any, contentId: string, userId: string) {
   try {
     const { data: content, error: fetchError } = await supabase
       .from("content_items").select("*")
@@ -171,10 +156,10 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     );
     if (hasPlaceholders) {
       const targetCount = Math.min(h2s.length || 4, 4);
-      const generatedHeadings = await callAI([
+      const generatedHeadings = await callGroq([
         { role: "system", content: "Generate SEO blog section headings. Return ONLY headings, one per line. No numbering, no explanation, no quotes." },
         { role: "user", content: `Generate exactly ${targetCount} H2 headings for a blog about "${main_keyword}". Short, specific, SEO-friendly. One per line.` },
-      ], apiKey);
+      ], GROQ_MODELS.outline);
       const newH2s = generatedHeadings.split("\n").map((h: string) => h.replace(/^#+\s*/, "").replace(/^\d+\.?\s*/, "").trim()).filter(Boolean);
       if (newH2s.length >= targetCount) {
         h2s = newH2s.slice(0, targetCount);
@@ -201,10 +186,10 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     let completed = 0;
 
     // 1. TITLE
-    const title = await callAI([
+    const title = await callGroq([
       { role: "system", content: "You generate powerful, direct SEO blog titles. Return ONLY the title text, nothing else. No quotes, no explanations." },
       { role: "user", content: `Create a bold, authoritative SEO title (55-65 chars) for: "${main_keyword}". Make it sound like an industry insider wrote it. Use power words that demand attention. No clickbait. Return only the title.` },
-    ], apiKey);
+    ], GROQ_MODELS.title);
 
     completed = 1;
     markdown = `# ${title.trim()}\n\n`;
@@ -214,7 +199,7 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
     });
 
     // 2. INTRODUCTION
-    const intro = await callAI([
+    const intro = await callGroq([
       { role: "system", content: SYSTEM_PROMPT },
       {
         role: "user", content: `Write the introduction for "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Weave in: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.introWords} words.
@@ -222,7 +207,7 @@ async function generateBlog(supabase: any, contentId: string, userId: string, ap
 Remember: EVERY paragraph = exactly ONE sentence. Then blank line. Then next sentence.
 
 Start with a confrontational opening. State the problem in 3-5 one-sentence paragraphs. No generic openers.` },
-    ], apiKey);
+    ], GROQ_MODELS.section);
 
     completed++;
     markdown += `${intro.trim()}\n\n`;
@@ -233,7 +218,7 @@ Start with a confrontational opening. State the problem in 3-5 one-sentence para
 
     // 3. H2 SECTIONS
     for (let i = 0; i < h2s.length; i++) {
-      const h2Content = await callAI([
+      const h2Content = await callGroq([
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Include: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.h2Words} words.
@@ -241,7 +226,7 @@ Start with a confrontational opening. State the problem in 3-5 one-sentence para
 EVERY paragraph = exactly ONE sentence. Then blank line. Then next sentence. NO multi-sentence paragraphs.
 
 Use **bold** for key terms. Include a plain-text list if relevant (items on separate lines, no bullets). Do NOT include the heading.` },
-      ], apiKey);
+      ], GROQ_MODELS.section);
 
       completed++;
       markdown += `## ${h2s[i]}\n\n${h2Content.trim()}\n\n`;
@@ -254,7 +239,7 @@ Use **bold** for key terms. Include a plain-text list if relevant (items on sepa
     // 4. H3 SECTIONS (removed as per instruction)
 
     // 5. CONCLUSION + FAQs (combined into one call for speed)
-    const closingContent = await callAI([
+    const closingContent = await callGroq([
       { role: "system", content: SYSTEM_PROMPT },
       {
         role: "user", content: `Write the conclusion AND FAQs for "${title.trim()}" about "${main_keyword}". Tone: ${tone}. ~${dist.conclusionWords + dist.faqWords} words.
@@ -275,7 +260,7 @@ Then write exactly this:
 [Answer.]
 
 EVERY paragraph = ONE sentence. No filler.` },
-    ], apiKey);
+    ], GROQ_MODELS.faq);
 
     completed++;
     markdown += `## Conclusion\n\n${closingContent.trim()}\n\n`;
@@ -304,9 +289,9 @@ serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const apiKey = Deno.env.get("LOVABLE_API_KEY");
+    const groqKey = Deno.env.get("GROQ_API_KEY");
 
-    if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
+    if (!groqKey) throw new Error("GROQ_API_KEY not configured");
 
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { contentId } = await req.json();
@@ -334,7 +319,7 @@ serve(async (req) => {
     }
 
     // Start background generation
-    const generationPromise = generateBlog(supabase, contentId, user.id, apiKey);
+    const generationPromise = generateBlog(supabase, contentId, user.id);
 
     // Use EdgeRuntime.waitUntil to prevent the function from shutting down
     // immediately after the response is sent.
@@ -346,7 +331,7 @@ serve(async (req) => {
       console.error("EdgeRuntime.waitUntil is not defined!");
       // If EdgeRuntime is missing, we must await to ensure completion,
       // but this risks timeout.
-      generateBlog(supabase, contentId, user.id, apiKey).catch(err => console.error("Background generation failed without waitUntil:", err));
+      generateBlog(supabase, contentId, user.id).catch(err => console.error("Background generation failed without waitUntil:", err));
     }
 
     return new Response(JSON.stringify({ success: true, contentId }), {
