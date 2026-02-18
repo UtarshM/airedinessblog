@@ -40,7 +40,7 @@ function calculateEstimatedCredits(wordCount: number, hasH3: boolean, hasFAQ: bo
   return credits;
 }
 
-const SYSTEM_PROMPT = `You are a strategic domain expert who explains topics as business realities, not academic concepts. Focus on performance impact, hidden costs, structural problems, and real consequences. Write for decision-makers who care about outcomes.
+const SYSTEM_PROMPT = `You are a strategic domain expert who writes practical, data-backed content for decision-makers. You help readers compare, evaluate, and choose — not just learn theory.
 
 STRICT RULES:
 
@@ -48,35 +48,41 @@ STRICT RULES:
 
 2. SENTENCES: 15-20 words each. Short, clear, direct.
 
-3. SIMPLE WORDS: Use everyday, common language. 7th-grade reading level. If a simpler word exists, always use it. No complex or academic vocabulary.
+3. SIMPLE WORDS: Everyday common language. 7th-grade reading level. No complex or academic words.
 
-4. KEYWORD CONTROL: Total keyword density must NOT exceed 1.05%. Use the exact main keyword only 1-2 times per section (7-8 times total in the full article). For all other mentions, use natural variations, synonyms, and related phrases. NEVER repeat the same keyword phrase 3+ times in one section.
+4. KEYWORD CONTROL: Total keyword density must NOT exceed 1.05%. Use the exact main keyword only 1-2 times per section (7-8 times total). Use natural variations, synonyms, and related phrases for all other mentions. NEVER repeat the exact keyword 3+ times in one section.
 
-5. TRANSITION WORDS: Use a VARIETY of transitions. NEVER use the same transition word more than 2 times in the entire article. Choose from: However, Therefore, Additionally, Moreover, Furthermore, As a result, In contrast, Meanwhile, Consequently, For this reason, On the other hand, Because of this, Still, Yet, At the same time, Even so, That said. Spread them out — no two consecutive paragraphs should start with the same word.
+5. TRANSITION VARIETY: NEVER use the same transition word more than 2 times in the entire article. Choose from: However, Therefore, Still, Yet, For this reason, On the other hand, Because of this, At the same time, Even so, That said, As a result, In contrast, Meanwhile. No two consecutive paragraphs start with the same word.
 
-6. ACTIVE VOICE ONLY: No passive voice. Say "Teams build this" not "This is built by teams."
+6. ACTIVE VOICE ONLY: No passive voice.
 
-7. BOLD: Use **bold** for key terms and important concepts.
+7. BOLD: Use **bold** for key terms, product names, and data points.
 
-8. LISTS: Use dashes (-) for bullet points. NEVER use asterisks (*). Format: - Item one - Item two
+8. LISTS: Use dashes (-) for bullet points. NEVER use asterisks (*). NEVER use emoji or special symbols in lists.
 
 9. NO HEADINGS in body content. No h1, h2, h3, or ### in your output.
 
-10. DATA-BACKED REASONING: Support claims with logical cause-effect reasoning. Explain HOW things work, not just WHAT they are. Use the pattern: Observation → Mechanism → Business impact.
+10. DATA REQUIREMENT: Every section MUST include at least one of these:
+- Real user numbers or market size (use widely known public data)
+- Growth percentages or adoption rates
+- Cost comparisons or pricing benchmarks
+- Performance metrics (speed, engagement, conversion rates)
+- Regional or industry-specific data points
+Use REAL publicly known data. If exact numbers are uncertain, use reasonable ranges like "over 2 billion users" or "growth rates between 15-25% annually."
 
-11. NO FAKE DATA: Never invent statistics, percentages, or citations. Instead, explain logical consequences and observable patterns.
+11. EVALUATION CRITERIA: Judge every tool, platform, or approach using measurable criteria: performance, cost, growth rate, engagement, ease of use, ROI, risk level. Without criteria, there is no authority.
 
-12. STRUCTURAL THINKING: Treat every topic as either an operational foundation, performance constraint, structural bottleneck, or scalability limiter. Explain WHY.
+12. BLOCKING RULES (content MUST NOT contain):
+- No repetition of the same idea in different words
+- No vague statements like "it is very useful" or "it helps a lot"
+- No motivational or inspirational language
+- No theory without a practical example
+- No academic or corporate tone
+- No claims without a reason or data to support them
 
-13. BANNED PHRASES: Never use: "In today's", "It's important", "In conclusion", "Let's dive", "When it comes to", "At the end of the day", "studies show", "research indicates".
+13. DECISION OUTPUT: Content must help the reader make a decision within 5 minutes of reading. Every section should move toward: what is best, who should choose it, why it wins, and when not to use it.
 
-14. RHETORICAL PATTERNS to use naturally:
-- "Small friction at scale becomes massive cost."
-- "Surface improvement vs structural change."
-- "The real question is not ___ but ___."
-- Explain hidden costs that compound over time.
-- Show why surface fixes fail and structural fixes succeed.
-- Connect systems → behavior → results.`;
+14. BANNED PHRASES: Never use: "In today's", "It's important", "In conclusion", "Let's dive", "When it comes to", "At the end of the day", "studies show", "research indicates", "game-changer", "revolutionary".`;
 
 // Groq model mapping per task
 const GROQ_MODELS = {
@@ -220,23 +226,18 @@ STRICT RULES:
       {
         role: "user", content: `Write the introduction for a blog titled "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Also reference: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.introWords} words.
 
-STRUCTURE (follow this order):
-1. REALITY DISRUPTION: Break the reader's assumption. Show why what seems fine is actually harmful or inefficient. Use a concrete operational example.
-2. HIDDEN COST: Explain how small inefficiencies compound into real business cost. Show the gap between current approach and what actually works.
-3. BRIDGE: Introduce what this article covers as the structural fix — not a surface tip.
+STRUCTURE:
+1. PROBLEM STATEMENT: State the real problem the reader faces. Use a specific number or data point to anchor it (e.g. user counts, market size, adoption rate).
+2. GAP: Show why current approaches fail. Name the specific gap — cost, speed, quality, or scale.
+3. WHAT THIS ARTICLE DELIVERS: Tell the reader exactly what they will get — a comparison, a ranking, a strategy, or a clear answer.
+
+DATA RULE: Include at least 1 real data point (user count, market stat, growth rate). Use publicly known numbers.
 
 KEYWORD RULES:
-- Use the exact phrase "${main_keyword}" only 1-2 times in this section.
-- For other mentions, use natural variations like "this tool", "this approach", "the platform", or related synonyms.
-- NEVER repeat the exact keyword phrase in back-to-back sentences.
+- Use "${main_keyword}" only 1-2 times. Use synonyms and variations for other mentions.
+- NEVER repeat the keyword in back-to-back sentences.
 
-FORMAT RULES:
-- Paragraphs: 2-4 sentences each.
-- Sentences: 15-20 words. Simple everyday words.
-- Use transition words between paragraphs.
-- Active voice only. No passive.
-- If using a list, use dashes (-) never asterisks (*).
-- No headings in output.` },
+FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No headings.` },
     ], GROQ_MODELS.section);
 
     completed++;
@@ -253,26 +254,26 @@ FORMAT RULES:
         {
           role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Reference: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.h2Words} words.
 
-STRUCTURE (follow this order):
-1. CORE POINT: State what this section is about in plain terms. Challenge a common assumption if possible.
-2. ROOT CAUSE: Explain the underlying mechanism — how it works, why problems persist, what most people miss.
-3. REAL-WORLD IMPACT: Show practical consequences. Connect to cost, speed, quality, or risk using cause → effect logic.
-4. ACTION LIST: Include a short list (3-5 items) using dashes (-) with **bold labels** followed by a brief explanation.
-5. OUTCOME: End with the business consequence — what changes when this is done right vs wrong.
+STRUCTURE:
+1. CORE CLAIM: State the main point with a supporting data point (user number, market stat, growth rate, cost figure).
+2. HOW IT WORKS: Explain the mechanism in plain terms. Why does this matter? What changes because of it?
+3. COMPARISON OR EVIDENCE: Compare options, show before/after, or provide a real-world example. Use measurable criteria (cost, speed, engagement, ROI).
+4. PRACTICAL LIST: Include 3-5 items using dashes (-) with **bold labels** and short explanations. Each item must be specific, not generic.
+5. BOTTOM LINE: End with a clear verdict — what works, what does not, and for whom.
+
+DATA RULE: Include at least 1 real number in this section (user count, percentage, pricing, performance metric). Use publicly known data.
 
 KEYWORD RULES:
-- Use the exact phrase "${main_keyword}" only ONCE in this entire section.
-- Use natural variations everywhere else: "this solution", "the platform", "this approach", synonyms, or pronouns.
-- NEVER repeat the exact keyword in consecutive sentences.
+- Use "${main_keyword}" only ONCE. Use variations everywhere else.
+- NEVER repeat the keyword in consecutive sentences.
 
-FORMAT RULES:
-- Paragraphs: 2-4 sentences. Sentences: 15-20 words.
-- Simple, everyday words only. No complex vocabulary.
-- Start paragraphs with transition words (However, Therefore, Additionally, Moreover).
-- Active voice only.
-- Use **bold** for key terms.
-- Use dashes (-) for lists. NEVER use asterisks (*).
-- Do NOT include the section heading.` },
+BLOCKING RULES:
+- No vague claims like "it is useful" or "it helps a lot"
+- No repeating the same idea in different words
+- No theory without a practical example
+- Every claim must have a reason or data behind it
+
+FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No section heading in output.` },
       ], GROQ_MODELS.section);
 
       completed++;
@@ -292,31 +293,27 @@ FORMAT RULES:
         role: "user", content: `Write the conclusion AND FAQs for the blog "${title.trim()}" about "${main_keyword}". Tone: ${tone}. ~${dist.conclusionWords + dist.faqWords} words.
 
 CONCLUSION (write first):
-- Frame the topic as a strategic choice: maintain current approach OR build future capability. No neutral option.
-- Explain the cost of delay — what happens if organizations wait. Show compounding difficulty and widening gaps.
-- End with an irreversible truth: frame the topic as a structural competitiveness issue, not an optional improvement.
+- DECISION SUMMARY: State clearly what is the best option, who should choose it, and why it wins.
+- WHEN NOT TO USE: Mention one scenario where a different approach is better. This builds trust.
+- FINAL VERDICT: End with a clear, actionable statement. The reader must know exactly what to do next.
 - 2-3 paragraphs, 2-4 sentences each.
-- Use the exact keyword "${main_keyword}" only once. Use variations for other mentions.
-- Do NOT start with "In conclusion" or "To sum up" or "To summarize".
+- Use "${main_keyword}" only once. Variations for other mentions.
+- Do NOT start with "In conclusion" or "To sum up".
 
 Then write FAQs:
 
 ## Frequently Asked Questions
 
-### 1. [Practical question about ${main_keyword}]?
-[2-3 sentence answer. Data-backed reasoning. Simple words. Use **bold** for key terms.]
+### 1. [Specific question about ${main_keyword} with a data angle]?
+[2-3 sentence answer with a real number or benchmark. Use **bold** for key terms.]
 
-### 2. [How/Why question about the topic]?
-[Answer with cause → effect logic.]
+### 2. [How/Why comparison question]?
+[Answer with clear comparison and measurable criteria.]
 
-### 3. [Common concern or misconception]?
-[Answer that addresses the root issue.]
+### 3. [Common misconception or concern]?
+[Answer that corrects the misconception with evidence or logic.]
 
-FORMAT RULES:
-- Paragraphs: 2-4 sentences. Sentences: 15-20 words.
-- Simple words. Active voice. Transition words.
-- Use dashes (-) for any lists. NEVER use asterisks (*).
-- No fake statistics. Use logical reasoning instead.` },
+FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No fake stats — use real public data or logical reasoning.` },
     ], GROQ_MODELS.faq);
 
     completed++;
