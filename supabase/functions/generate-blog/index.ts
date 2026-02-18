@@ -44,7 +44,7 @@ const SYSTEM_PROMPT = `You are a strategic domain expert who writes practical, d
 
 STRICT RULES:
 
-1. PARAGRAPHS: 2-4 sentences each. Never 1 sentence alone. Never 5+ sentences.
+1. PARAGRAPHS: Max 2 sentences per paragraph. Keep them punchy and scannable. Never 3+ sentences.
 
 2. SENTENCES: 15-20 words each. Short, clear, direct.
 
@@ -52,7 +52,7 @@ STRICT RULES:
 
 4. KEYWORD CONTROL: Total keyword density must NOT exceed 1.05%. Use the exact main keyword only 1-2 times per section (7-8 times total). Use natural variations, synonyms, and related phrases for all other mentions. NEVER repeat the exact keyword 3+ times in one section.
 
-5. TRANSITION VARIETY: NEVER use the same transition word more than 2 times in the entire article. Choose from: However, Therefore, Still, Yet, For this reason, On the other hand, Because of this, At the same time, Even so, That said, As a result, In contrast, Meanwhile. No two consecutive paragraphs start with the same word.
+5. TRANSITION CONTROL: AVOID overuse of "However", "Additionally", "Moreover", "Therefore". Use each MAX 1 time in the entire article. Prefer natural segues or no transition word at all. Use variety: Still, Yet, For this reason, On the other hand, Because of this, At the same time, Even so, That said, As a result, In contrast, Meanwhile.
 
 6. ACTIVE VOICE ONLY: No passive voice.
 
@@ -293,10 +293,11 @@ FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active vo
         role: "user", content: `Write the conclusion AND FAQs for the blog "${title.trim()}" about "${main_keyword}". Tone: ${tone}. ~${dist.conclusionWords + dist.faqWords} words.
 
 CONCLUSION (write first):
+- SENTENCE QUALITY: Write full, proper sentences. No fragments. AVOID "However", "Additionally", "Moreover", "Therefore". Use natural language.
 - DECISION SUMMARY: State clearly what is the best option, who should choose it, and why it wins.
 - WHEN NOT TO USE: Mention one scenario where a different approach is better. This builds trust.
 - FINAL VERDICT: End with a clear, actionable statement. The reader must know exactly what to do next.
-- 2-3 paragraphs, 2-4 sentences each.
+- Max 2 sentences per paragraph.
 - Use "${main_keyword}" only once. Variations for other mentions.
 - Do NOT start with "In conclusion" or "To sum up".
 
@@ -305,15 +306,15 @@ Then write FAQs:
 ## Frequently Asked Questions
 
 ### 1. [Specific question about ${main_keyword} with a data angle]?
-[2-3 sentence answer with a real number or benchmark. Use **bold** for key terms.]
+[2-3 sentence answer with a real number or benchmark. Write full sentences. Use **bold** for key terms.]
 
 ### 2. [How/Why comparison question]?
-[Answer with clear comparison and measurable criteria.]
+[Answer with clear comparison and measurable criteria. Full sentences.]
 
 ### 3. [Common misconception or concern]?
-[Answer that corrects the misconception with evidence or logic.]
+[Answer that corrects the misconception with evidence or logic. Full sentences.]
 
-FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No fake stats — use real public data or logical reasoning.` },
+FORMAT: Max 2 sentences per paragraph. Sentences 15-20 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No fake stats — use real public data or logical reasoning.` },
     ], GROQ_MODELS.faq);
 
     completed++;
