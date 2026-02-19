@@ -14,40 +14,22 @@ import { Loader2, X, Plus, Sparkles, LayoutTemplate, FileText, ListOrdered, GitC
 // --- BLOG TEMPLATES ---
 const TEMPLATES = [
   {
+    id: "blog",
+    name: "Blog Article",
+    icon: FileText,
+    color: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+    description: "Standard SEO blog post",
+    h2s: ["Introduction", "Key Concepts", "Best Practices", "Common Challenges", "Future Trends", "Conclusion"],
+    h3s: [],
+  },
+  {
     id: "service",
     name: "Service Page",
-    icon: FileText,
+    icon: LayoutTemplate,
     color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
     description: "For agencies & businesses",
-    h2s: ["What is [Service]", "Benefits of [Service]", "Our Process", "Why Choose Us", "Pricing & Packages"],
+    h2s: ["What is [Service]", "Benefits of [Service]", "Our Process", "Why Choose Us", "Pricing & Packages", "FAQ"],
     h3s: [],
-  },
-  {
-    id: "howto",
-    name: "How-To Guide",
-    icon: BookOpen,
-    color: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-    description: "Step-by-step tutorials",
-    h2s: ["Prerequisites", "Step-by-Step Guide", "Tips & Best Practices", "Common Mistakes to Avoid"],
-    h3s: ["Step 1", "Step 2", "Step 3"],
-  },
-  {
-    id: "listicle",
-    name: "Listicle",
-    icon: ListOrdered,
-    color: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    description: "Top N lists & roundups",
-    h2s: ["Top Pick #1", "Top Pick #2", "Top Pick #3", "Top Pick #4", "Top Pick #5"],
-    h3s: [],
-  },
-  {
-    id: "comparison",
-    name: "Comparison",
-    icon: GitCompare,
-    color: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
-    description: "A vs B comparisons",
-    h2s: ["Overview", "Feature Comparison", "Pros and Cons", "Pricing", "Which One Should You Choose?"],
-    h3s: ["Pros of A", "Cons of A", "Pros of B", "Cons of B"],
   },
 ];
 

@@ -162,24 +162,24 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
     const h3s = h3_list || [];
     const secondaryKw = (secondary_keywords || []).join(", ");
 
-    // Auto-generate 4 H2 headings if empty, placeholder, or too many
+    // Auto-generate 6 H2 headings if empty, placeholder, or too many
     const hasPlaceholders = h2s.length === 0 || h2s.some((h: string) =>
       /Top Pick #|\[Item|^Step \d|^\d+\. \[/.test(h)
     );
     if (hasPlaceholders) {
-      const targetCount = Math.min(h2s.length || 4, 4);
+      const targetCount = 6; // User requested 5-6 headings
       const generatedHeadings = await callGroq([
         { role: "system", content: "Generate SEO blog section headings. Return ONLY headings, one per line. No numbering, no explanation, no quotes." },
         { role: "user", content: `Generate exactly ${targetCount} H2 headings for a blog about "${main_keyword}". Short, specific, SEO-friendly. One per line.` },
       ], GROQ_MODELS.outline);
       const newH2s = generatedHeadings.split("\n").map((h: string) => h.replace(/^#+\s*/, "").replace(/^\d+\.?\s*/, "").trim()).filter(Boolean);
-      if (newH2s.length >= targetCount) {
+      if (newH2s.length >= 4) { // Accept if we got at least 4, but aim for 6
         h2s = newH2s.slice(0, targetCount);
       }
       await supabase.from("content_items").update({ h2_list: h2s }).eq("id", contentId);
     }
-    // Cap at 4 H2s max for speed
-    if (h2s.length > 4) h2s = h2s.slice(0, 4);
+    // Cap at 6 H2s max for speed
+    if (h2s.length > 6) h2s = h2s.slice(0, 6);
 
     const dist = calculateWordDistribution(word_count_target, h2s.length, 0);
     // Total: Title + Intro + H2s + Conclusion/FAQs = fewer calls
