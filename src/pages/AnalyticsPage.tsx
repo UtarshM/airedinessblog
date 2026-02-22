@@ -27,6 +27,7 @@ const AnalyticsPage = () => {
             const { data: contentData } = await supabase
                 .from("content_items")
                 .select("id, main_keyword, status, word_count_target, created_at, generated_content")
+                .eq("user_id", user?.id)
                 .order("created_at", { ascending: true });
 
             setItems(contentData || []);

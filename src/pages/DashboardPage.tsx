@@ -39,6 +39,7 @@ const DashboardPage = () => {
     const { data: contentData } = await supabase
       .from("content_items")
       .select("id, main_keyword, h1, status, word_count_target, generated_title, created_at, sections_completed, total_sections")
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
     setItems(contentData || []);
@@ -88,7 +89,12 @@ const DashboardPage = () => {
   }, [user]);
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("content_items").delete().eq("id", id);
+    const { error } = await supabase
+      .from("content_items")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user?.id);
+
     if (error) toast.error("Failed to delete");
     else {
       setItems(prev => prev.filter(i => i.id !== id));
@@ -106,7 +112,9 @@ const DashboardPage = () => {
         current_section: null,
         generated_content: null,
         generated_title: null,
-      }).eq("id", id);
+      })
+        .eq("id", id)
+        .eq("user_id", user?.id);
 
       if (updateError) throw updateError;
 

@@ -11,6 +11,7 @@ import { marked } from "marked";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ContentItem {
   id: string;
@@ -85,6 +86,7 @@ function computeSEOScore(content: ContentItem) {
 
 const ContentViewPage = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const [content, setContent] = useState<ContentItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -106,11 +108,12 @@ const ContentViewPage = () => {
   const [fetchingCategories, setFetchingCategories] = useState(false);
 
   const fetchContent = useCallback(async () => {
-    if (!id) return;
+    if (!id || !user) return;
     const { data, error } = await supabase
       .from("content_items")
       .select("*")
       .eq("id", id)
+      .eq("user_id", user.id)
       .single();
 
     if (error) {

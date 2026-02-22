@@ -17,11 +17,13 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "./ui/button";
 
 const AppSidebar = () => {
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const location = useLocation();
 
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'My';
+
   const workspaces = [
-    { id: "1", name: "um18218's Workspace" }
+    { id: "1", name: `${userName}'s Workspace` }
   ];
 
   const contentLinks = [
