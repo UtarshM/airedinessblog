@@ -49,6 +49,20 @@ const SettingsPage = () => {
                     used: creditData.used_credits,
                     remaining: creditData.total_credits - creditData.used_credits - creditData.locked_credits,
                 });
+            } else {
+                // Auto-provision 50 credits for new users fallback
+                const { error: insertError } = await supabase
+                    .from("workspace_credits" as any)
+                    .insert({
+                        user_id: user.id,
+                        total_credits: 50,
+                        used_credits: 0,
+                        locked_credits: 0
+                    } as any);
+
+                if (!insertError) {
+                    setCredits({ total: 50, used: 0, remaining: 50 });
+                }
             }
 
             // Fetch transactions

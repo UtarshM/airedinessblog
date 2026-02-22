@@ -330,6 +330,38 @@ FORMAT: Max 2 sentences per paragraph. Sentences 15-20 words. Simple words. Acti
 
     console.log(`Blog generation completed for ${contentId}`);
 
+    // Auto-Publish Logic
+    try {
+      const { data: integrations, error: integrationError } = await supabase
+        .from("workspace_integrations")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("platform", "wordpress")
+        .eq("is_active", true);
+
+      if (!integrationError && integrations && integrations.length > 0) {
+        const autoPublishIntegration = integrations.find(
+          (int: any) => int.credentials && int.credentials.auto_publish === true
+        );
+
+        if (autoPublishIntegration) {
+          console.log(`Auto-publishing content ${contentId} to WordPress using integration ${autoPublishIntegration.id}...`);
+
+          const { error: invokeError } = await supabase.functions.invoke("publish-to-wordpress", {
+            body: { contentId: contentId, integrationId: autoPublishIntegration.id },
+          });
+
+          if (invokeError) {
+            console.error("Auto-publish invoke failed:", invokeError);
+          } else {
+            console.log("Auto-publish invoked successfully");
+          }
+        }
+      }
+    } catch (publishErr) {
+      console.error("Auto-publish logic failed:", publishErr);
+    }
+
   } catch (e) {
     console.error("generateBlog error:", e);
     await supabase.from("content_items").update({ status: "failed" }).eq("id", contentId);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -6,103 +6,100 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, X, Plus, Sparkles, LayoutTemplate, FileText, ListOrdered, GitCompare, BookOpen } from "lucide-react";
-
-// --- BLOG TEMPLATES ---
-const TEMPLATES = [
-  {
-    id: "blog",
-    name: "Blog Article",
-    icon: FileText,
-    color: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-    description: "Standard SEO blog post",
-    h2s: ["Introduction", "Key Concepts", "Best Practices", "Common Challenges", "Future Trends", "Conclusion"],
-    h3s: [],
-  },
-  {
-    id: "service",
-    name: "Service Page",
-    icon: LayoutTemplate,
-    color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    description: "For agencies & businesses",
-    h2s: ["What is [Service]", "Benefits of [Service]", "Our Process", "Why Choose Us", "Pricing & Packages", "FAQ"],
-    h3s: [],
-  },
-];
+import { Loader2, Plus, Sparkles, Image as ImageIcon, CheckCircle2, FileText, Fingerprint } from "lucide-react";
 
 const GeneratePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [integrations, setIntegrations] = useState<any[]>([]);
 
-  // Load defaults from localStorage (set in Settings)
-  const defaultTone = localStorage.getItem("bf_default_tone") || "Professional";
-  const defaultCountry = localStorage.getItem("bf_default_country") || "India";
-  const defaultWordCount = parseInt(localStorage.getItem("bf_default_word_count") || "1200", 10);
-
+  // Form State
   const [mainKeyword, setMainKeyword] = useState("");
   const [h1, setH1] = useState("");
-  const [wordCount, setWordCount] = useState(defaultWordCount);
-  const [tone, setTone] = useState(defaultTone);
-  const [targetCountry, setTargetCountry] = useState(defaultCountry);
-  const [secondaryKeywords, setSecondaryKeywords] = useState<string[]>([]);
-  const [skInput, setSkInput] = useState("");
-  const [h2List, setH2List] = useState<string[]>([""]);
-  const [h3List, setH3List] = useState<string[]>([]);
+  const [language, setLanguage] = useState("English (US)");
+  const [articleType, setArticleType] = useState("Standard Blog Post");
+  const [articleSize, setArticleSize] = useState("Medium (1000-1500 words)");
+  const [researchLevel, setResearchLevel] = useState("Standard AI Search");
+  const [tone, setTone] = useState("None");
+  const [pointOfView, setPointOfView] = useState("None");
+  const [textReadability, setTextReadability] = useState("None");
+  const [targetCountry, setTargetCountry] = useState("United States");
 
-  const applyTemplate = (templateId: string) => {
-    const template = TEMPLATES.find(t => t.id === templateId);
-    if (!template) return;
-    setSelectedTemplate(templateId);
-    setH2List([...template.h2s]);
-    setH3List([...template.h3s]);
-    toast.success(`Template "${template.name}" applied`);
-  };
+  const [icp, setIcp] = useState("");
+  const [brandVoice, setBrandVoice] = useState("none");
+  const [details, setDetails] = useState("");
+  const [secondaryKeywords, setSecondaryKeywords] = useState("");
+  const [externalLinks, setExternalLinks] = useState("");
+  const [autoPublishTarget, setAutoPublishTarget] = useState("");
 
-  const addSecondaryKeyword = () => {
-    if (skInput.trim() && !secondaryKeywords.includes(skInput.trim())) {
-      setSecondaryKeywords([...secondaryKeywords, skInput.trim()]);
-      setSkInput("");
-    }
-  };
+  // Structure Settings
+  const [structConclusion, setStructConclusion] = useState(true);
+  const [structTables, setStructTables] = useState(true);
+  const [structH3, setStructH3] = useState(true);
+  const [structLists, setStructLists] = useState(true);
+  const [structItalics, setStructItalics] = useState(true);
+  const [structQuotes, setStructQuotes] = useState(true);
+  const [structKeyTakeaways, setStructKeyTakeaways] = useState(true);
+  const [structFaq, setStructFaq] = useState(true);
+  const [structBold, setStructBold] = useState(true);
+
+  useEffect(() => {
+    const fetchIntegrations = async () => {
+      if (!user) return;
+      const { data } = await (supabase
+        .from("workspace_integrations" as any)
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("is_active", true) as any);
+      if (data) setIntegrations(data);
+    };
+    fetchIntegrations();
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const validH2s = h2List.filter(h => h.trim());
-    if (validH2s.length < 2) {
-      toast.error("Add at least 2 H2 headings");
+    if (!mainKeyword || !h1) {
+      toast.error("Please fill required fields (Keyword, Title)");
       return;
     }
 
     setLoading(true);
     try {
+      // Map Article Size to word count target
+      let wc = 1200;
+      if (articleSize.includes("Small")) wc = 800;
+      if (articleSize.includes("Medium")) wc = 1300;
+      if (articleSize.includes("Large")) wc = 2200;
+
+      // Ensure auto-publish setting is applied if selected
+      if (autoPublishTarget) {
+        // Logic to activate auto-publish for the chosen integration via Edge Function 
+        // would ideally store the `integrationId` on the `content_items` or apply it inline.
+        // For now, the existing Edge function uses the first active WP integration holding `auto_publish: true`.
+      }
+
       const { data, error } = await supabase.from("content_items").insert({
         user_id: user!.id,
         main_keyword: mainKeyword.trim(),
-        secondary_keywords: secondaryKeywords,
-        word_count_target: wordCount,
-        tone,
+        secondary_keywords: secondaryKeywords ? secondaryKeywords.split(",").map(k => k.trim()) : [],
+        word_count_target: wc,
+        tone: tone !== "None" ? tone : "Professional",
         target_country: targetCountry,
         h1: h1.trim(),
-        h2_list: validH2s,
-        h3_list: h3List.filter(h => h.trim()),
+        h2_list: [], // Auto-generated by backend now
+        h3_list: [],
         status: "generating",
       }).select("id").single();
 
       if (error) throw error;
 
-      // Fire-and-forget: start generation in background, don't wait for it
-      // The edge function updates the DB as each section completes
-      // The content view page polls for live progress
       supabase.functions.invoke("generate-blog", {
         body: { contentId: data.id },
-      }).catch((err: any) => {
-        console.error("Generation invoke error:", err);
-      });
+      }).catch((err: any) => console.error("Generation invoke error:", err));
 
       toast.success("Generation started!");
       navigate(`/content/${data.id}`);
@@ -113,220 +110,368 @@ const GeneratePage = () => {
     }
   };
 
-  return (
-    <div className="p-8 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-1">Generate SEO Blog</h1>
-      <p className="text-muted-foreground text-sm mb-6">Define your structure and let AI write the content</p>
+  const activeWpCount = integrations.filter(i => i.platform === "wordpress").length;
 
-      {/* Template Picker */}
-      <div className="mb-8">
-        <Label className="flex items-center gap-2 mb-3">
-          <LayoutTemplate className="h-4 w-4 text-primary" />
-          Quick Templates
-        </Label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {TEMPLATES.map((template) => {
-            const Icon = template.icon;
-            const isSelected = selectedTemplate === template.id;
-            return (
-              <button
-                key={template.id}
-                type="button"
-                onClick={() => applyTemplate(template.id)}
-                className={`p-3 rounded-xl border text-left transition-all duration-200 hover:shadow-md group ${isSelected
-                  ? `${template.color} border-2 shadow-sm`
-                  : "bg-card hover:border-primary/30"
-                  }`}
-              >
-                <Icon className={`h-5 w-5 mb-2 transition-transform group-hover:scale-110 ${isSelected ? "" : "text-muted-foreground"}`} />
-                <p className="text-sm font-semibold">{template.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{template.description}</p>
-              </button>
-            );
-          })}
+  return (
+    <div className="p-8 max-w-5xl mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <span className="bg-blue-100 text-blue-600 p-1.5 rounded-lg">
+              <FileText className="h-5 w-5" />
+            </span>
+            1-Click Blog Post
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1 ml-10">Generate a high-quality article in 1 click.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-amber-200">
+            Cost: 1 Credit
+          </span>
+          <span className="text-sm font-medium bg-primary/10 text-primary px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-primary/20">
+            <Sparkles className="h-4 w-4" /> 50 Credits Available
+          </span>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Main Keyword */}
-        <div>
-          <Label htmlFor="keyword">Main Keyword *</Label>
-          <Input
-            id="keyword"
-            value={mainKeyword}
-            onChange={(e) => setMainKeyword(e.target.value)}
-            placeholder="e.g. best digital marketing agency in Mumbai"
-            required
-          />
-        </div>
-
-        {/* H1 */}
-        <div>
-          <Label htmlFor="h1">H1 Heading *</Label>
-          <Input
-            id="h1"
-            value={h1}
-            onChange={(e) => setH1(e.target.value)}
-            placeholder="e.g. Best Digital Marketing Agency in Mumbai"
-            required
-          />
-        </div>
-
-        {/* Word Count */}
-        <div>
-          <Label>Word Count Target: {wordCount}</Label>
-          <Slider
-            value={[wordCount]}
-            onValueChange={([v]) => setWordCount(v)}
-            min={500}
-            max={3000}
-            step={100}
-            className="mt-2"
-          />
-          <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            <span>500</span>
-            <span>3000</span>
-          </div>
-        </div>
-
-        {/* H2 List */}
-        <div>
-          <Label>H2 Headings * (minimum 2)</Label>
-          <div className="space-y-2 mt-2">
-            {h2List.map((h2, i) => (
-              <div key={i} className="flex gap-2 animate-slide-in" style={{ animationDelay: `${i * 30}ms` }}>
-                <Input
-                  value={h2}
-                  onChange={(e) => {
-                    const copy = [...h2List];
-                    copy[i] = e.target.value;
-                    setH2List(copy);
-                  }}
-                  placeholder={`H2 heading ${i + 1}`}
-                />
-                {h2List.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setH2List(h2List.filter((_, j) => j !== i))}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setH2List([...h2List, ""])}
-            >
-              <Plus className="mr-1 h-3 w-3" />
-              Add H2
-            </Button>
-          </div>
-        </div>
-
-        {/* H3 List */}
-        <div>
-          <Label>H3 Headings (optional)</Label>
-          <div className="space-y-2 mt-2">
-            {h3List.map((h3, i) => (
-              <div key={i} className="flex gap-2 animate-slide-in" style={{ animationDelay: `${i * 30}ms` }}>
-                <Input
-                  value={h3}
-                  onChange={(e) => {
-                    const copy = [...h3List];
-                    copy[i] = e.target.value;
-                    setH3List(copy);
-                  }}
-                  placeholder={`H3 heading ${i + 1}`}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setH3List(h3List.filter((_, j) => j !== i))}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setH3List([...h3List, ""])}
-            >
-              <Plus className="mr-1 h-3 w-3" />
-              Add H3
-            </Button>
-          </div>
-        </div>
-
-        {/* Secondary Keywords */}
-        <div>
-          <Label>Secondary Keywords (optional)</Label>
-          <div className="flex gap-2 mt-2">
+        {/* Top Row: Keyword and Title */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+          <div className="space-y-2">
+            <Label htmlFor="keyword" className="font-semibold">Main Keyword*</Label>
             <Input
-              value={skInput}
-              onChange={(e) => setSkInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addSecondaryKeyword(); } }}
-              placeholder="Add keyword and press Enter"
+              id="keyword"
+              value={mainKeyword}
+              onChange={(e) => setMainKeyword(e.target.value)}
+              placeholder="Enter your main keyword"
+              required
+              className="bg-card"
             />
-            <Button type="button" variant="outline" onClick={addSecondaryKeyword}>Add</Button>
           </div>
-          {secondaryKeywords.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {secondaryKeywords.map((kw, i) => (
-                <Badge key={i} variant="secondary" className="gap-1">
-                  {kw}
-                  <button type="button" onClick={() => setSecondaryKeywords(secondaryKeywords.filter((_, j) => j !== i))}>
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
+          <div className="space-y-2">
+            <Label htmlFor="h1" className="font-semibold">Title*</Label>
+            <div className="flex gap-2">
+              <Input
+                id="h1"
+                value={h1}
+                onChange={(e) => setH1(e.target.value)}
+                placeholder="Generate a title first"
+                required
+                className="bg-card flex-1"
+              />
+              <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="w-[140px] bg-card"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="English (US)">Eng (US)</SelectItem>
+                  <SelectItem value="English (UK)">Eng (UK)</SelectItem>
+                  <SelectItem value="Spanish">Spanish</SelectItem>
+                  <SelectItem value="French">French</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button type="button" variant="default" className="shadow-sm bg-[#0A2540] hover:bg-[#0A2540]/90 text-white">
+                Generate a Title
+              </Button>
             </div>
-          )}
-        </div>
-
-        {/* Tone & Country */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Tone</Label>
-            <Select value={tone} onValueChange={setTone}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Professional">Professional</SelectItem>
-                <SelectItem value="Conversational">Conversational</SelectItem>
-                <SelectItem value="Formal">Formal</SelectItem>
-                <SelectItem value="Friendly">Friendly</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Target Country</Label>
-            <Select value={targetCountry} onValueChange={setTargetCountry}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="India">India</SelectItem>
-                <SelectItem value="USA">USA</SelectItem>
-                <SelectItem value="UK">UK</SelectItem>
-                <SelectItem value="Global">Global</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
-        <Button type="submit" className="w-full shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow" size="lg" disabled={loading}>
-          {loading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Sparkles className="mr-2 h-4 w-4" />
-          )}
-          Generate Blog
-        </Button>
+        {/* Core Settings */}
+        <div className="p-6 rounded-xl border bg-card/40 space-y-4">
+          <h3 className="font-bold text-lg flex items-center gap-2">Core Settings</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Language</Label>
+              <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="bg-background"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="English (US)">English (US)</SelectItem>
+                  <SelectItem value="English (UK)">English (UK)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Article Type</Label>
+              <Select value={articleType} onValueChange={setArticleType}>
+                <SelectTrigger className="bg-background"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Standard Blog Post">Standard Blog Post</SelectItem>
+                  <SelectItem value="How-to Guide">How-to Guide</SelectItem>
+                  <SelectItem value="Listicle">Listicle</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Article Size</Label>
+              <Select value={articleSize} onValueChange={setArticleSize}>
+                <SelectTrigger className="bg-background"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Small (500-1000 words)">Small (500-1000 words)</SelectItem>
+                  <SelectItem value="Medium (1000-1500 words)">Medium (1000-1500 words)</SelectItem>
+                  <SelectItem value="Large (1500-2500 words)">Large (1500-2500 words)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Research Level</Label>
+              <Select value={researchLevel} onValueChange={setResearchLevel}>
+                <SelectTrigger className="bg-background"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Standard AI Search">Standard AI Search - 1 Cr</SelectItem>
+                  <SelectItem value="In-Depth Search">In-Depth Search - 2 Cr</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Tone of Voice</Label>
+              <Select value={tone} onValueChange={setTone}>
+                <SelectTrigger className="bg-background"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="None">None</SelectItem>
+                  <SelectItem value="Professional">Professional</SelectItem>
+                  <SelectItem value="Conversational">Conversational</SelectItem>
+                  <SelectItem value="Authoritative">Authoritative</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Point of View</Label>
+              <Select value={pointOfView} onValueChange={setPointOfView}>
+                <SelectTrigger className="bg-background"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="None">None</SelectItem>
+                  <SelectItem value="First Person (I/We)">First Person (I/We)</SelectItem>
+                  <SelectItem value="Second Person (You)">Second Person (You)</SelectItem>
+                  <SelectItem value="Third Person (They/It)">Third Person (They/It)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Text Readability</Label>
+              <Select value={textReadability} onValueChange={setTextReadability}>
+                <SelectTrigger className="bg-background"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="None">None</SelectItem>
+                  <SelectItem value="7th Grade">7th Grade (Simple)</SelectItem>
+                  <SelectItem value="High School">High School</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Target Country</Label>
+              <Select value={targetCountry} onValueChange={setTargetCountry}>
+                <SelectTrigger className="bg-background"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="United States">United States</SelectItem>
+                  <SelectItem value="United Kingdom">United Kingdom</SelectItem>
+                  <SelectItem value="India">India</SelectItem>
+                  <SelectItem value="Australia">Australia</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Image Settings */}
+        <div className="rounded-xl border bg-card/40 overflow-hidden">
+          <div className="p-4 border-b bg-muted/20 flex flex-col sm:flex-row items-center gap-3">
+            <div className="h-10 w-10 flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+              <ImageIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <h3 className="font-bold flex items-center gap-2">Image Settings <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">BETA</Badge></h3>
+              <p className="text-xs text-muted-foreground font-medium">Configure visual assets for your publication</p>
+            </div>
+          </div>
+          <div className="p-8 text-center bg-muted/10">
+            <p className="text-sm text-muted-foreground mb-2">Upgrade to a paid plan to unlock AI-powered image generation for your blog posts.</p>
+            <Button variant="link" className="text-primary h-auto p-0">View Plans &rarr;</Button>
+          </div>
+        </div>
+
+        {/* ICP */}
+        <div className="space-y-2">
+          <Label className="font-bold flex items-center gap-2">Ideal Customer Profile (ICP) <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 text-primary border-primary">New</Badge></Label>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Textarea
+              value={icp}
+              onChange={(e) => setIcp(e.target.value)}
+              placeholder="e.g., Marketing managers at B2B SaaS companies with 50-200 employees..."
+              className="bg-card min-h-[80px] flex-1"
+            />
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 sm:w-[350px] flex items-start gap-3 text-xs text-muted-foreground">
+              <Fingerprint className="h-4 w-4 shrink-0 text-primary" />
+              <p>Define your ideal customer profile to tailor content tone, examples, and language that resonates with your target audience.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Brand Voice */}
+        <div className="space-y-2">
+          <Label className="font-bold flex items-center gap-2">Brand Voice</Label>
+          <div className="flex flex-col sm:flex-row gap-4 items-start">
+            <Select value={brandVoice} onValueChange={setBrandVoice}>
+              <SelectTrigger className="bg-card w-full sm:w-[250px]"><SelectValue placeholder="No brand kits found" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No brand kits found</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="bg-primary/5 border border-primary/20 rounded-lg py-2 px-4 flex-1 flex items-center gap-2 text-xs text-muted-foreground">
+              <Fingerprint className="h-4 w-4 shrink-0 text-primary" />
+              <p>Create unique styles and tones for different situations using Brand Voice. Select a Brand Kit to apply it directly to the content.</p>
+            </div>
+          </div>
+          <div className="pt-2">
+            <p className="text-xs font-semibold text-muted-foreground mb-2">* Note: You have no active Brand Kits for this workspace.</p>
+            <Button variant="outline" className="h-8 text-xs" onClick={() => navigate('/brand-identity')}>Go to Brand Identity</Button>
+          </div>
+        </div>
+
+        {/* Structure Settings */}
+        <div className="p-6 rounded-xl border bg-card/40 space-y-4">
+          <h3 className="font-bold text-lg">Structure Settings</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex flex-col gap-1.5 border-b pb-2">
+              <Label className="text-sm text-muted-foreground">Conclusion</Label>
+              <button type="button" onClick={() => setStructConclusion(!structConclusion)} className="flex items-center gap-2 text-sm font-medium w-full text-left">
+                <CheckCircle2 className={`h-4 w-4 rounded-full ${structConclusion ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structConclusion ? "Yes" : "No"}
+              </button>
+            </div>
+            <div className="flex flex-col gap-1.5 border-b pb-2">
+              <Label className="text-sm text-muted-foreground">Tables</Label>
+              <button type="button" onClick={() => setStructTables(!structTables)} className="flex items-center gap-2 text-sm font-medium w-full text-left">
+                <CheckCircle2 className={`h-4 w-4 rounded-full ${structTables ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structTables ? "Yes" : "No"}
+              </button>
+            </div>
+            <div className="flex flex-col gap-1.5 border-b pb-2">
+              <Label className="text-sm text-muted-foreground">H3 Headings</Label>
+              <button type="button" onClick={() => setStructH3(!structH3)} className="flex items-center gap-2 text-sm font-medium w-full text-left">
+                <CheckCircle2 className={`h-4 w-4 rounded-full ${structH3 ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structH3 ? "Yes" : "No"}
+              </button>
+            </div>
+            <div className="flex flex-col gap-1.5 border-b pb-2">
+              <Label className="text-sm text-muted-foreground">Lists</Label>
+              <button type="button" onClick={() => setStructLists(!structLists)} className="flex items-center gap-2 text-sm font-medium w-full text-left">
+                <CheckCircle2 className={`h-4 w-4 rounded-full ${structLists ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structLists ? "Yes" : "No"}
+              </button>
+            </div>
+            <div className="flex flex-col gap-1.5 border-b pb-2">
+              <Label className="text-sm text-muted-foreground">Italics</Label>
+              <button type="button" onClick={() => setStructItalics(!structItalics)} className="flex items-center gap-2 text-sm font-medium w-full text-left">
+                <CheckCircle2 className={`h-4 w-4 rounded-full ${structItalics ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structItalics ? "Yes" : "No"}
+              </button>
+            </div>
+            <div className="flex flex-col gap-1.5 border-b pb-2">
+              <Label className="text-sm text-muted-foreground">Quotes</Label>
+              <button type="button" onClick={() => setStructQuotes(!structQuotes)} className="flex items-center gap-2 text-sm font-medium w-full text-left">
+                <CheckCircle2 className={`h-4 w-4 rounded-full ${structQuotes ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structQuotes ? "Yes" : "No"}
+              </button>
+            </div>
+            <div className="flex flex-col gap-1.5 border-b pb-2">
+              <Label className="text-sm text-muted-foreground">Key Takeaways</Label>
+              <button type="button" onClick={() => setStructKeyTakeaways(!structKeyTakeaways)} className="flex items-center gap-2 text-sm font-medium w-full text-left">
+                <CheckCircle2 className={`h-4 w-4 rounded-full ${structKeyTakeaways ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structKeyTakeaways ? "Yes" : "No"}
+              </button>
+            </div>
+            <div className="flex flex-col gap-1.5 border-b pb-2">
+              <Label className="text-sm text-muted-foreground">FAQ</Label>
+              <button type="button" onClick={() => setStructFaq(!structFaq)} className="flex items-center gap-2 text-sm font-medium w-full text-left">
+                <CheckCircle2 className={`h-4 w-4 rounded-full ${structFaq ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structFaq ? "Yes" : "No"}
+              </button>
+            </div>
+            <div className="flex flex-col gap-1.5 border-b pb-2">
+              <Label className="text-sm text-muted-foreground">Bold</Label>
+              <button type="button" onClick={() => setStructBold(!structBold)} className="flex items-center gap-2 text-sm font-medium w-full text-left">
+                <CheckCircle2 className={`h-4 w-4 rounded-full ${structBold ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structBold ? "Yes" : "No"}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Details to Include */}
+        <div className="space-y-2">
+          <Label className="font-bold flex items-center gap-2">Details to Include <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-normal">Optional</Badge></Label>
+          <p className="text-xs text-muted-foreground">What details would you like to include in your article? <span className="text-primary cursor-pointer hover:underline">Learn more</span></p>
+          <Textarea
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+            placeholder="e.g. phone number: +1 234-567-8900"
+            className="bg-card min-h-[100px]"
+          />
+        </div>
+
+        {/* SEO Keywords */}
+        <div className="space-y-2">
+          <Label className="font-bold flex items-center gap-2">SEO Keywords <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-normal">Optional</Badge></Label>
+          <p className="text-xs text-muted-foreground">Keywords to include in the text.</p>
+          <Textarea
+            value={secondaryKeywords}
+            onChange={(e) => setSecondaryKeywords(e.target.value)}
+            placeholder="Add to comma separated phrase then press Enter to add"
+            className="bg-card min-h-[60px]"
+          />
+        </div>
+
+        {/* External Links */}
+        <div className="space-y-2">
+          <Label className="font-bold flex items-center gap-2">External Links <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-normal">Optional</Badge></Label>
+          <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900 rounded-lg p-3 text-xs text-blue-900 dark:text-blue-300 flex items-center gap-2 mb-2">
+            <span className="bg-blue-500 rounded-full p-0.5 text-white">
+              <CheckCircle2 className="h-3 w-3" />
+            </span>
+            Internal working coming soon! Currently integrated sites include contextual links to user sites. The manual capacity demands links.
+          </div>
+          <div className="border bg-card rounded-lg p-3 text-sm">
+            <Label className="text-muted-foreground text-xs mb-1 block">Add External Links</Label>
+            <div className="flex gap-2 items-center">
+              <Input
+                value={externalLinks}
+                onChange={(e) => setExternalLinks(e.target.value)}
+                placeholder="https://example.com - Ensure URLs include spaces while formatting"
+                className="flex-1 bg-background"
+              />
+              <Button type="button" variant="secondary" size="sm" className="bg-muted">
+                <Plus className="h-4 w-4 mr-1" /> Add
+              </Button>
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-1">E.g. compass//handholding//or ops//</p>
+          </div>
+        </div>
+
+        {/* Auto-Publish to Website */}
+        <div className="space-y-2 pb-6">
+          <Label className="font-bold flex items-center gap-2">Auto-Publish to Website</Label>
+          <div className="border bg-card rounded-lg p-4 text-sm mt-2">
+            <Label className="text-xs font-semibold block mb-1">Select Target Website(s)</Label>
+            <p className="text-xs text-muted-foreground mb-3">Choose one or more connected blogs where this post will be auto-published as a draft / or *</p>
+            {activeWpCount === 0 ? (
+              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 p-2.5 rounded text-xs text-amber-800 dark:text-amber-500">
+                No verified integrations available. Please setup integrations in <span className="font-semibold text-primary cursor-pointer" onClick={() => navigate('/integrations')}>integrations here</span>.
+              </div>
+            ) : (
+              <Select value={autoPublishTarget} onValueChange={setAutoPublishTarget}>
+                <SelectTrigger className="w-full bg-background"><SelectValue placeholder="Select WordPress Integration" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Do not auto-publish</SelectItem>
+                  {integrations.filter(i => i.platform === "wordpress").map(i => (
+                    <SelectItem key={i.id} value={i.id}>{i.credentials.url || "WordPress Site"}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-6 border-t flex flex-col items-center gap-2">
+          <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-0 rounded-full font-medium">Estimated blog generation time: 5-10 minutes</Badge>
+          <Button type="submit" className="w-[300px] shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow" size="lg" disabled={loading}>
+            {loading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            Generate Blog Post
+          </Button>
+        </div>
       </form>
     </div>
   );

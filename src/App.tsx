@@ -10,10 +10,12 @@ import DashboardLayout from "@/components/DashboardLayout";
 import AuthPage from "@/pages/AuthPage";
 import DashboardPage from "@/pages/DashboardPage";
 import GeneratePage from "@/pages/GeneratePage";
+import BulkGeneratePage from "@/pages/BulkGeneratePage";
 import ContentViewPage from "@/pages/ContentViewPage";
 import IntegrationsPage from "@/pages/IntegrationsPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 import SettingsPage from "@/pages/SettingsPage";
+import { ManagePostsPage, CalendarPage, BrandIdentityPage } from "@/pages/Placeholders";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,7 +40,11 @@ const App = () => (
               >
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/generate" element={<GeneratePage />} />
+                <Route path="/bulk-generate" element={<BulkGeneratePage />} />
                 <Route path="/content/:id" element={<ContentViewPage />} />
+                <Route path="/manage-posts" element={<ManagePostsPage />} />
+                <Route path="/calendar" element={<CalendarPage />} />
+                <Route path="/brand-identity" element={<BrandIdentityPage />} />
                 <Route path="/integrations" element={<IntegrationsPage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />

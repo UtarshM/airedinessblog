@@ -4,6 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -16,6 +18,7 @@ interface Integration {
         url?: string;
         username?: string;
         app_password?: string;
+        auto_publish?: boolean;
     };
     is_active: boolean;
     created_at: string;
@@ -29,6 +32,7 @@ const IntegrationsPage = () => {
     const [url, setUrl] = useState("");
     const [username, setUsername] = useState("");
     const [appPassword, setAppPassword] = useState("");
+    const [autoPublish, setAutoPublish] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
 
     const fetchIntegrations = async () => {
@@ -62,22 +66,48 @@ const IntegrationsPage = () => {
 
         setIsAdding(true);
         try {
+            // 1. Prepare clean URL
+            let cleanUrl = url.trim();
+            if (cleanUrl.endsWith("/")) cleanUrl = cleanUrl.slice(0, -1);
+
+            // 2. Test WordPress Credentials
+            const authString = btoa(`${username.trim()}:${appPassword.trim()}`);
+            const testResponse = await fetch(`${cleanUrl}/wp-json/wp/v2/users/me`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Basic ${authString}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!testResponse.ok) {
+                if (testResponse.status === 401) {
+                    throw new Error("Invalid Username or Application Password.");
+                } else if (testResponse.status === 404) {
+                    throw new Error("WordPress REST API not found at this URL. Make sure it's a valid WordPress site.");
+                } else {
+                    throw new Error(`WordPress returned an error: ${testResponse.status} ${testResponse.statusText}`);
+                }
+            }
+
+            // 3. If validation successful, save to Supabase
             const { error } = await supabase
                 .from("workspace_integrations" as any)
                 .insert({
                     user_id: user!.id,
                     platform: "wordpress",
-                    credentials: { url, username, app_password: appPassword },
+                    credentials: { url: cleanUrl, username: username.trim(), app_password: appPassword.trim(), auto_publish: autoPublish },
                     is_active: true
                 });
 
             if (error) throw error;
 
-            toast.success("Integration added");
+            toast.success("WordPress connected successfully!");
             setDialogOpen(false);
             setUrl("");
             setUsername("");
             setAppPassword("");
+            setAutoPublish(false);
             fetchIntegrations();
         } catch (err: any) {
             toast.error(err.message || "Failed to add integration");
@@ -153,6 +183,13 @@ const IntegrationsPage = () => {
                                     Go to Users &gt; Profile &gt; Application Passwords in WordPress admin.
                                 </p>
                             </div>
+                            <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                <div className="space-y-0.5">
+                                    <Label>Auto-Publish</Label>
+                                    <p className="text-xs text-muted-foreground">Automatically publish generated content to WordPress.</p>
+                                </div>
+                                <Switch checked={autoPublish} onCheckedChange={setAutoPublish} />
+                            </div>
                             <DialogFooter>
                                 <Button type="submit" disabled={isAdding}>
                                     {isAdding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -188,9 +225,17 @@ const IntegrationsPage = () => {
                                     {integration.credentials.url}
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="text-sm">
+                            <CardContent className="text-sm space-y-2">
                                 <p><span className="font-medium">User:</span> {integration.credentials.username}</p>
-                                <p className="text-xs text-muted-foreground mt-2">Added on {new Date(integration.created_at).toLocaleDateString()}</p>
+                                <div className="flex items-center gap-2">
+                                    <span className="font-medium">Auto-Publish:</span>
+                                    {integration.credentials.auto_publish ? (
+                                        <Badge variant="outline" className="text-emerald-500 bg-emerald-500/10 border-0">Enabled</Badge>
+                                    ) : (
+                                        <Badge variant="outline" className="text-muted-foreground bg-muted border-0">Disabled</Badge>
+                                    )}
+                                </div>
+                                <p className="text-xs text-muted-foreground pt-1">Added on {new Date(integration.created_at).toLocaleDateString()}</p>
                             </CardContent>
                             <CardFooter className="justify-end">
                                 <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleDelete(integration.id)}>

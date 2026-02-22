@@ -7,6 +7,10 @@ import { toast } from "sonner";
 import { ArrowLeft, Loader2, Copy, Check, Pencil, Eye, Globe, RefreshCw, BarChart3, Send } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { marked } from "marked";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface ContentItem {
   id: string;
@@ -94,6 +98,13 @@ const ContentViewPage = () => {
   const [refinePrompt, setRefinePrompt] = useState("");
   const [refining, setRefining] = useState(false);
 
+  // New WP Publish Settings State
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
+  const [publishStatus, setPublishStatus] = useState("draft");
+  const [wpCategories, setWpCategories] = useState<{ id: number, name: string }[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("none");
+  const [fetchingCategories, setFetchingCategories] = useState(false);
+
   const fetchContent = useCallback(async () => {
     if (!id) return;
     const { data, error } = await supabase
@@ -152,17 +163,122 @@ const ContentViewPage = () => {
     setSaving(false);
   };
 
+  const openPublishDialog = async () => {
+    setPublishDialogOpen(true);
+    setFetchingCategories(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { data: integrations } = await (supabase
+        .from("workspace_integrations" as any)
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("platform", "wordpress")
+        .eq("is_active", true) as any);
+
+      if (integrations && integrations.length > 0) {
+        const creds = integrations[0].credentials;
+        if (creds && creds.url && creds.username && creds.app_password) {
+          let cleanUrl = creds.url.trim();
+          if (cleanUrl.endsWith("/")) cleanUrl = cleanUrl.slice(0, -1);
+          const authString = btoa(`${creds.username}:${creds.app_password}`);
+
+          const res = await fetch(`${cleanUrl}/wp-json/wp/v2/categories?per_page=100`, {
+            headers: { Authorization: `Basic ${authString}` }
+          });
+          if (res.ok) {
+            const cats = await res.json();
+            setWpCategories(cats);
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setFetchingCategories(false);
+    }
+  };
+
   const handlePublish = async () => {
     setPublishing(true);
     try {
-      const { data, error } = await supabase.functions.invoke('publish-to-wordpress', {
-        body: { contentId: id }
+      if (!content || !content.id) throw new Error("No content to publish");
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
+
+      // 1. Fetch Integration
+      // Use 'as any' to bypass the type error in the table schema
+      const { data: integrations, error: intError } = await (supabase
+        .from("workspace_integrations" as any)
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("platform", "wordpress")
+        .eq("is_active", true) as any);
+
+      if (intError) throw new Error("Failed to check WordPress integration: " + intError.message);
+      if (!integrations || integrations.length === 0) {
+        throw new Error("No active WordPress integration found. Please connect in Settings > Integrations.");
+      }
+
+      const integration = integrations[0];
+      const creds = integration.credentials;
+      if (!creds || !creds.url || !creds.username || !creds.app_password) {
+        throw new Error("WordPress integration is missing credentials.");
+      }
+
+      // 2. Prepare HTML
+      let cleanUrl = creds.url.trim();
+      if (cleanUrl.endsWith("/")) cleanUrl = cleanUrl.slice(0, -1);
+
+      const title = content.generated_title || content.h1;
+      const markdownContent = content.generated_content || "";
+      const htmlContent = await marked.parse(markdownContent);
+
+      const payload: any = {
+        title: title,
+        content: htmlContent,
+        status: publishStatus,
+      };
+
+      if (selectedCategory !== "none") {
+        payload.categories = [parseInt(selectedCategory)];
+      }
+
+      // 3. Publish to WP Directly 
+      console.log(`Publishing directly from frontend to ${cleanUrl}...`);
+      const authString = btoa(`${creds.username}:${creds.app_password}`);
+      const endpoint = `${cleanUrl}/wp-json/wp/v2/posts`;
+
+      const wpResponse = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Basic ${authString}`,
+        },
+        body: JSON.stringify(payload),
       });
-      if (error) throw error;
-      if (data.error) throw new Error(data.error);
-      toast.success("Published to WordPress!");
+
+      if (!wpResponse.ok) {
+        const errorText = await wpResponse.text();
+        console.error("WordPress API Error:", wpResponse.status, errorText);
+        throw new Error(`WordPress rejected the connection (${wpResponse.status}). Make sure it is an Application Password.`);
+      }
+
+      const wpData = await wpResponse.json();
+
+      // 4. Update status in Supabase
+      await supabase.from("content_items").update({
+        status: "published",
+        published_url: wpData.link
+      }).eq("id", content.id);
+
+      toast.success("Successfully sent to WordPress!");
+      setPublishDialogOpen(false);
       fetchContent();
     } catch (e: any) {
+      console.error(e);
       toast.error(e.message || "Failed to publish");
     } finally {
       setPublishing(false);
@@ -447,15 +563,11 @@ const ContentViewPage = () => {
           <Button
             variant="default"
             size="sm"
-            onClick={handlePublish}
-            disabled={publishing || content.status === "published"}
+            onClick={openPublishDialog}
+            disabled={content.status === "published"}
             className="ml-auto"
           >
-            {publishing ? (
-              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-            ) : (
-              <Globe className="mr-1 h-3 w-3" />
-            )}
+            <Globe className="mr-1 h-3 w-3" />
             {content.status === "published" ? "Published" : "Publish to WP"}
           </Button>
         </div>
@@ -543,6 +655,51 @@ const ContentViewPage = () => {
           />
         )}
       </div>
+
+      <Dialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Publish to WordPress</DialogTitle>
+            <DialogDescription>Configure how your post will appear on your WordPress site.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Post Status</Label>
+              <Select value={publishStatus} onValueChange={setPublishStatus}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Save as Draft (Review Later)</SelectItem>
+                  <SelectItem value="publish">Publish Immediately (Live)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Category {fetchingCategories && <Loader2 className="inline h-3 w-3 animate-spin ml-2 text-primary" />}</Label>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={fetchingCategories || wpCategories.length === 0}>
+                <SelectTrigger><SelectValue placeholder={fetchingCategories ? "Fetching Categories..." : "Select a Category (Optional)"} /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None / Default</SelectItem>
+                  {wpCategories.map(cat => (
+                    <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <p className="text-xs text-muted-foreground mt-2 text-center bg-muted/30 p-2 rounded-lg">
+              Tags and advanced SEO meta functionality will be applied directly via your WordPress site after generation.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPublishDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handlePublish} disabled={publishing}>
+              {publishing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Send to WordPress
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

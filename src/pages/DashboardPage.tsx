@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, FileText, Trash2, TrendingUp, Zap, BookOpen, RefreshCw } from "lucide-react";
+import { PlusCircle, FileText, Trash2, RefreshCw, Layers, Fingerprint, Lightbulb, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { SkeletonDashboard } from "@/components/SkeletonCard";
 
@@ -57,7 +57,22 @@ const DashboardPage = () => {
           remaining: creditData.total_credits - creditData.used_credits - creditData.locked_credits
         });
       } else {
-        setCredits({ total: 50, used: 5, remaining: 45 });
+        // Auto-provision 50 credits for new users
+        const { error: insertError } = await supabase
+          .from("workspace_credits" as any)
+          .insert({
+            user_id: user.id,
+            total_credits: 50,
+            used_credits: 0,
+            locked_credits: 0
+          } as any);
+
+        if (!insertError) {
+          setCredits({ total: 50, used: 0, remaining: 50 });
+        } else {
+          console.error("Failed to provision initial credits", insertError);
+          setCredits({ total: 0, used: 0, remaining: 0 });
+        }
       }
     }
     setLoading(false);
@@ -111,122 +126,142 @@ const DashboardPage = () => {
   const totalWords = items.reduce((sum, i) => sum + i.word_count_target, 0);
 
   return (
-    <div className="p-8 max-w-5xl">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-8 max-w-5xl mx-auto space-y-6">
+      {/* Welcome Header */}
+      <div className="flex items-center justify-between border-b pb-4">
         <div>
-          <h1 className="text-2xl font-bold">My Content</h1>
-          <p className="text-muted-foreground text-sm mt-1">Manage your SEO blog posts</p>
+          <h1 className="text-2xl font-bold">Welcome back to BlogForge</h1>
+          <p className="text-muted-foreground text-sm mt-1">Ready to create high-quality, SEO-optimized blog content?</p>
         </div>
-        <Button asChild className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow">
-          <Link to="/generate">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            New Blog
-          </Link>
-        </Button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="p-4 rounded-xl border bg-card hover:shadow-md transition-all duration-300 group">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <BookOpen className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{items.length}</p>
-              <p className="text-xs text-muted-foreground">Total Posts</p>
-            </div>
-          </div>
-        </div>
-        <div className="p-4 rounded-xl border bg-card hover:shadow-md transition-all duration-300 group">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <TrendingUp className="h-5 w-5 text-emerald-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{completedCount}</p>
-              <p className="text-xs text-muted-foreground">Completed</p>
-            </div>
-          </div>
-        </div>
-        <div className="p-4 rounded-xl border bg-card hover:shadow-md transition-all duration-300 group">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Zap className="h-5 w-5 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{credits?.remaining ?? "—"}<span className="text-sm font-normal text-muted-foreground">/{credits?.total ?? "—"}</span></p>
-              <p className="text-xs text-muted-foreground">Credits Left</p>
-            </div>
-          </div>
+        <div className="flex items-center gap-4">
+          <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800 hidden sm:flex px-3 py-1 text-xs">
+            {credits?.remaining ?? "—"} Credits
+          </Badge>
+          <Button variant="default" className="shadow-sm">Quick Tour</Button>
         </div>
       </div>
 
-      {/* Content List */}
-      {loading ? (
-        <SkeletonDashboard />
-      ) : items.length === 0 ? (
-        <div className="text-center py-20 border border-dashed rounded-xl bg-card/50">
-          <FileText className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-          <h3 className="font-semibold mb-1">No content yet</h3>
-          <p className="text-sm text-muted-foreground mb-4">Generate your first SEO blog post</p>
-          <Button asChild size="sm">
-            <Link to="/generate">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Create Blog
-            </Link>
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {items.map((item, index) => {
-            const status = statusConfig[item.status] || statusConfig.draft;
-            return (
-              <Link
-                key={item.id}
-                to={`/content/${item.id}`}
-                className="flex items-center justify-between p-4 rounded-xl border bg-card hover:shadow-md hover:border-primary/20 transition-all duration-300 group animate-slide-in"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
-                      {item.generated_title || item.h1}
-                    </h3>
-                    <Badge variant="secondary" className={`${status.bg} ${status.text} gap-1.5`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
-                      {item.status === "generating"
-                        ? `Generating ${item.sections_completed || 0}/${item.total_sections || "?"}`
-                        : item.status}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {item.main_keyword} · {item.word_count_target.toLocaleString()} words · {new Date(item.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1">
-                  {(item.status === "generating" || item.status === "failed") && (
-                    <button
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRetry(item.id); }}
-                      className="opacity-0 group-hover:opacity-100 p-2 text-muted-foreground hover:text-primary transition-all rounded-lg hover:bg-primary/10"
-                      title="Retry generation"
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                    </button>
-                  )}
-                  <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(item.id); }}
-                    className="opacity-0 group-hover:opacity-100 p-2 text-muted-foreground hover:text-destructive transition-all rounded-lg hover:bg-destructive/10"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
+      {/* Tip of the Day */}
+      <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 flex items-start gap-3 text-sm">
+        <Lightbulb className="h-5 w-5 text-primary shrink-0" />
+        <p><span className="font-semibold text-primary">Pro Tip:</span> <span className="text-muted-foreground">Group related content around pillar topics to establish topical authority before generating posts.</span></p>
+      </div>
+
+      {/* Action Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Create Post */}
+        <Link to="/generate" className="p-6 rounded-xl border bg-card hover:shadow-md hover:border-primary/30 transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h3 className="font-semibold text-lg">Create Post</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">Create a single blog post with AI assistance</p>
+          </div>
+          <div className="flex items-center text-primary text-sm font-medium mt-4 group-hover:underline">
+            Get Started <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </div>
+        </Link>
+
+        {/* Bulk Creation */}
+        <Link to="/bulk-generate" className="p-6 rounded-xl border bg-card hover:shadow-md hover:border-emerald-500/30 transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                <Layers className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <h3 className="font-semibold text-lg">Bulk Creation</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">Generate multiple blog posts in one go</p>
+          </div>
+          <div className="flex items-center text-primary text-sm font-medium mt-4 group-hover:underline">
+            Get Started <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </div>
+        </Link>
+
+        {/* Brand Identity */}
+        <Link to="/brand-identity" className="p-6 rounded-xl border bg-card hover:shadow-md hover:border-purple-500/30 transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <Fingerprint className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <h3 className="font-semibold text-lg">Brand Identity</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">Set up your brand voice and style</p>
+          </div>
+          <div className="flex items-center text-primary text-sm font-medium mt-4 group-hover:underline">
+            Configure <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </div>
+        </Link>
+      </div>
+
+      {/* Recent Posts List */}
+      <div className="pt-8">
+        <h2 className="text-xl font-bold mb-4">Recent Blog Posts</h2>
+        {loading ? (
+          <SkeletonDashboard />
+        ) : items.length === 0 ? (
+          <div className="text-center py-16 border rounded-xl bg-card border-dashed">
+            <p className="text-muted-foreground mb-4">No blog posts found. Create your first blog post!</p>
+            <Button asChild variant="default" className="shadow-sm">
+              <Link to="/generate">
+                Create Blog Post
               </Link>
-            );
-          })}
-        </div>
-      )}
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {items.map((item, index) => {
+              const status = statusConfig[item.status] || statusConfig.draft;
+              return (
+                <Link
+                  key={item.id}
+                  to={`/content/${item.id}`}
+                  className="flex items-center justify-between p-4 rounded-xl border bg-card hover:shadow-md hover:border-primary/20 transition-all duration-300 group animate-slide-in"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
+                        {item.generated_title || item.h1}
+                      </h3>
+                      <Badge variant="secondary" className={`${status.bg} ${status.text} gap-1.5`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
+                        {item.status === "generating"
+                          ? `Generating ${item.sections_completed || 0}/${item.total_sections || "?"}`
+                          : item.status}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {item.main_keyword} · {item.word_count_target.toLocaleString()} words · {new Date(item.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {(item.status === "generating" || item.status === "failed") && (
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRetry(item.id); }}
+                        className="opacity-0 group-hover:opacity-100 p-2 text-muted-foreground hover:text-primary transition-all rounded-lg hover:bg-primary/10"
+                        title="Retry generation"
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(item.id); }}
+                      className="opacity-0 group-hover:opacity-100 p-2 text-muted-foreground hover:text-destructive transition-all rounded-lg hover:bg-destructive/10"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
