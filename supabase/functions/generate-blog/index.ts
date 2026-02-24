@@ -44,9 +44,9 @@ const SYSTEM_PROMPT = `Act as a senior SEO content strategist with 20+ years of 
 
 STRICT RULES:
 
-1. PARAGRAPHS: Max 2 sentences per paragraph. Keep them punchy and scannable. Never 3+ sentences.
+1. PARAGRAPHS: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. This is the most critical rule. If a paragraph has 3 or more sentences, you have failed.
 
-2. SENTENCES: 15-20 words each. Short, clear, direct.
+2. SENTENCES: 10-15 words each. Short, extremely concise, direct. Avoid filler words.
 
 3. SIMPLE WORDS: Everyday common language. 7th-grade reading level. No complex or academic words.
 
@@ -92,7 +92,7 @@ const GROQ_MODELS = {
   faq: "llama-3.1-8b-instant",
 } as const;
 
-async function callGroq(messages: any[], model: string): Promise<string> {
+async function callGroq(messages: any[], model: string, maxTokens: number = 2000): Promise<string> {
   const groqKey = Deno.env.get("GROQ_API_KEY");
   if (!groqKey) throw new Error("GROQ_API_KEY not configured");
 
@@ -106,7 +106,7 @@ async function callGroq(messages: any[], model: string): Promise<string> {
         Authorization: `Bearer ${groqKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ model, messages, max_tokens: 2000, temperature: 0.7 }),
+      body: JSON.stringify({ model, messages, max_tokens: maxTokens, temperature: 0.7 }),
     });
 
     if (response.status === 429) {
@@ -162,7 +162,12 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
       return;
     }
 
-    const { main_keyword, secondary_keywords, word_count_target, tone, h1, h2_list, h3_list, target_country, internal_links, generate_image } = content;
+    let { main_keyword, secondary_keywords, word_count_target, tone, h1, h2_list, h3_list, target_country, internal_links, generate_image } = content;
+
+    // Safety default if word count is unexpectedly empty or wildly out of bounds
+    if (!word_count_target || word_count_target < 500) {
+      word_count_target = 1000;
+    }
     let h2s: string[] = h2_list || [];
     const h3s = h3_list || [];
     const secondaryKw = (secondary_keywords || []).join(", ");
@@ -253,7 +258,8 @@ STRICT RULES:
     const intro = await callGroq([
       { role: "system", content: dynamicSystemPrompt },
       {
-        role: "user", content: `Write the introduction for a blog titled "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Also reference: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.introWords} words.
+        role: "user", content: `Write the introduction for a blog titled "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Also reference: ${secondaryKw}.` : ""} Tone: ${tone}.
+CRITICAL LENGTH: STRICTLY limit your response to around ${dist.introWords} words. DO NOT WRITE MORE THAN THIS.
 
 STRUCTURE:
 1. PROBLEM STATEMENT: State the real problem the reader faces. Use a specific number or data point to anchor it (e.g. user counts, market size, adoption rate).
@@ -267,7 +273,7 @@ KEYWORD RULES:
 - NEVER repeat the keyword in back-to-back sentences.
 
 FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No headings.` },
-    ], GROQ_MODELS.section);
+    ], GROQ_MODELS.section, Math.round(dist.introWords * 1.5) + 100);
 
     completed++;
     markdown += `${intro.trim()}\n\n`;
@@ -281,7 +287,8 @@ FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active vo
       const h2Content = await callGroq([
         { role: "system", content: dynamicSystemPrompt },
         {
-          role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Reference: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.h2Words} words.
+          role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Reference: ${secondaryKw}.` : ""} Tone: ${tone}.
+CRITICAL LENGTH: STRICTLY limit your response to around ${dist.h2Words} words. DO NOT WRITE MORE THAN THIS.
 
 STRUCTURE:
 1. CORE CLAIM: State the main point with a supporting data point (user number, market stat, growth rate, cost figure).
@@ -303,7 +310,7 @@ BLOCKING RULES:
 - Every claim must have a reason or data behind it
 
 FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No section heading in output.` },
-      ], GROQ_MODELS.section);
+      ], GROQ_MODELS.section, Math.round(dist.h2Words * 1.5) + 100);
 
       completed++;
       markdown += `## ${h2s[i]}\n\n${h2Content.trim()}\n\n`;
@@ -319,7 +326,8 @@ FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active vo
     const closingContent = await callGroq([
       { role: "system", content: dynamicSystemPrompt },
       {
-        role: "user", content: `Write the conclusion AND FAQs for the blog "${title.trim()}" about "${main_keyword}". Tone: ${tone}. ~${dist.conclusionWords + dist.faqWords} words.
+        role: "user", content: `Write the conclusion AND FAQs for the blog "${title.trim()}" about "${main_keyword}". Tone: ${tone}.
+CRITICAL LENGTH: STRICTLY limit the ENTIRE output to around ${dist.conclusionWords + dist.faqWords} words combined. DO NOT WABBLE OR OVER-EXPLAIN.
 
 CONCLUSION (write first):
 - SENTENCE QUALITY: Write full, proper sentences. No fragments. AVOID "However", "Additionally", "Moreover", "Therefore". Use natural language.
@@ -329,6 +337,7 @@ CONCLUSION (write first):
 - Max 2 sentences per paragraph.
 - Use "${main_keyword}" only once. Variations for other mentions.
 - Do NOT start with "In conclusion" or "To sum up".
+- DO NOT INCLUDE A HEADING FOR THE CONCLUSION. Do NOT output "## Conclusion". Start writing the actual conclusion body immediately.
 
 Then write FAQs:
 
@@ -344,10 +353,12 @@ Then write FAQs:
 [Answer that corrects the misconception with evidence or logic. Full sentences.]
 
 FORMAT: Max 2 sentences per paragraph. Sentences 15-20 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No fake stats — use real public data or logical reasoning.` },
-    ], GROQ_MODELS.faq);
+    ], GROQ_MODELS.faq, Math.round((dist.conclusionWords + dist.faqWords) * 1.5) + 200);
 
     completed++;
-    markdown += `## Conclusion\n\n${closingContent.trim()}\n\n`;
+    // Strip out any ## Conclusion if the model hallucinated it anyway
+    const cleanClosing = closingContent.replace(/^##\s*Conclusion\s*/mi, '');
+    markdown += `## Conclusion\n\n${cleanClosing.trim()}\n\n`;
     await updateProgress(supabase, contentId, {
       generated_content: markdown, sections_completed: completed, current_section: "Done",
       status: "completed",
