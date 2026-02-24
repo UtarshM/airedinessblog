@@ -97,6 +97,9 @@ async function callGroq(messages: any[], model: string): Promise<string> {
   if (!groqKey) throw new Error("GROQ_API_KEY not configured");
 
   for (let attempt = 0; attempt < 3; attempt++) {
+    // Aggressive intentional delay to respect Groq Tokens-Per-Minute limits
+    await new Promise(r => setTimeout(r, 3000));
+
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -109,7 +112,8 @@ async function callGroq(messages: any[], model: string): Promise<string> {
     if (response.status === 429) {
       const text = await response.text();
       console.warn(`Rate limited on ${model}, attempt ${attempt + 1}. Details: ${text}`);
-      await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+      // Heavy exponential backoff
+      await new Promise(r => setTimeout(r, 5000 * (attempt + 1)));
       continue;
     }
 
