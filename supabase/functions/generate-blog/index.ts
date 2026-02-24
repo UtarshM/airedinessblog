@@ -107,7 +107,8 @@ async function callGroq(messages: any[], model: string): Promise<string> {
     });
 
     if (response.status === 429) {
-      console.warn(`Rate limited on ${model}, attempt ${attempt + 1}`);
+      const text = await response.text();
+      console.warn(`Rate limited on ${model}, attempt ${attempt + 1}. Details: ${text}`);
       await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
       continue;
     }
@@ -388,7 +389,11 @@ FORMAT: Max 2 sentences per paragraph. Sentences 15-20 words. Simple words. Acti
 
   } catch (e) {
     console.error("generateBlog error:", e);
-    await supabase.from("content_items").update({ status: "failed" }).eq("id", contentId);
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    await supabase.from("content_items").update({
+      status: "failed",
+      generated_content: `### Generation Error\n\nThe AI generation failed due to the following system error:\n\n\`\`\`\n${errorMessage}\n\`\`\`\n\n**Possible reasons:**\n- You may have hit your daily/minute tokens limit on Groq.\n- The API key may be invalid or exhausted.\n\nPlease refer to your Groq dashboard to verify your limits.`
+    }).eq("id", contentId);
     try { await refundCredits(supabase, userId, contentId); } catch (_) { }
   }
 }
@@ -428,8 +433,20 @@ serve(async (req) => {
         status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    // Start generation and explicitly AWAIT it so Deno doesn't freeze the isolate
-    await generateBlog(supabase, contentId, user.id);
+    // Start background generation
+    const generationPromise = generateBlog(supabase, contentId, user.id);
+
+    // Use EdgeRuntime.waitUntil to prevent the function from shutting down
+    // immediately after the response is sent.
+    // Use globalThis to avoid TypeScript "Cannot find name" errors.
+    const edgeRuntime = (globalThis as any).EdgeRuntime;
+    if (edgeRuntime && edgeRuntime.waitUntil) {
+      edgeRuntime.waitUntil(generationPromise);
+    } else {
+      console.error("EdgeRuntime.waitUntil is not defined!");
+      // If EdgeRuntime is missing, we must NOT await to ensure background execution.
+      generateBlog(supabase, contentId, user.id).catch(err => console.error("Background generation failed without waitUntil:", err));
+    }
 
     return new Response(JSON.stringify({ success: true, contentId }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
