@@ -32,7 +32,7 @@ serve(async (req) => {
             });
         }
 
-        const { contentId, integrationId } = await req.json();
+        const { contentId, integrationId, publishStatus, categories } = await req.json();
 
         if (!contentId) {
             return new Response(JSON.stringify({ error: "Content ID required" }), {
@@ -155,7 +155,7 @@ serve(async (req) => {
             title: title,
             content: htmlContent,
             excerpt: metaDescription, // Native WP Excerpt (SEO plugins fallback to this)
-            status: "draft", // Publish as draft
+            status: publishStatus || "draft", // Publish as draft by default
             meta: {
                 rank_math_title: title,
                 rank_math_description: metaDescription,
@@ -163,6 +163,10 @@ serve(async (req) => {
                 _yoast_wpseo_metadesc: metaDescription
             }
         };
+
+        if (categories && categories.length > 0) {
+            postPayload.categories = categories;
+        }
 
         if (featuredMediaId) {
             postPayload.featured_media = featuredMediaId;

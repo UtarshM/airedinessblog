@@ -106,6 +106,7 @@ const ContentViewPage = () => {
   const [wpCategories, setWpCategories] = useState<{ id: number, name: string }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("none");
   const [fetchingCategories, setFetchingCategories] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
 
   const fetchContent = useCallback(async () => {
     if (!id || !user) return;
@@ -231,51 +232,43 @@ const ContentViewPage = () => {
         throw new Error("WordPress integration is missing credentials.");
       }
 
-      // 2. Prepare HTML
-      let cleanUrl = creds.url.trim();
-      if (cleanUrl.endsWith("/")) cleanUrl = cleanUrl.slice(0, -1);
+      // 2. Upload Feature Image if selected
+      if (selectedImageFile) {
+        const fileExt = selectedImageFile.name.split('.').pop();
+        const fileName = `${content.id}-${Math.random()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('blog_images')
+          .upload(fileName, selectedImageFile, { upsert: true });
 
-      const title = content.generated_title || content.h1;
-      const markdownContent = content.generated_content || "";
-      const htmlContent = await marked.parse(markdownContent);
+        if (uploadError) {
+          // It's possible the bucket 'blog_images' doesn't exist yet, we catch this explicitly
+          console.error("Storage upload error:", uploadError);
+          throw new Error("Failed to upload image. Please ensure the 'blog_images' public storage bucket exists in Supabase.");
+        }
 
-      const payload: any = {
-        title: title,
-        content: htmlContent,
-        status: publishStatus,
-      };
+        const { data: { publicUrl } } = supabase.storage
+          .from('blog_images')
+          .getPublicUrl(fileName);
 
-      if (selectedCategory !== "none") {
-        payload.categories = [parseInt(selectedCategory)];
+        // Update the content item with the new image url
+        await supabase.from("content_items").update({ featured_image_url: publicUrl } as any).eq("id", content.id);
       }
 
-      // 3. Publish to WP Directly 
-      console.log(`Publishing directly from frontend to ${cleanUrl}...`);
-      const authString = btoa(`${creds.username}:${creds.app_password}`);
-      const endpoint = `${cleanUrl}/wp-json/wp/v2/posts`;
+      // 3. Publish to WP via Edge Function
+      const categoriesArray = selectedCategory !== "none" ? [parseInt(selectedCategory)] : undefined;
 
-      const wpResponse = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Basic ${authString}`,
+      console.log(`Sending publish request to edge function for ${integration.id}...`);
+      const { data: wpData, error: invokeError } = await supabase.functions.invoke("publish-to-wordpress", {
+        body: {
+          contentId: content.id,
+          integrationId: integration.id,
+          publishStatus: publishStatus,
+          categories: categoriesArray
         },
-        body: JSON.stringify(payload),
       });
 
-      if (!wpResponse.ok) {
-        const errorText = await wpResponse.text();
-        console.error("WordPress API Error:", wpResponse.status, errorText);
-        throw new Error(`WordPress rejected the connection (${wpResponse.status}). Make sure it is an Application Password.`);
-      }
-
-      const wpData = await wpResponse.json();
-
-      // 4. Update status in Supabase
-      await supabase.from("content_items").update({
-        status: "published",
-        published_url: wpData.link
-      }).eq("id", content.id);
+      if (invokeError) throw invokeError;
+      if (wpData && wpData.error) throw new Error(wpData.error);
 
       toast.success("Successfully sent to WordPress!");
       setPublishDialogOpen(false);
@@ -690,7 +683,18 @@ const ContentViewPage = () => {
               </Select>
             </div>
 
-            <p className="text-xs text-muted-foreground mt-2 text-center bg-muted/30 p-2 rounded-lg">
+            <div className="space-y-2 pt-2 border-t">
+              <Label>Custom Featured Image <span className="text-muted-foreground font-normal">(Optional)</span></Label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setSelectedImageFile(e.target.files?.[0] || null)}
+                className="cursor-pointer"
+              />
+              <p className="text-[11px] text-muted-foreground mt-1">If selected, this image will replace the auto-generated one.</p>
+            </div>
+
+            <p className="text-xs text-muted-foreground mt-4 text-center bg-muted/30 p-2 rounded-lg">
               Tags and advanced SEO meta functionality will be applied directly via your WordPress site after generation.
             </p>
           </div>

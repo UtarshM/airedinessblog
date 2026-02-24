@@ -38,6 +38,7 @@ const GeneratePage = () => {
   const [externalLinks, setExternalLinks] = useState("");
   const [generateImage, setGenerateImage] = useState(false);
   const [autoPublishTarget, setAutoPublishTarget] = useState("");
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
 
   // Structure Settings
   const [structConclusion, setStructConclusion] = useState(true);
@@ -85,6 +86,26 @@ const GeneratePage = () => {
         // For now, the existing Edge function uses the first active WP integration holding `auto_publish: true`.
       }
 
+      let uploadedImageUrl = null;
+      if (selectedImageFile) {
+        const fileExt = selectedImageFile.name.split('.').pop();
+        const fileName = `pregen-${Date.now()}-${Math.random()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('blog_images')
+          .upload(fileName, selectedImageFile, { upsert: true });
+
+        if (uploadError) {
+          console.error("Storage upload error:", uploadError);
+          throw new Error("Failed to upload image. Please ensure the 'blog_images' public storage bucket exists in Supabase.");
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('blog_images')
+          .getPublicUrl(fileName);
+
+        uploadedImageUrl = publicUrl;
+      }
+
       const { data, error } = await supabase.from("content_items").insert({
         user_id: user!.id,
         main_keyword: mainKeyword.trim(),
@@ -97,6 +118,7 @@ const GeneratePage = () => {
         h3_list: [],
         internal_links: internalLinks ? internalLinks.split(",").map(k => k.trim()) : [],
         generate_image: generateImage,
+        featured_image_url: uploadedImageUrl,
         status: "generating",
       }).select("id").single();
 
@@ -319,8 +341,18 @@ const GeneratePage = () => {
             </div>
           </div>
           <div className="p-8 text-center bg-muted/10">
-            <p className="text-sm text-muted-foreground mb-2">Upgrade to a paid plan to unlock AI-powered image generation for your blog posts.</p>
-            <Button variant="link" className="text-primary h-auto p-0">View Plans &rarr;</Button>
+            <div className="max-w-md mx-auto space-y-3 text-left">
+              <Label className="text-sm font-semibold">Custom Featured Image <span className="font-normal text-muted-foreground">(Optional)</span></Label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setSelectedImageFile(e.target.files?.[0] || null)}
+                className="cursor-pointer bg-card"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Upload a custom image to be used as the featured image for the blog. If left empty, an AI image can be generated depending on your plan.
+              </p>
+            </div>
           </div>
         </div>
 
