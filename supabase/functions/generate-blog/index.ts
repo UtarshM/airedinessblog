@@ -268,8 +268,9 @@ STRUCTURE:
 
 DATA RULE: Include at least 1 real data point (user count, market stat, growth rate). Use publicly known numbers.
 
-KEYWORD RULES:
-- MUST use the EXACT keyword "${main_keyword}" 1 to 2 times. Do not skip it. Use synonyms for other mentions.
+KEYWORD RULES (TARGET DENSITY: ~1%):
+- MUST use the EXACT keyword "${main_keyword}" exactly 1 time. Do not skip it.
+- Use synonyms, LSI terms, or variations for all other mentions to avoid keyword stuffing.
 - NEVER repeat the keyword in back-to-back sentences.
 
 FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No headings.` },
@@ -299,8 +300,9 @@ STRUCTURE:
 
 DATA RULE: Include at least 1 real number in this section (user count, percentage, pricing, performance metric). Use publicly known data.
 
-KEYWORD RULES:
-- MUST use the EXACT keyword "${main_keyword}" exactly 2 times in this section to boost SEO density.
+KEYWORD RULES (TARGET DENSITY: ~1%):
+- MUST use the EXACT keyword "${main_keyword}" between 1 and 2 times in this section (never 0, never 3+).
+- Use synonyms, LSI terms, or variations for all other mentions to avoid keyword stuffing.
 - NEVER repeat the keyword in consecutive sentences.
 
 BLOCKING RULES:
