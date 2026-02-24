@@ -1,4 +1,4 @@
-project_id = "yfqqskcafkrgjgpmllvt"
+project_id = "vomymtttacomieswsomg"
 
 [functions.generate-blog]
 verify_jwt = false
@@ -7,4 +7,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.generate-title]
+verify_jwt = false
+
+[functions.publish-to-wordpress]
 verify_jwt = false

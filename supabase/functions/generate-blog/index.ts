@@ -87,8 +87,8 @@ Use REAL publicly known data. If exact numbers are uncertain, use reasonable ran
 // Groq model mapping per task
 const GROQ_MODELS = {
   title: "llama-3.1-8b-instant",
-  outline: "llama-3.3-70b-versatile",
-  section: "llama-3.3-70b-versatile",
+  outline: "llama-3.1-8b-instant",
+  section: "llama-3.1-8b-instant",
   faq: "llama-3.1-8b-instant",
 } as const;
 
@@ -428,22 +428,8 @@ serve(async (req) => {
         status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    // Start background generation
-    const generationPromise = generateBlog(supabase, contentId, user.id);
-
-    // Use EdgeRuntime.waitUntil to prevent the function from shutting down
-    // immediately after the response is sent.
-    // Use globalThis to avoid TypeScript "Cannot find name" errors.
-    const edgeRuntime = (globalThis as any).EdgeRuntime;
-    if (edgeRuntime && edgeRuntime.waitUntil) {
-      edgeRuntime.waitUntil(generationPromise);
-    } else {
-      console.error("EdgeRuntime.waitUntil is not defined!");
-      // If EdgeRuntime is missing, we must await to ensure completion,
-      // but this risks timeout.
-      generateBlog(supabase, contentId, user.id).catch(err => console.error("Background generation failed without waitUntil:", err));
-    }
+    // Start generation and explicitly AWAIT it so Deno doesn't freeze the isolate
+    await generateBlog(supabase, contentId, user.id);
 
     return new Response(JSON.stringify({ success: true, contentId }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
