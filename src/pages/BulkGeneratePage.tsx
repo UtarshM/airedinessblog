@@ -45,7 +45,9 @@ const BulkGeneratePage = () => {
     const [brandVoice, setBrandVoice] = useState("none");
     const [details, setDetails] = useState("");
     const [secondaryKeywords, setSecondaryKeywords] = useState("");
+    const [internalLinks, setInternalLinks] = useState("");
     const [externalLinks, setExternalLinks] = useState("");
+    const [generateImage, setGenerateImage] = useState(false);
     const [autoPublishTarget, setAutoPublishTarget] = useState("");
 
     // Structure Settings
@@ -138,6 +140,8 @@ const BulkGeneratePage = () => {
                     h1: topic.title.trim(),
                     h2_list: [], // Auto-generated
                     h3_list: [],
+                    internal_links: internalLinks ? internalLinks.split(",").map(k => k.trim()) : [],
+                    generate_image: generateImage,
                     status: "generating",
                 }).select("id").single();
             });
@@ -403,6 +407,40 @@ const BulkGeneratePage = () => {
                                 <CheckCircle2 className={`h-4 w-4 rounded-full ${structQuotes ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structQuotes ? "Yes" : "No"}
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                {/* Global Links */}
+                <div className="p-6 rounded-xl border bg-card/40 space-y-4">
+                    <h3 className="font-bold text-lg flex items-center gap-2">Global Links <span className="text-xs text-muted-foreground font-normal ml-2 tracking-normal">(applies to all generated posts)</span></h3>
+                    <div className="space-y-2 mt-2">
+                        <Label className="font-bold flex items-center gap-2">Internal Links <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-normal">Optional</Badge></Label>
+                        <p className="text-xs text-muted-foreground">Provide comma-separated URLs or topics. The AI will weave these into all articles.</p>
+                        <Textarea
+                            value={internalLinks}
+                            onChange={(e) => setInternalLinks(e.target.value)}
+                            placeholder="https://mysite.com/about, /pricing, https://mysite.com/blog/seo"
+                            className="bg-card min-h-[60px]"
+                        />
+                    </div>
+                </div>
+
+                {/* Global Featured Image */}
+                <div className="p-6 rounded-xl border bg-card/40">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                            <Label className="text-base font-bold flex items-center gap-2">
+                                <ImageIcon className="h-4 w-4 text-primary" /> Generate Featured Images <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-normal">Optional</Badge>
+                            </Label>
+                            <p className="text-xs text-muted-foreground">Automatically fetch and attach a relevant Unsplash image to all WordPress posts.</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setGenerateImage(!generateImage)}
+                            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${generateImage ? 'bg-primary' : 'bg-input'}`}
+                        >
+                            <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-background shadow ring-0 transition duration-200 ease-in-out ${generateImage ? 'translate-x-4' : 'translate-x-0'}`} />
+                        </button>
                     </div>
                 </div>
 

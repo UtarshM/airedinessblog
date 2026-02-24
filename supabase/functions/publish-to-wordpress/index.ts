@@ -92,19 +92,77 @@ serve(async (req) => {
 
         // 3. Prepare Content (Markdown -> HTML)
         const title = content.generated_title || content.h1;
-        const markdownContent = content.generated_content || "";
-        // marked.parse returns string | Promise<string> depending on options. Default is string.
+        let markdownContent = content.generated_content || "";
+
+        // Strip the duplicate H1 from the top of the content so it doesn't appear in the WP body
+        markdownContent = markdownContent.replace(/^#\s+.*(\r?\n)+/, '');
+
         const htmlContent = marked.parse(markdownContent);
 
+        // Extract a clean excerpt for meta description (first ~160 chars of plain text)
+        // We strip markdown headings, list items, bold/italic, etc.
+        const plainTextBlocks = markdownContent.replace(/[#*`~>-]+/g, '').split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 20);
+        let plainText = plainTextBlocks.length > 0 ? plainTextBlocks[0] : title;
+        if (plainText.toLowerCase().startsWith(title.toLowerCase())) {
+            // If the first line is the title, take the next paragraph
+            plainText = plainTextBlocks.length > 1 ? plainTextBlocks[1] : plainText;
+        }
+        const metaDescription = plainText.length > 160 ? plainText.substring(0, 157) + "..." : plainText;
+
         // 4. Publish to WordPress
-        // Clean URL: remove trailing slash
         let cleanUrl = wpUrl.trim();
         if (cleanUrl.endsWith("/")) cleanUrl = cleanUrl.slice(0, -1);
-
-        const endpoint = `${cleanUrl}/wp-json/wp/v2/posts`;
         const authString = btoa(`${username}:${app_password}`);
 
+        let featuredMediaId = undefined;
+        if (content.featured_image_url) {
+            try {
+                console.log("Uploading featured image to WP...");
+                const imgRes = await fetch(content.featured_image_url);
+                if (imgRes.ok) {
+                    const imgBlob = await imgRes.blob();
+                    const mediaEndpoint = `${cleanUrl}/wp-json/wp/v2/media`;
+                    const mediaRes = await fetch(mediaEndpoint, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Basic ${authString}`,
+                            "Content-Disposition": `attachment; filename="${contentId}-featured.jpg"`,
+                            "Content-Type": imgBlob.type || "image/jpeg"
+                        },
+                        body: imgBlob
+                    });
+                    if (mediaRes.ok) {
+                        const mediaData = await mediaRes.json();
+                        featuredMediaId = mediaData.id;
+                        console.log("Uploaded featured image, ID:", featuredMediaId);
+                    } else {
+                        console.error("Failed to upload media:", await mediaRes.text());
+                    }
+                }
+            } catch (imgUploadError) {
+                console.error("Error uploading feature image:", imgUploadError);
+            }
+        }
+
+        const endpoint = `${cleanUrl}/wp-json/wp/v2/posts`;
         console.log(`Publishing to ${endpoint}...`);
+
+        const postPayload: any = {
+            title: title,
+            content: htmlContent,
+            excerpt: metaDescription, // Native WP Excerpt (SEO plugins fallback to this)
+            status: "draft", // Publish as draft
+            meta: {
+                rank_math_title: title,
+                rank_math_description: metaDescription,
+                _yoast_wpseo_title: title,
+                _yoast_wpseo_metadesc: metaDescription
+            }
+        };
+
+        if (featuredMediaId) {
+            postPayload.featured_media = featuredMediaId;
+        }
 
         const wpResponse = await fetch(endpoint, {
             method: "POST",
@@ -112,11 +170,7 @@ serve(async (req) => {
                 "Content-Type": "application/json",
                 "Authorization": `Basic ${authString}`,
             },
-            body: JSON.stringify({
-                title: title,
-                content: htmlContent,
-                status: "draft", // Publish as draft
-            }),
+            body: JSON.stringify(postPayload),
         });
 
         if (!wpResponse.ok) {

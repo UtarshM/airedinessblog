@@ -157,7 +157,7 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
       return;
     }
 
-    const { main_keyword, secondary_keywords, word_count_target, tone, h1, h2_list, h3_list, target_country } = content;
+    const { main_keyword, secondary_keywords, word_count_target, tone, h1, h2_list, h3_list, target_country, internal_links, generate_image } = content;
     let h2s: string[] = h2_list || [];
     const h3s = h3_list || [];
     const secondaryKw = (secondary_keywords || []).join(", ");
@@ -172,7 +172,19 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
     }
 
     // Append currency rule to system prompt dynamically
-    const dynamicSystemPrompt = `${SYSTEM_PROMPT}\n\n15. ${currencyRule}`;
+    let dynamicSystemPrompt = `${SYSTEM_PROMPT}\n\n15. ${currencyRule}`;
+
+    // Internal Links rule
+    if (internal_links && internal_links.length > 0) {
+      dynamicSystemPrompt += `\n16. INTERNAL LINKS: You MUST naturally weave the following URLs into the content using relevant anchor text: ${internal_links.join(", ")}.`;
+    }
+
+    // Handle Featured Image Generation (Pollinations AI)
+    let featuredImageUrl = content.featured_image_url;
+    if (generate_image && !featuredImageUrl) {
+      featuredImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(`High quality blog post featured image representing ${main_keyword}`)}?width=1200&height=630&nologo=true`;
+      await supabase.from("content_items").update({ featured_image_url: featuredImageUrl }).eq("id", contentId);
+    }
 
     // Auto-generate 6 H2 headings if empty, placeholder, or too many
     const hasPlaceholders = h2s.length === 0 || h2s.some((h: string) =>
