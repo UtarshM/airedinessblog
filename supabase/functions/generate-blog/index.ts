@@ -157,10 +157,22 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
       return;
     }
 
-    const { main_keyword, secondary_keywords, word_count_target, tone, h1, h2_list, h3_list } = content;
+    const { main_keyword, secondary_keywords, word_count_target, tone, h1, h2_list, h3_list, target_country } = content;
     let h2s: string[] = h2_list || [];
     const h3s = h3_list || [];
     const secondaryKw = (secondary_keywords || []).join(", ");
+
+    // Determine currency rule
+    let currencyRule = "Use USD ($) for all pricing, costs, and monetary values.";
+    const countryStr = (target_country || "").toLowerCase();
+    if (countryStr.includes("india")) {
+      currencyRule = "CRITICAL CURRENCY RULE: You MUST use ONLY INR (₹ / Rupees) for all pricing, salaries, costs, and monetary values. NEVER use USD ($).";
+    } else if (countryStr.includes("global") || countryStr.includes("united states") || countryStr.includes("uk") || countryStr.includes("united kingdom")) {
+      currencyRule = "CRITICAL CURRENCY RULE: You MUST use ONLY USD ($) for all pricing, salaries, costs, and monetary values.";
+    }
+
+    // Append currency rule to system prompt dynamically
+    const dynamicSystemPrompt = `${SYSTEM_PROMPT}\n\n15. ${currencyRule}`;
 
     // Auto-generate 6 H2 headings if empty, placeholder, or too many
     const hasPlaceholders = h2s.length === 0 || h2s.some((h: string) =>
@@ -222,7 +234,7 @@ STRICT RULES:
 
     // 2. INTRODUCTION
     const intro = await callGroq([
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: dynamicSystemPrompt },
       {
         role: "user", content: `Write the introduction for a blog titled "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Also reference: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.introWords} words.
 
@@ -250,7 +262,7 @@ FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active vo
     // 3. H2 SECTIONS
     for (let i = 0; i < h2s.length; i++) {
       const h2Content = await callGroq([
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: dynamicSystemPrompt },
         {
           role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Reference: ${secondaryKw}.` : ""} Tone: ${tone}. ~${dist.h2Words} words.
 
@@ -288,7 +300,7 @@ FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active vo
 
     // 5. CONCLUSION + FAQs (combined into one call for speed)
     const closingContent = await callGroq([
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: dynamicSystemPrompt },
       {
         role: "user", content: `Write the conclusion AND FAQs for the blog "${title.trim()}" about "${main_keyword}". Tone: ${tone}. ~${dist.conclusionWords + dist.faqWords} words.
 
