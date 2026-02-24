@@ -201,7 +201,7 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
       /Top Pick #|\[Item|^Step \d|^\d+\. \[/.test(h)
     );
     if (hasPlaceholders) {
-      const targetCount = 6; // User requested 5-6 headings
+      const targetCount = 5; // User requested 5-6 headings, but 5 hits ~1200 words better with FAQs
       const generatedHeadings = await callGroq([
         { role: "system", content: "Generate SEO blog section headings. Return ONLY headings, one per line. No numbering, no explanation, no quotes." },
         { role: "user", content: `Generate exactly ${targetCount} H2 headings for a blog about "${main_keyword}". Short, specific, SEO-friendly. One per line.` },
@@ -238,7 +238,7 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
         role: "user", content: `Create an SEO title for the keyword: "${main_keyword}".
 
 STRICT RULES:
-- MUST contain the exact keyword "${main_keyword}" once
+- MUST contain the EXACT, UNALTERED keyword: "${main_keyword}"
 - Length: 50-70 characters maximum (STRICT - count carefully)
 - Word count: 6-12 words
 - Use simple, everyday words only
@@ -269,10 +269,10 @@ STRUCTURE:
 DATA RULE: Include at least 1 real data point (user count, market stat, growth rate). Use publicly known numbers.
 
 KEYWORD RULES:
-- Use "${main_keyword}" only 1-2 times. Use synonyms and variations for other mentions.
+- MUST use the EXACT keyword "${main_keyword}" 1 to 2 times. Do not skip it. Use synonyms for other mentions.
 - NEVER repeat the keyword in back-to-back sentences.
 
-FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No headings.` },
+FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No headings.` },
     ], GROQ_MODELS.section, Math.round(dist.introWords * 1.5) + 100);
 
     completed++;
@@ -300,7 +300,7 @@ STRUCTURE:
 DATA RULE: Include at least 1 real number in this section (user count, percentage, pricing, performance metric). Use publicly known data.
 
 KEYWORD RULES:
-- Use "${main_keyword}" only ONCE. Use variations everywhere else.
+- MUST use the EXACT keyword "${main_keyword}" exactly 2 times in this section to boost SEO density.
 - NEVER repeat the keyword in consecutive sentences.
 
 BLOCKING RULES:
@@ -309,7 +309,7 @@ BLOCKING RULES:
 - No theory without a practical example
 - Every claim must have a reason or data behind it
 
-FORMAT: Paragraphs 2-4 sentences. Sentences 15-20 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No section heading in output.` },
+FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No section heading in output.` },
       ], GROQ_MODELS.section, Math.round(dist.h2Words * 1.5) + 100);
 
       completed++;
@@ -335,7 +335,7 @@ CONCLUSION (write first):
 - WHEN NOT TO USE: Mention one scenario where a different approach is better. This builds trust.
 - FINAL VERDICT: End with a clear, actionable statement. The reader must know exactly what to do next.
 - Max 2 sentences per paragraph.
-- Use "${main_keyword}" only once. Variations for other mentions.
+- MUST use the EXACT keyword "${main_keyword}" exactly 1 time.
 - Do NOT start with "In conclusion" or "To sum up".
 - DO NOT INCLUDE A HEADING FOR THE CONCLUSION. Do NOT output "## Conclusion". Start writing the actual conclusion body immediately.
 
@@ -352,7 +352,7 @@ Then write FAQs:
 ### 3. [Common misconception or concern]?
 [Answer that corrects the misconception with evidence or logic. Full sentences.]
 
-FORMAT: Max 2 sentences per paragraph. Sentences 15-20 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No fake stats — use real public data or logical reasoning.` },
+FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No fake stats — use real public data or logical reasoning.` },
     ], GROQ_MODELS.faq, Math.round((dist.conclusionWords + dist.faqWords) * 1.5) + 200);
 
     completed++;
