@@ -196,24 +196,33 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
       await supabase.from("content_items").update({ featured_image_url: featuredImageUrl }).eq("id", contentId);
     }
 
-    // Auto-generate 6 H2 headings if empty, placeholder, or too many
+    // Auto-generate H2 headings based on target word count
     const hasPlaceholders = h2s.length === 0 || h2s.some((h: string) =>
       /Top Pick #|\[Item|^Step \d|^\d+\. \[/.test(h)
     );
+
+    // Determine how many H2s we need to naturally hit the word count
+    // Assume: Intro (~120 words) + Conclusion/FAQ (~200 words) = 320 base words
+    // Target H2 words = word_count_target - 320
+    // Average H2 length = 200 words (strict 8B model limits)
+    let targetCount = Math.max(3, Math.round((word_count_target - 320) / 200));
+    // Cap at a reasonable maximum so we don't spam 20 headings
+    targetCount = Math.min(targetCount, 12);
+
     if (hasPlaceholders) {
-      const targetCount = 5; // User requested 5-6 headings, but 5 hits ~1200 words better with FAQs
       const generatedHeadings = await callGroq([
         { role: "system", content: "Generate SEO blog section headings. Return ONLY headings, one per line. No numbering, no explanation, no quotes." },
         { role: "user", content: `Generate exactly ${targetCount} H2 headings for a blog about "${main_keyword}". Short, specific, SEO-friendly. One per line.` },
       ], GROQ_MODELS.outline);
       const newH2s = generatedHeadings.split("\n").map((h: string) => h.replace(/^#+\s*/, "").replace(/^\d+\.?\s*/, "").trim()).filter(Boolean);
-      if (newH2s.length >= 4) { // Accept if we got at least 4, but aim for 6
+      if (newH2s.length >= Math.max(2, targetCount - 2)) {
         h2s = newH2s.slice(0, targetCount);
       }
       await supabase.from("content_items").update({ h2_list: h2s }).eq("id", contentId);
     }
-    // Cap at 6 H2s max for speed
-    if (h2s.length > 6) h2s = h2s.slice(0, 6);
+
+    // Cap at targetCount max for speed and word limits
+    if (h2s.length > targetCount) h2s = h2s.slice(0, targetCount);
 
     const dist = calculateWordDistribution(word_count_target, h2s.length, 0);
     // Total: Title + Intro + H2s + Conclusion/FAQs = fewer calls
