@@ -22,6 +22,7 @@ const BulkGeneratePage = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
+    const [generatingTitleFor, setGeneratingTitleFor] = useState<string | null>(null);
     const [integrations, setIntegrations] = useState<any[]>([]);
 
     // Topics State
@@ -85,6 +86,29 @@ const BulkGeneratePage = () => {
 
     const updateTopic = (id: string, field: keyof BulkTopic, value: string) => {
         setTopics(topics.map(t => t.id === id ? { ...t, [field]: value } : t));
+    };
+
+    const handleGenerateTitle = async (id: string, keyword: string) => {
+        if (!keyword.trim()) {
+            toast.error("Please enter a Main Keyword first");
+            return;
+        }
+        setGeneratingTitleFor(id);
+        try {
+            const { data, error } = await supabase.functions.invoke("generate-title", {
+                body: { keyword: keyword.trim() }
+            });
+            if (error) throw error;
+            if (data.error) throw new Error(data.error);
+            if (data.title) {
+                updateTopic(id, 'title', data.title);
+                toast.success("Title generated successfully");
+            }
+        } catch (err: any) {
+            toast.error(err.message || "Failed to generate title");
+        } finally {
+            setGeneratingTitleFor(null);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -223,8 +247,16 @@ const BulkGeneratePage = () => {
                                         />
                                     </div>
                                     <div className="col-span-2 flex justify-end gap-2 pr-2">
-                                        <Button type="button" variant="outline" size="sm" className="h-10 border-primary text-primary hover:bg-primary/5 px-3">
-                                            Generate Title
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleGenerateTitle(topic.id, topic.keyword)}
+                                            disabled={generatingTitleFor === topic.id || !topic.keyword.trim()}
+                                            className="h-10 border-primary text-primary hover:bg-primary/5 px-3"
+                                        >
+                                            {generatingTitleFor === topic.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                            {generatingTitleFor === topic.id ? "Generating..." : "Generate Title"}
                                         </Button>
                                         {topics.length > 1 && (
                                             <button type="button" onClick={() => removeTopic(topic.id)} className="text-muted-foreground hover:text-destructive p-2">

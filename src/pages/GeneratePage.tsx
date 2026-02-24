@@ -15,6 +15,7 @@ const GeneratePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [generatingTitle, setGeneratingTitle] = useState(false);
   const [integrations, setIntegrations] = useState<any[]>([]);
 
   // Form State
@@ -110,6 +111,29 @@ const GeneratePage = () => {
     }
   };
 
+  const handleGenerateTitle = async () => {
+    if (!mainKeyword.trim()) {
+      toast.error("Please enter a Main Keyword first");
+      return;
+    }
+    setGeneratingTitle(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-title", {
+        body: { keyword: mainKeyword.trim() }
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      if (data.title) {
+        setH1(data.title);
+        toast.success("Title generated successfully");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to generate title");
+    } finally {
+      setGeneratingTitle(false);
+    }
+  };
+
   const activeWpCount = integrations.filter(i => i.platform === "wordpress").length;
 
   return (
@@ -168,8 +192,15 @@ const GeneratePage = () => {
                   <SelectItem value="French">French</SelectItem>
                 </SelectContent>
               </Select>
-              <Button type="button" variant="default" className="shadow-sm bg-[#0A2540] hover:bg-[#0A2540]/90 text-white">
-                Generate a Title
+              <Button
+                type="button"
+                variant="default"
+                onClick={handleGenerateTitle}
+                disabled={generatingTitle || !mainKeyword.trim()}
+                className="shadow-sm bg-[#0A2540] hover:bg-[#0A2540]/90 text-white"
+              >
+                {generatingTitle ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {generatingTitle ? "Generating..." : "Generate a Title"}
               </Button>
             </div>
           </div>
