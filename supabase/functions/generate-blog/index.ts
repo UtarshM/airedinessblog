@@ -282,11 +282,18 @@ KEYWORD RULES (TARGET DENSITY: ~1%):
 - Use synonyms, LSI terms, or variations for all other mentions to avoid keyword stuffing.
 - NEVER repeat the keyword in back-to-back sentences.
 
-FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No headings.` },
+FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No headings.
+- DO NOT start your response with the blog title. DO NOT repeat the title. JUST write the introduction paragraphs.` },
     ], GROQ_MODELS.section, Math.round(dist.introWords * 1.5) + 100);
 
     completed++;
-    markdown += `${intro.trim()}\n\n`;
+
+    // Safety check: deeply strip the title if the LLM hallucinated it anyway
+    let cleanIntro = intro.trim();
+    const titleRegex = new RegExp(`^${title.trim().replace(/[.*+?^$\\{\\}()|[\\]\\\\]/g, '\\\\$&')}\\s*\\n+`, 'i');
+    cleanIntro = cleanIntro.replace(titleRegex, '').trim();
+
+    markdown += `${cleanIntro}\n\n`;
     await updateProgress(supabase, contentId, {
       generated_content: markdown, sections_completed: completed,
       current_section: h2s.length > 0 ? h2s[0] : "Conclusion",

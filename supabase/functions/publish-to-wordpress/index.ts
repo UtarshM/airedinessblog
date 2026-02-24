@@ -97,6 +97,10 @@ serve(async (req) => {
         // Strip the duplicate H1 from the top of the content so it doesn't appear in the WP body
         markdownContent = markdownContent.replace(/^#\s+.*(\r?\n)+/, '');
 
+        // Fail-safe: Strip the plain-text title if the LLM hallucinated it exactly at the top of the body
+        const titleRegex = new RegExp(`^${title.trim().replace(/[.*+?^$\\{\\}()|[\\]\\\\]/g, '\\\\$&')}\\s*\\n+`, 'i');
+        markdownContent = markdownContent.replace(titleRegex, '').trim();
+
         const htmlContent = marked.parse(markdownContent);
 
         // Extract a clean excerpt for meta description (first ~160 chars of plain text)
