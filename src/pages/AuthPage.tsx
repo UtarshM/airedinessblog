@@ -27,6 +27,17 @@ const AuthPage = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Failsafe timeout to prevent infinite button spinning
+    const timeout = setTimeout(() => setLoading(false), 5000);
+
+    // Explicit check for missing Environment Variables on live hosts (Vercel/Netlify/Cloudflare)
+    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
+      clearTimeout(timeout);
+      setLoading(false);
+      toast.error("CRITICAL HOSTING ERROR: Your web host is missing the Supabase Environment Variables. You must add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to your host's dashboard and redeploy.");
+      return;
+    }
+
     try {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -42,8 +53,9 @@ const AuthPage = () => {
         toast.success("Check your email to verify your account!");
       }
     } catch (err: any) {
-      toast.error(err.message || "Authentication failed");
+      toast.error(err.message || "Authentication failed. Check your network or environment variables.");
     } finally {
+      clearTimeout(timeout);
       setLoading(false);
     }
   };
