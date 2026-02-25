@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, User, CreditCard, Settings2, Save } from "lucide-react";
+import { Loader2, User, CreditCard, Settings2, Save, ShieldCheck } from "lucide-react";
 
 interface CreditTransaction {
     id: string;
@@ -25,6 +25,11 @@ const SettingsPage = () => {
     const [saving, setSaving] = useState(false);
     const [credits, setCredits] = useState<{ total: number; used: number; remaining: number } | null>(null);
     const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
+
+    // Security
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
 
     // Preferences (stored in localStorage for now)
     const [defaultTone, setDefaultTone] = useState(() => localStorage.getItem("bf_default_tone") || "Professional");
@@ -90,6 +95,29 @@ const SettingsPage = () => {
         }, 300);
     };
 
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newPassword !== confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
+        }
+        if (newPassword.length < 6) {
+            toast.error("Password must be at least 6 characters");
+            return;
+        }
+        setIsChangingPassword(true);
+        const { error } = await supabase.auth.updateUser({ password: newPassword });
+        setIsChangingPassword(false);
+
+        if (error) {
+            toast.error(error.message || "Failed to change password");
+        } else {
+            toast.success("Password changed successfully!");
+            setNewPassword("");
+            setConfirmPassword("");
+        }
+    };
+
     const txTypeConfig: Record<string, { label: string; color: string }> = {
         usage: { label: "Usage", color: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
         refund: { label: "Refund", color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
@@ -149,6 +177,51 @@ const SettingsPage = () => {
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* Security Card */}
+                {user?.app_metadata?.provider === "email" && (
+                    <Card>
+                        <CardHeader className="pb-3">
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <ShieldCheck className="h-5 w-5 text-primary" />
+                                Security
+                            </CardTitle>
+                            <CardDescription>Update your password</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={handlePasswordChange} className="space-y-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="new-password">New Password</Label>
+                                        <Input
+                                            id="new-password"
+                                            type="password"
+                                            placeholder="••••••••"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            minLength={6}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="confirm-password">Confirm New Password</Label>
+                                        <Input
+                                            id="confirm-password"
+                                            type="password"
+                                            placeholder="••••••••"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            minLength={6}
+                                        />
+                                    </div>
+                                </div>
+                                <Button type="submit" disabled={isChangingPassword || !newPassword || !confirmPassword} size="sm">
+                                    {isChangingPassword ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                                    Update Password
+                                </Button>
+                            </form>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Default Preferences */}
                 <Card>

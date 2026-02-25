@@ -127,7 +127,7 @@ const ContentViewPage = () => {
       setContent(data as unknown as ContentItem);
       if (!editing) {
         setEditTitle(data?.generated_title || data?.h1 || "");
-        setEditMetaDesc(data?.meta_description || "");
+        setEditMetaDesc((data as any)?.meta_description || "");
         setEditContent(data?.generated_content || "");
       }
     }
