@@ -20,6 +20,7 @@ interface ContentItem {
   status: string;
   word_count_target: number;
   generated_title: string | null;
+  meta_description: string | null;
   generated_content: string | null;
   current_section: string | null;
   sections_completed: number | null;
@@ -90,6 +91,9 @@ const ContentViewPage = () => {
   const [content, setContent] = useState<ContentItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editMetaTitle, setEditMetaTitle] = useState("");
+  const [editMetaDesc, setEditMetaDesc] = useState("");
   const [editContent, setEditContent] = useState("");
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -121,10 +125,14 @@ const ContentViewPage = () => {
       toast.error("Failed to load content");
     } else {
       setContent(data as unknown as ContentItem);
-      if (!editing) setEditContent(data?.generated_content || "");
+      if (!editing) {
+        setEditTitle(data?.generated_title || data?.h1 || "");
+        setEditMetaDesc(data?.meta_description || "");
+        setEditContent(data?.generated_content || "");
+      }
     }
     setLoading(false);
-  }, [id, editing]);
+  }, [id, editing, user]);
 
   useEffect(() => {
     fetchContent();
@@ -139,12 +147,16 @@ const ContentViewPage = () => {
       }, (payload) => {
         const updated = payload.new as unknown as ContentItem;
         setContent(updated);
-        if (!editing) setEditContent(updated.generated_content || "");
+        if (!editing) {
+          setEditTitle(updated.generated_title || updated.h1);
+          setEditMetaDesc(updated.meta_description || "");
+          setEditContent(updated.generated_content || "");
+        }
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [id, fetchContent]);
+  }, [id, fetchContent, editing]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(content?.generated_content || "");
@@ -155,10 +167,19 @@ const ContentViewPage = () => {
 
   const handleSave = async () => {
     setSaving(true);
+    if (!content) {
+      toast.error("Content not loaded.");
+      setSaving(false);
+      return;
+    }
     const { error } = await supabase
       .from("content_items")
-      .update({ generated_content: editContent })
-      .eq("id", id!);
+      .update({
+        generated_title: editTitle,
+        meta_description: editMetaDesc,
+        generated_content: editContent
+      })
+      .eq("id", content.id);
     if (error) toast.error("Failed to save");
     else {
       toast.success("Saved");
@@ -637,11 +658,45 @@ const ContentViewPage = () => {
       {/* Content */}
       <div className="border rounded-xl bg-card p-8">
         {editing ? (
-          <Textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            className="min-h-[500px] font-mono text-sm resize-y"
-          />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Blog Title (H1)</Label>
+              <Input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="font-bold text-lg"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>SEO Meta Description <span className="text-muted-foreground text-xs font-normal">({editMetaDesc.length} chars)</span></Label>
+              <Textarea
+                value={editMetaDesc}
+                onChange={(e) => setEditMetaDesc(e.target.value)}
+                className="min-h-[80px] text-sm"
+                placeholder="Enter SEO meta description (150-160 chars recommended)"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Blog Content (Markdown)</Label>
+              <Textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="min-h-[60vh] font-mono text-sm leading-relaxed"
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => {
+                setEditTitle(content?.generated_title || content?.h1 || "");
+                setEditMetaDesc(content?.meta_description || "");
+                setEditContent(content?.generated_content || "");
+                setEditing(false);
+              }}>Cancel</Button>
+              <Button onClick={handleSave} disabled={saving}>
+                {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {saving ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          </div>
         ) : (
           <article
             className="prose prose-sm max-w-none dark:prose-invert"
