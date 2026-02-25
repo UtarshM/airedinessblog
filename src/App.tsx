@@ -15,7 +15,8 @@ import ContentViewPage from "@/pages/ContentViewPage";
 import IntegrationsPage from "@/pages/IntegrationsPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 import SettingsPage from "@/pages/SettingsPage";
-import { ManagePostsPage, CalendarPage, BrandIdentityPage } from "@/pages/Placeholders";
+import CalendarPage from "@/pages/CalendarPage";
+import { ManagePostsPage, BrandIdentityPage } from "@/pages/Placeholders";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

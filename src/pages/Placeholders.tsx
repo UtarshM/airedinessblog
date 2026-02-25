@@ -9,15 +9,6 @@ export const ManagePostsPage = () => {
     );
 };
 
-export const CalendarPage = () => {
-    return (
-        <div className="p-8 max-w-5xl">
-            <h1 className="text-2xl font-bold">Calendar</h1>
-            <p className="text-muted-foreground mt-2">Content Calendar view coming soon.</p>
-        </div>
-    );
-};
-
 export const BrandIdentityPage = () => {
     return (
         <div className="p-8 max-w-5xl">

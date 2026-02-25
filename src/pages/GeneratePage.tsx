@@ -9,7 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, Plus, Sparkles, Image as ImageIcon, CheckCircle2, FileText, Fingerprint } from "lucide-react";
+import { Loader2, Plus, Sparkles, Image as ImageIcon, CheckCircle2, FileText, Fingerprint, Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 const GeneratePage = () => {
   const navigate = useNavigate();
@@ -35,6 +39,7 @@ const GeneratePage = () => {
   const [details, setDetails] = useState("");
   const [secondaryKeywords, setSecondaryKeywords] = useState("");
   const [internalLinks, setInternalLinks] = useState("");
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
   const [externalLinks, setExternalLinks] = useState("");
   const [generateImage, setGenerateImage] = useState(false);
   const [autoPublishTarget, setAutoPublishTarget] = useState("");
@@ -120,6 +125,7 @@ const GeneratePage = () => {
         generate_image: generateImage,
         featured_image_url: uploadedImageUrl,
         details: details.trim() || null,
+        scheduled_date: scheduledDate ? scheduledDate.toISOString() : null,
         status: "generating",
       }).select("id").single();
 
@@ -478,6 +484,34 @@ const GeneratePage = () => {
             placeholder="Add to comma separated phrase then press Enter to add"
             className="bg-card min-h-[60px]"
           />
+        </div>
+
+        {/* Scheduled Date */}
+        <div className="space-y-2">
+          <Label className="font-bold flex items-center gap-2">Scheduled Date <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-normal">Optional</Badge></Label>
+          <p className="text-xs text-muted-foreground">When do you want this post to be scheduled for the content calendar?</p>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-full sm:w-[280px] justify-start text-left font-normal bg-card",
+                  !scheduledDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {scheduledDate ? format(scheduledDate, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={scheduledDate}
+                onSelect={setScheduledDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* Internal Links */}
