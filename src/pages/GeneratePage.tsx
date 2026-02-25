@@ -119,6 +119,7 @@ const GeneratePage = () => {
         internal_links: internalLinks ? internalLinks.split(",").map(k => k.trim()) : [],
         generate_image: generateImage,
         featured_image_url: uploadedImageUrl,
+        details: details.trim() || null,
         status: "generating",
       }).select("id").single();
 
