@@ -24,11 +24,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Failsafe timeout to prevent infinite loading screen
+    const isReadyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
     // Real Supabase Auth Subscription
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      clearTimeout(isReadyTimeout);
     });
 
     // Initial Session Check
@@ -39,12 +45,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      clearTimeout(isReadyTimeout);
     }).catch(err => {
       console.error("Auth session exception:", err);
       setLoading(false);
+      clearTimeout(isReadyTimeout);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(isReadyTimeout);
+    };
   }, []);
 
   const signOut = async () => {
