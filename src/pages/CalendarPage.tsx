@@ -15,8 +15,12 @@ import {
     startOfWeek,
     endOfWeek
 } from "date-fns";
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface ContentItem {
     id: string;
@@ -32,6 +36,7 @@ const CalendarPage = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [items, setItems] = useState<ContentItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchItems = async () => {
@@ -73,6 +78,23 @@ const CalendarPage = () => {
             const itemDate = item.scheduled_date ? parseISO(item.scheduled_date) : parseISO(item.created_at);
             return isSameDay(itemDate, day);
         });
+    };
+
+    const updateItemDate = async (id: string, newDate: Date | undefined) => {
+        if (!newDate) return;
+        setUpdatingId(id);
+        const dateStr = newDate.toISOString();
+
+        // Optimistic UI update
+        setItems(prevItems => prevItems.map(i => i.id === id ? { ...i, scheduled_date: dateStr } : i));
+
+        const { error } = await supabase.from('content_items').update({ scheduled_date: dateStr } as any).eq('id', id);
+        if (error) {
+            toast.error("Failed to reschedule post.");
+        } else {
+            toast.success("Post rescheduled successfully!");
+        }
+        setUpdatingId(null);
     };
 
     return (
@@ -130,17 +152,46 @@ const CalendarPage = () => {
 
                                 <div className="flex-1 overflow-y-auto space-y-1.5 mt-1 pr-1 scrollbar-thin">
                                     {dayItems.map(item => (
-                                        <Link
-                                            key={item.id}
-                                            to={`/content/${item.id}`}
-                                            className={`block p-1.5 text-xs rounded border hover:border-primary/50 transition-colors ${item.status === 'published' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400' :
-                                                    item.status === 'generating' ? 'bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400' :
-                                                        'bg-secondary border-border text-secondary-foreground'
-                                                }`}
-                                        >
-                                            <div className="font-medium truncate">{item.generated_title || item.main_keyword}</div>
-                                            <div className="text-[10px] opacity-70 capitalize truncate mt-0.5">{item.status}</div>
-                                        </Link>
+                                        <Popover key={item.id}>
+                                            <PopoverTrigger asChild>
+                                                <button
+                                                    className={`text-left w-full block p-1.5 text-xs rounded border hover:border-primary/50 transition-colors ${item.status === 'published' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400' :
+                                                        item.status === 'generating' ? 'bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400' :
+                                                            'bg-secondary border-border text-secondary-foreground'
+                                                        }${updatingId === item.id ? ' opacity-50' : ''}`}
+                                                >
+                                                    <div className="font-medium truncate">{item.generated_title || item.main_keyword}</div>
+                                                    <div className="text-[10px] opacity-70 capitalize truncate mt-0.5">{item.status}</div>
+                                                </button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-80 p-4" align="start">
+                                                <div className="space-y-4">
+                                                    <div className="space-y-1 block">
+                                                        <h4 className="font-medium leading-tight">{item.generated_title || item.main_keyword}</h4>
+                                                        <p className="text-sm text-muted-foreground">Status: <span className="capitalize font-medium text-foreground">{item.status}</span></p>
+                                                    </div>
+
+                                                    <div className="space-y-2 pt-2 border-t">
+                                                        <Label>Schedule Date</Label>
+                                                        <div className="flex justify-center border rounded-md p-1 bg-card">
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={item.scheduled_date ? parseISO(item.scheduled_date) : parseISO(item.created_at)}
+                                                                onSelect={(date) => updateItemDate(item.id, date)}
+                                                                disabled={item.status === 'published'}
+                                                            />
+                                                        </div>
+                                                        {item.status === 'published' && <p className="text-[10px] text-muted-foreground text-center">Cannot reschedule published posts</p>}
+                                                    </div>
+
+                                                    <div className="flex justify-end pt-2">
+                                                        <Button asChild size="sm" className="w-full">
+                                                            <Link to={`/content/${item.id}`}>Manage Content <ArrowRight className="h-4 w-4 ml-2" /></Link>
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
                                     ))}
                                 </div>
                             </div>
