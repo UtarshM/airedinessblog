@@ -46,7 +46,7 @@ function computeSEOScore(content: ContentItem) {
   const maxScore = 6;
 
   // 1. Title length
-  const titleLen = (content.generated_title || "").length;
+  const titleLen = (content.generated_title || content.h1 || "").length;
   const titleOk = titleLen >= 30 && titleLen <= 70;
   checks.push({ label: "Title Length", pass: titleOk, tip: titleOk ? `${titleLen} chars (good)` : `${titleLen} chars (aim 30-70)` });
   if (titleOk) totalScore++;
