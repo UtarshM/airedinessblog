@@ -103,15 +103,17 @@ serve(async (req) => {
 
         const htmlContent = marked.parse(markdownContent);
 
-        // Extract a clean excerpt for meta description (first ~160 chars of plain text)
-        // We strip markdown headings, list items, bold/italic, etc.
-        const plainTextBlocks = markdownContent.replace(/[#*`~>-]+/g, '').split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 20);
-        let plainText = plainTextBlocks.length > 0 ? plainTextBlocks[0] : title;
-        if (plainText.toLowerCase().startsWith(title.toLowerCase())) {
-            // If the first line is the title, take the next paragraph
-            plainText = plainTextBlocks.length > 1 ? plainTextBlocks[1] : plainText;
+        // Use designated meta_description if it exists, otherwise extract from content
+        let metaDescription = content.meta_description;
+
+        if (!metaDescription) {
+            const plainTextBlocks = markdownContent.replace(/[#*`~>-]+/g, '').split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 20);
+            let plainText = plainTextBlocks.length > 0 ? plainTextBlocks[0] : title;
+            if (plainText.toLowerCase().startsWith(title.toLowerCase())) {
+                plainText = plainTextBlocks.length > 1 ? plainTextBlocks[1] : plainText;
+            }
+            metaDescription = plainText.length > 160 ? plainText.substring(0, 157) + "..." : plainText;
         }
-        const metaDescription = plainText.length > 160 ? plainText.substring(0, 157) + "..." : plainText;
 
         // 4. Publish to WordPress
         let cleanUrl = wpUrl.trim();
@@ -152,16 +154,10 @@ serve(async (req) => {
         console.log(`Publishing to ${endpoint}...`);
 
         const postPayload: any = {
-            title: title,
+            title: title || "Untitled Blog Post",
             content: htmlContent,
-            excerpt: metaDescription, // Native WP Excerpt (SEO plugins fallback to this)
+            excerpt: metaDescription, // Native WP Excerpt (SEO plugins fallback to this safely)
             status: publishStatus || "draft", // Publish as draft by default
-            meta: {
-                rank_math_title: title,
-                rank_math_description: metaDescription,
-                _yoast_wpseo_title: title,
-                _yoast_wpseo_metadesc: metaDescription
-            }
         };
 
         if (categories && categories.length > 0) {

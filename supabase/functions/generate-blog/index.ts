@@ -162,7 +162,7 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
       return;
     }
 
-    let { main_keyword, secondary_keywords, word_count_target, tone, h1, h2_list, h3_list, target_country, internal_links, generate_image } = content;
+    let { main_keyword, secondary_keywords, word_count_target, tone, h1, h2_list, h3_list, target_country, internal_links, generate_image, details } = content;
 
     // Safety default if word count is unexpectedly empty or wildly out of bounds
     if (!word_count_target || word_count_target < 500) {
@@ -184,9 +184,19 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
     // Append currency rule to system prompt dynamically
     let dynamicSystemPrompt = `${SYSTEM_PROMPT}\n\n15. ${currencyRule}`;
 
+    // Custom Details Option
+    if (details && details.trim().length > 0) {
+      dynamicSystemPrompt += `\n16. CRITICAL REQUIRED DETAILS: The user explicitly requested you include this specific information (e.g., a phone number, name, location, or fact): "${details}". You MUST seamlessly weave these exact details into the article. Failure to include them is unacceptable.`;
+    }
+
+    // Secondary Keywords Enhancement
+    if (secondaryKw && secondaryKw.length > 0) {
+      dynamicSystemPrompt += `\n17. SECONDARY KEYWORDS: You MUST try to naturally weave in these secondary keywords: ${secondaryKw}.`;
+    }
+
     // Internal Links rule
     if (internal_links && internal_links.length > 0) {
-      dynamicSystemPrompt += `\n16. INTERNAL LINKS: You MUST naturally weave the following URLs into the content using relevant anchor text: ${internal_links.join(", ")}.`;
+      dynamicSystemPrompt += `\n18. INTERNAL LINKS: You MUST naturally integrate the following URLs into the content using highly relevant anchor text: ${internal_links.join(", ")}.`;
     }
 
     // Handle Featured Image Generation (Pollinations AI)
@@ -240,26 +250,41 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
     let markdown = "";
     let completed = 0;
 
-    // 1. TITLE
-    const title = await callGroq([
-      { role: "system", content: "You generate SEO blog titles. Return ONLY the title text. No quotes, no explanation." },
+    // 1. TITLE & META DESC
+    const titleAndMetaStr = await callGroq([
+      { role: "system", content: "You generate SEO blog titles and meta descriptions. Return ONLY a JSON object with 'title' and 'meta_description' string properties. No markdown formatting, no explanation." },
       {
-        role: "user", content: `Create an SEO title for the keyword: "${main_keyword}".
+        role: "user", content: `Create an SEO title and meta description for the keyword: "${main_keyword}".
 
 STRICT RULES:
 - MUST contain the EXACT, UNALTERED keyword: "${main_keyword}"
-- Length: 50-70 characters maximum (STRICT - count carefully)
-- Word count: 6-12 words
+- Title Length: 50-70 characters maximum
+- Meta Description Length: STRICTLY 150-160 characters. Provide a compelling summary that drives clicks.
 - Use simple, everyday words only
-- Make it specific and valuable (e.g. "How to...", "Why...", "Best...")
-- No clickbait, no all-caps, no complex words
-- Return ONLY the title text, nothing else` },
+- Return ONLY valid JSON format: {"title": "...", "meta_description": "..."}` },
     ], GROQ_MODELS.title);
+
+    let title = `${main_keyword} Guide`;
+    let metaDescription = "";
+    try {
+      let cleanJsonStr = titleAndMetaStr;
+      const jsonMatch = titleAndMetaStr.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        cleanJsonStr = jsonMatch[0];
+      }
+      const parsed = JSON.parse(cleanJsonStr);
+      title = parsed.title || title;
+      metaDescription = parsed.meta_description || "";
+    } catch (e) {
+      console.error("Failed to parse title/meta JSON", e);
+      title = titleAndMetaStr.replace(/[{}]/g, "").replace(/"meta_description":.*$/is, "").trim();
+    }
 
     completed = 1;
     markdown = `# ${title.trim()}\n\n`;
     await updateProgress(supabase, contentId, {
       generated_title: title.trim(), generated_content: markdown,
+      meta_description: metaDescription.trim(),
       sections_completed: completed, current_section: "Introduction",
     });
 
