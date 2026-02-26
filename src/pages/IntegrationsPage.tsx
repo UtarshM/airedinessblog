@@ -91,9 +91,9 @@ const IntegrationsPage = () => {
                 <CardHeader className="flex flex-row items-center gap-4 pb-2">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                         {platformId === 'wordpress' ? (
-                            <img src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png" alt="WP" className="h-6 w-6 object-contain" />
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/20/WordPress_logo.svg" alt="WordPress" className="h-7 w-7 object-contain" />
                         ) : platformId === 'shopify' ? (
-                            <Store className="h-6 w-6 text-emerald-500" />
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Shopify_logo_2018.svg" alt="Shopify" className="h-7 w-7 object-contain" />
                         ) : (
                             <Icon className="h-6 w-6 text-primary" />
                         )}
