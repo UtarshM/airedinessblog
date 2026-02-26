@@ -14,6 +14,7 @@ import BulkGeneratePage from "@/pages/BulkGeneratePage";
 import ContentViewPage from "@/pages/ContentViewPage";
 import IntegrationsPage from "@/pages/IntegrationsPage";
 import ShopifyIntegrationPage from "@/pages/ShopifyIntegrationPage";
+import WordPressIntegrationPage from "@/pages/WordPressIntegrationPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 import SettingsPage from "@/pages/SettingsPage";
 import CalendarPage from "@/pages/CalendarPage";
@@ -49,6 +50,7 @@ const App = () => (
                 <Route path="/brand-identity" element={<BrandIdentityPage />} />
                 <Route path="/integrations" element={<IntegrationsPage />} />
                 <Route path="/integrations/shopify" element={<ShopifyIntegrationPage />} />
+                <Route path="/integrations/wordpress" element={<WordPressIntegrationPage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
               </Route>

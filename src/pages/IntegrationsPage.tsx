@@ -2,15 +2,10 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, CheckCircle, XCircle, Store } from "lucide-react";
+import { Loader2, Trash2, CheckCircle, Store, Webhook, MonitorUp, Boxes, BookOpen, Ghost } from "lucide-react";
 
 interface Integration {
     id: string;
@@ -33,17 +28,10 @@ const IntegrationsPage = () => {
     const { user } = useAuth();
     const [integrations, setIntegrations] = useState<Integration[]>([]);
     const [loading, setLoading] = useState(true);
-    const [isAdding, setIsAdding] = useState(false);
-    const [url, setUrl] = useState("");
-    const [username, setUsername] = useState("");
-    const [appPassword, setAppPassword] = useState("");
-    const [autoPublish, setAutoPublish] = useState(false);
-    const [dialogOpen, setDialogOpen] = useState(false);
 
     const fetchIntegrations = async () => {
         if (!user) return;
         setLoading(true);
-        // Use 'as any' to bypass strict typing for the new table
         const { data, error } = await (supabase
             .from("workspace_integrations" as any)
             .select("*")
@@ -62,214 +50,160 @@ const IntegrationsPage = () => {
         fetchIntegrations();
     }, [user]);
 
-    const handleAdd = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!url || !username || !appPassword) {
-            toast.error("Please fill all fields");
-            return;
-        }
-
-        setIsAdding(true);
-        try {
-            // 1. Prepare clean URL
-            let cleanUrl = url.trim();
-            if (cleanUrl.endsWith("/")) cleanUrl = cleanUrl.slice(0, -1);
-
-            // 2. Test WordPress Credentials
-            const authString = btoa(`${username.trim()}:${appPassword.trim()}`);
-            const testResponse = await fetch(`${cleanUrl}/wp-json/wp/v2/users/me`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Basic ${authString}`,
-                    "Content-Type": "application/json"
-                }
-            });
-
-            if (!testResponse.ok) {
-                if (testResponse.status === 401) {
-                    throw new Error("Invalid Username or Application Password.");
-                } else if (testResponse.status === 404) {
-                    throw new Error("WordPress REST API not found at this URL. Make sure it's a valid WordPress site.");
-                } else {
-                    throw new Error(`WordPress returned an error: ${testResponse.status} ${testResponse.statusText}`);
-                }
-            }
-
-            // 3. If validation successful, save to Supabase
-            const { error } = await supabase
-                .from("workspace_integrations" as any)
-                .insert({
-                    user_id: user!.id,
-                    platform: "wordpress",
-                    credentials: { url: cleanUrl, username: username.trim(), app_password: appPassword.trim(), auto_publish: autoPublish },
-                    is_active: true
-                });
-
-            if (error) throw error;
-
-            toast.success("WordPress connected successfully!");
-            setDialogOpen(false);
-            setUrl("");
-            setUsername("");
-            setAppPassword("");
-            setAutoPublish(false);
-            fetchIntegrations();
-        } catch (err: any) {
-            toast.error(err.message || "Failed to add integration");
-        } finally {
-            setIsAdding(false);
-        }
-    };
-
     const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this integration?")) return;
+        if (!confirm("Are you sure you want to disconnect this integration?")) return;
         const { error } = await supabase
             .from("workspace_integrations" as any)
             .delete()
             .eq("id", id);
 
-        if (error) toast.error("Failed to delete");
-        else {
-            toast.success("Deleted");
+        if (error) {
+            toast.error("Failed to disconnect");
+        } else {
+            toast.success("Disconnected successfully");
             fetchIntegrations();
         }
     };
 
+    const getIntegrationStatus = (platform: string) => {
+        return integrations.find(i => i.platform === platform);
+    };
+
+    const AppCard = ({
+        title,
+        description,
+        icon: Icon,
+        platformId,
+        comingSoon = false,
+        linkUrl
+    }: {
+        title: string,
+        description: string,
+        icon: any,
+        platformId: string,
+        comingSoon?: boolean,
+        linkUrl?: string
+    }) => {
+        const existingIntegration = getIntegrationStatus(platformId);
+
+        return (
+            <Card className="flex flex-col h-full bg-card/60 border-primary/10 shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        {platformId === 'wordpress' ? (
+                            <img src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png" alt="WP" className="h-6 w-6 object-contain" />
+                        ) : platformId === 'shopify' ? (
+                            <Store className="h-6 w-6 text-emerald-500" />
+                        ) : (
+                            <Icon className="h-6 w-6 text-primary" />
+                        )}
+                    </div>
+                    <div className="flex-1">
+                        <CardTitle className="text-xl flex items-center justify-between">
+                            {title}
+                            {existingIntegration && <CheckCircle className="h-5 w-5 text-green-500" />}
+                        </CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent className="flex-1 pt-2">
+                    <p className="text-sm text-muted-foreground">{description}</p>
+                    {existingIntegration && (
+                        <div className="mt-4 p-3 bg-muted rounded-md border text-xs text-muted-foreground">
+                            <span className="font-semibold text-foreground">Connected: </span>
+                            {new Date(existingIntegration.created_at).toLocaleDateString()}
+                            <div className="mt-1 font-medium truncate text-foreground flex items-center gap-1">
+                                {platformId === 'wordpress' ? existingIntegration.credentials.url : existingIntegration.credentials.shop_domain}
+                            </div>
+                        </div>
+                    )}
+                </CardContent>
+                <CardFooter className="pt-0 justify-between items-center gap-4">
+                    {comingSoon ? (
+                        <div className="w-full text-center py-2.5 text-sm font-medium text-muted-foreground border rounded-md bg-muted/50 cursor-not-allowed">
+                            Coming Soon
+                        </div>
+                    ) : (
+                        <>
+                            {existingIntegration ? (
+                                <Button variant="destructive" className="w-full text-sm font-semibold rounded-md shadow-sm" onClick={() => handleDelete(existingIntegration.id)}>
+                                    <Trash2 className="h-4 w-4 mr-2" /> Disconnect
+                                </Button>
+                            ) : (
+                                <Button asChild className="w-full text-sm font-semibold rounded-md shadow-sm">
+                                    <Link to={linkUrl || "#"}>
+                                        Add New
+                                    </Link>
+                                </Button>
+                            )}
+                        </>
+                    )}
+                </CardFooter>
+            </Card>
+        );
+    };
+
     return (
-        <div className="p-8 max-w-4xl">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-2xl font-bold">Integrations</h1>
-                    <p className="text-muted-foreground">Manage your external connections</p>
-                </div>
-                <div className="flex gap-3">
-                    <Button variant="outline" asChild>
-                        <Link to="/integrations/shopify">
-                            <Store className="mr-2 h-4 w-4" />
-                            Connect Shopify
-                        </Link>
-                    </Button>
-                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add WordPress
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Connect WordPress</DialogTitle>
-                                <DialogDescription>
-                                    Use an Application Password, not your login password.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <form onSubmit={handleAdd} className="space-y-4">
-                                <div>
-                                    <Label htmlFor="url">Site URL</Label>
-                                    <Input
-                                        id="url"
-                                        value={url}
-                                        onChange={(e) => setUrl(e.target.value)}
-                                        placeholder="https://mysite.com"
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="username">Username</Label>
-                                    <Input
-                                        id="username"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        placeholder="admin"
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="appPassword">Application Password</Label>
-                                    <Input
-                                        id="appPassword"
-                                        type="password"
-                                        value={appPassword}
-                                        onChange={(e) => setAppPassword(e.target.value)}
-                                        placeholder="xxxx xxxx xxxx xxxx"
-                                    />
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                        Go to Users &gt; Profile &gt; Application Passwords in WordPress admin.
-                                    </p>
-                                </div>
-                                <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                    <div className="space-y-0.5">
-                                        <Label>Auto-Publish</Label>
-                                        <p className="text-xs text-muted-foreground">Automatically publish generated content to WordPress.</p>
-                                    </div>
-                                    <Switch checked={autoPublish} onCheckedChange={setAutoPublish} />
-                                </div>
-                                <DialogFooter>
-                                    <Button type="submit" disabled={isAdding}>
-                                        {isAdding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                        Connect
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
-                </div>
+        <div className="p-8 max-w-6xl mx-auto animate-in fade-in duration-500">
+            <div className="mb-8">
+                <h1 className="text-2xl font-bold">Content Management & Website Builders</h1>
+                <p className="text-muted-foreground mt-1">Build, manage, and optimize your digital presence with powerful CMS and website building tools</p>
             </div>
 
             {loading ? (
-                <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+                <div className="flex h-40 items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
             ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {integrations.length === 0 && (
-                        <div className="col-span-full text-center py-12 border rounded-lg border-dashed text-muted-foreground">
-                            No integrations found. Add one to start publishing.
-                        </div>
-                    )}
-                    {integrations.map((integration) => (
-                        <Card key={integration.id}>
-                            <CardHeader className="pb-3">
-                                <CardTitle className="flex justify-between items-center text-lg capitalize">
-                                    {integration.platform}
-                                    {integration.is_active ? (
-                                        <CheckCircle className="h-4 w-4 text-green-500" />
-                                    ) : (
-                                        <XCircle className="h-4 w-4 text-muted-foreground" />
-                                    )}
-                                </CardTitle>
-                                <CardDescription className="truncate">
-                                    {integration.platform === 'wordpress' ? integration.credentials.url : integration.credentials.shop_domain}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="text-sm space-y-2">
-                                {integration.platform === 'wordpress' ? (
-                                    <>
-                                        <p><span className="font-medium">User:</span> {integration.credentials.username}</p>
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-medium">Auto-Publish:</span>
-                                            {integration.credentials.auto_publish ? (
-                                                <Badge variant="outline" className="text-emerald-500 bg-emerald-500/10 border-0">Enabled</Badge>
-                                            ) : (
-                                                <Badge variant="outline" className="text-muted-foreground bg-muted border-0">Disabled</Badge>
-                                            )}
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p><span className="font-medium">Store Name:</span> {integration.credentials.store_name}</p>
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-medium">Auto-Publish:</span>
-                                            <Badge variant="outline" className="text-emerald-500 bg-emerald-500/10 border-0">Enabled</Badge>
-                                        </div>
-                                    </>
-                                )}
-                                <p className="text-xs text-muted-foreground pt-1">Added on {new Date(integration.created_at).toLocaleDateString()}</p>
-                            </CardContent>
-                            <CardFooter className="justify-end">
-                                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleDelete(integration.id)}>
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Remove
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                    ))}
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+
+                    <AppCard
+                        title="Webhook"
+                        description="Automatically publish your generated blog posts to any custom endpoint or CMS via webhooks."
+                        icon={Webhook}
+                        platformId="webhook"
+                        linkUrl="/integrations/webhook"
+                    />
+
+                    <AppCard
+                        title="WordPress Plugin"
+                        description="Automatically publish your generated blog posts directly to your WordPress site with one click."
+                        icon={BookOpen}
+                        platformId="wordpress"
+                        linkUrl="/integrations/wordpress"
+                    />
+
+                    <AppCard
+                        title="Ghost"
+                        description="Seamlessly publish your AI-generated articles to Ghost CMS for professional content publishing."
+                        icon={Ghost}
+                        platformId="ghost"
+                        linkUrl="/integrations/ghost"
+                    />
+
+                    <AppCard
+                        title="Shopify"
+                        description="Publish generated blog content directly to your Shopify store blog to boost SEO and engagement."
+                        icon={Store}
+                        platformId="shopify"
+                        linkUrl="/integrations/shopify"
+                    />
+
+                    <AppCard
+                        title="Webflow"
+                        description="Automatically publish your generated blog posts to your Webflow CMS to keep your content fresh."
+                        icon={MonitorUp}
+                        platformId="webflow"
+                        comingSoon
+                    />
+
+                    <AppCard
+                        title="Framer"
+                        description="Publish your generated blog content directly to your Framer site for seamless content management."
+                        icon={Boxes}
+                        platformId="framer"
+                        comingSoon
+                    />
+
                 </div>
             )}
         </div>
