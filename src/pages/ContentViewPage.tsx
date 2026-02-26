@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
+import ImageGallery from "@/components/ImageGallery";
 
 interface ContentItem {
   id: string;
@@ -554,6 +555,11 @@ const ContentViewPage = () => {
             </div>
           )}
         </div>
+      )}
+
+      {/* Image Gallery */}
+      {(content.status === "completed" || content.status === "published") && user && (
+        <ImageGallery contentId={content.id} userId={user.id} />
       )}
 
       {/* Actions */}
