@@ -99,19 +99,11 @@ const ImageGallery = ({ contentId, userId }: ImageGalleryProps) => {
     const handleGenerateImages = async () => {
         setGenerating(true);
         try {
-            // Explicitly get session and pass auth token — required for edge function auth
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) throw new Error("Not authenticated. Please refresh the page and try again.");
-
             const { error } = await supabase.functions.invoke("generate-images", {
-                body: { contentId },
-                headers: {
-                    Authorization: `Bearer ${session.access_token}`,
-                },
+                body: { contentId, userId },
             });
             if (error) throw error;
             toast.success("Generating images... this may take 1-2 minutes.");
-            // Start polling since realtime may not be reliable
             startPolling();
         } catch (err: any) {
             toast.error(err.message || "Failed to start image generation");
