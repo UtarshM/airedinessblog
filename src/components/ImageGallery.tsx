@@ -99,8 +99,15 @@ const ImageGallery = ({ contentId, userId }: ImageGalleryProps) => {
     const handleGenerateImages = async () => {
         setGenerating(true);
         try {
+            // Explicitly get session and pass auth token — required for edge function auth
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error("Not authenticated. Please refresh the page and try again.");
+
             const { error } = await supabase.functions.invoke("generate-images", {
                 body: { contentId },
+                headers: {
+                    Authorization: `Bearer ${session.access_token}`,
+                },
             });
             if (error) throw error;
             toast.success("Generating images... this may take 1-2 minutes.");
@@ -114,6 +121,9 @@ const ImageGallery = ({ contentId, userId }: ImageGalleryProps) => {
 
     const handleDeleteImage = async (imageId: string) => {
         try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error("Not authenticated. Please refresh the page and try again.");
+
             const { error } = await (supabase
                 .from("blog_images" as any)
                 .delete()
