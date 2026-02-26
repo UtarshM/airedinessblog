@@ -206,13 +206,17 @@ serve(async (req) => {
             });
         }
 
-        // Verify user authentication
-        const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
-            global: { headers: { Authorization: authHeader || "" } },
-        });
-        const { data: { user }, error: userError } = await anonClient.auth.getUser();
+        // Verify user authentication using the JWT token from Authorization header
+        const token = authHeader?.replace("Bearer ", "") ?? "";
+        if (!token) {
+            return new Response(JSON.stringify({ error: "Missing authorization token" }), {
+                status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+        }
+        const { data: { user }, error: userError } = await supabase.auth.getUser(token);
         if (userError || !user) {
-            return new Response(JSON.stringify({ error: "Unauthorized" }), {
+            console.error("Auth error:", userError?.message);
+            return new Response(JSON.stringify({ error: "Unauthorized", detail: userError?.message }), {
                 status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
             });
         }
