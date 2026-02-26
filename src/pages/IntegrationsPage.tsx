@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Trash2, CheckCircle, Store, Webhook, MonitorUp, Boxes, BookOpen, Ghost } from "lucide-react";
+import { Loader2, Trash2, CheckCircle, Store, BookOpen } from "lucide-react";
 
 interface Integration {
     id: string;
@@ -157,14 +157,6 @@ const IntegrationsPage = () => {
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
 
                     <AppCard
-                        title="Webhook"
-                        description="Automatically publish your generated blog posts to any custom endpoint or CMS via webhooks."
-                        icon={Webhook}
-                        platformId="webhook"
-                        linkUrl="/integrations/webhook"
-                    />
-
-                    <AppCard
                         title="WordPress Plugin"
                         description="Automatically publish your generated blog posts directly to your WordPress site with one click."
                         icon={BookOpen}
@@ -173,35 +165,11 @@ const IntegrationsPage = () => {
                     />
 
                     <AppCard
-                        title="Ghost"
-                        description="Seamlessly publish your AI-generated articles to Ghost CMS for professional content publishing."
-                        icon={Ghost}
-                        platformId="ghost"
-                        linkUrl="/integrations/ghost"
-                    />
-
-                    <AppCard
                         title="Shopify"
                         description="Publish generated blog content directly to your Shopify store blog to boost SEO and engagement."
                         icon={Store}
                         platformId="shopify"
                         linkUrl="/integrations/shopify"
-                    />
-
-                    <AppCard
-                        title="Webflow"
-                        description="Automatically publish your generated blog posts to your Webflow CMS to keep your content fresh."
-                        icon={MonitorUp}
-                        platformId="webflow"
-                        comingSoon
-                    />
-
-                    <AppCard
-                        title="Framer"
-                        description="Publish your generated blog content directly to your Framer site for seamless content management."
-                        icon={Boxes}
-                        platformId="framer"
-                        comingSoon
                     />
 
                 </div>
