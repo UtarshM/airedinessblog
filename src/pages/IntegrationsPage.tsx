@@ -4,12 +4,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, Plus, Trash2, CheckCircle, XCircle, Store } from "lucide-react";
 
 interface Integration {
     id: string;
@@ -19,6 +20,10 @@ interface Integration {
         username?: string;
         app_password?: string;
         auto_publish?: boolean;
+        store_name?: string;
+        shop_domain?: string;
+        client_id?: string;
+        client_secret?: string;
     };
     is_active: boolean;
     created_at: string;
@@ -43,7 +48,7 @@ const IntegrationsPage = () => {
             .from("workspace_integrations" as any)
             .select("*")
             .eq("user_id", user.id)
-            .eq("platform", "wordpress") as any);
+            .in("platform", ["wordpress", "shopify"]) as any);
 
         if (error) {
             toast.error("Failed to load integrations");
@@ -137,68 +142,76 @@ const IntegrationsPage = () => {
                     <h1 className="text-2xl font-bold">Integrations</h1>
                     <p className="text-muted-foreground">Manage your external connections</p>
                 </div>
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add WordPress
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Connect WordPress</DialogTitle>
-                            <DialogDescription>
-                                Use an Application Password, not your login password.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <form onSubmit={handleAdd} className="space-y-4">
-                            <div>
-                                <Label htmlFor="url">Site URL</Label>
-                                <Input
-                                    id="url"
-                                    value={url}
-                                    onChange={(e) => setUrl(e.target.value)}
-                                    placeholder="https://mysite.com"
-                                />
-                            </div>
-                            <div>
-                                <Label htmlFor="username">Username</Label>
-                                <Input
-                                    id="username"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    placeholder="admin"
-                                />
-                            </div>
-                            <div>
-                                <Label htmlFor="appPassword">Application Password</Label>
-                                <Input
-                                    id="appPassword"
-                                    type="password"
-                                    value={appPassword}
-                                    onChange={(e) => setAppPassword(e.target.value)}
-                                    placeholder="xxxx xxxx xxxx xxxx"
-                                />
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    Go to Users &gt; Profile &gt; Application Passwords in WordPress admin.
-                                </p>
-                            </div>
-                            <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                <div className="space-y-0.5">
-                                    <Label>Auto-Publish</Label>
-                                    <p className="text-xs text-muted-foreground">Automatically publish generated content to WordPress.</p>
+                <div className="flex gap-3">
+                    <Button variant="outline" asChild>
+                        <Link to="/integrations/shopify">
+                            <Store className="mr-2 h-4 w-4" />
+                            Connect Shopify
+                        </Link>
+                    </Button>
+                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add WordPress
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Connect WordPress</DialogTitle>
+                                <DialogDescription>
+                                    Use an Application Password, not your login password.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <form onSubmit={handleAdd} className="space-y-4">
+                                <div>
+                                    <Label htmlFor="url">Site URL</Label>
+                                    <Input
+                                        id="url"
+                                        value={url}
+                                        onChange={(e) => setUrl(e.target.value)}
+                                        placeholder="https://mysite.com"
+                                    />
                                 </div>
-                                <Switch checked={autoPublish} onCheckedChange={setAutoPublish} />
-                            </div>
-                            <DialogFooter>
-                                <Button type="submit" disabled={isAdding}>
-                                    {isAdding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Connect
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+                                <div>
+                                    <Label htmlFor="username">Username</Label>
+                                    <Input
+                                        id="username"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        placeholder="admin"
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="appPassword">Application Password</Label>
+                                    <Input
+                                        id="appPassword"
+                                        type="password"
+                                        value={appPassword}
+                                        onChange={(e) => setAppPassword(e.target.value)}
+                                        placeholder="xxxx xxxx xxxx xxxx"
+                                    />
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        Go to Users &gt; Profile &gt; Application Passwords in WordPress admin.
+                                    </p>
+                                </div>
+                                <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                    <div className="space-y-0.5">
+                                        <Label>Auto-Publish</Label>
+                                        <p className="text-xs text-muted-foreground">Automatically publish generated content to WordPress.</p>
+                                    </div>
+                                    <Switch checked={autoPublish} onCheckedChange={setAutoPublish} />
+                                </div>
+                                <DialogFooter>
+                                    <Button type="submit" disabled={isAdding}>
+                                        {isAdding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                        Connect
+                                    </Button>
+                                </DialogFooter>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
 
             {loading ? (
@@ -213,8 +226,8 @@ const IntegrationsPage = () => {
                     {integrations.map((integration) => (
                         <Card key={integration.id}>
                             <CardHeader className="pb-3">
-                                <CardTitle className="flex justify-between items-center text-lg">
-                                    WordPress
+                                <CardTitle className="flex justify-between items-center text-lg capitalize">
+                                    {integration.platform}
                                     {integration.is_active ? (
                                         <CheckCircle className="h-4 w-4 text-green-500" />
                                     ) : (
@@ -222,19 +235,31 @@ const IntegrationsPage = () => {
                                     )}
                                 </CardTitle>
                                 <CardDescription className="truncate">
-                                    {integration.credentials.url}
+                                    {integration.platform === 'wordpress' ? integration.credentials.url : integration.credentials.shop_domain}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="text-sm space-y-2">
-                                <p><span className="font-medium">User:</span> {integration.credentials.username}</p>
-                                <div className="flex items-center gap-2">
-                                    <span className="font-medium">Auto-Publish:</span>
-                                    {integration.credentials.auto_publish ? (
-                                        <Badge variant="outline" className="text-emerald-500 bg-emerald-500/10 border-0">Enabled</Badge>
-                                    ) : (
-                                        <Badge variant="outline" className="text-muted-foreground bg-muted border-0">Disabled</Badge>
-                                    )}
-                                </div>
+                                {integration.platform === 'wordpress' ? (
+                                    <>
+                                        <p><span className="font-medium">User:</span> {integration.credentials.username}</p>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Auto-Publish:</span>
+                                            {integration.credentials.auto_publish ? (
+                                                <Badge variant="outline" className="text-emerald-500 bg-emerald-500/10 border-0">Enabled</Badge>
+                                            ) : (
+                                                <Badge variant="outline" className="text-muted-foreground bg-muted border-0">Disabled</Badge>
+                                            )}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p><span className="font-medium">Store Name:</span> {integration.credentials.store_name}</p>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Auto-Publish:</span>
+                                            <Badge variant="outline" className="text-emerald-500 bg-emerald-500/10 border-0">Enabled</Badge>
+                                        </div>
+                                    </>
+                                )}
                                 <p className="text-xs text-muted-foreground pt-1">Added on {new Date(integration.created_at).toLocaleDateString()}</p>
                             </CardContent>
                             <CardFooter className="justify-end">
