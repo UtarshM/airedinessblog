@@ -99,10 +99,25 @@ const ImageGallery = ({ contentId, userId }: ImageGalleryProps) => {
     const handleGenerateImages = async () => {
         setGenerating(true);
         try {
-            const { error } = await supabase.functions.invoke("generate-images", {
-                body: { contentId, userId },
+            // Use direct fetch instead of supabase.functions.invoke to avoid URL issues
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+            const { data: { session } } = await supabase.auth.getSession();
+
+            const res = await fetch(`${supabaseUrl}/functions/v1/generate-images`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": supabaseKey,
+                    "Authorization": `Bearer ${session?.access_token || supabaseKey}`,
+                },
+                body: JSON.stringify({ contentId, userId }),
             });
-            if (error) throw error;
+
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`Function error ${res.status}: ${errText}`);
+            }
             toast.success("Generating images... this may take 1-2 minutes.");
             startPolling();
         } catch (err: any) {
@@ -139,6 +154,28 @@ const ImageGallery = ({ contentId, userId }: ImageGalleryProps) => {
             console.error("Error clearing images:", err);
         }
         handleGenerateImages();
+    };
+
+    const handleClearAll = async () => {
+        if (!window.confirm("Are you sure you want to delete all generated images for this post? This cannot be undone.")) return;
+
+        try {
+            setGenerating(true);
+            const { error } = await (supabase
+                .from("blog_images" as any)
+                .delete()
+                .eq("content_id", contentId) as any);
+
+            if (error) throw error;
+
+            setImages([]);
+            toast.success("All images cleared successfully");
+        } catch (err: any) {
+            console.error("Error clearing images:", err);
+            toast.error(err.message || "Failed to clear images");
+        } finally {
+            setGenerating(false);
+        }
     };
 
     const handleManualRefresh = async () => {
@@ -200,19 +237,30 @@ const ImageGallery = ({ contentId, userId }: ImageGalleryProps) => {
                                 {generating ? "Generating... (takes 1-2 min)" : "Generate Images"}
                             </Button>
                         ) : (
-                            <Button
-                                onClick={handleRegenerateAll}
-                                disabled={generating}
-                                variant="outline"
-                                size="sm"
-                            >
-                                {generating ? (
-                                    <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                                ) : (
-                                    <RefreshCw className="mr-2 h-3.5 w-3.5" />
-                                )}
-                                {generating ? "Regenerating..." : "Regenerate All"}
-                            </Button>
+                            <>
+                                <Button
+                                    onClick={handleRegenerateAll}
+                                    disabled={generating}
+                                    variant="outline"
+                                    size="sm"
+                                >
+                                    {generating ? (
+                                        <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                                    ) : (
+                                        <RefreshCw className="mr-2 h-3.5 w-3.5" />
+                                    )}
+                                    {generating ? "Regenerating..." : "Regenerate All"}
+                                </Button>
+                                <Button
+                                    onClick={handleClearAll}
+                                    disabled={generating}
+                                    variant="destructive"
+                                    size="sm"
+                                >
+                                    <Trash2 className="mr-2 h-3.5 w-3.5" />
+                                    Clear All
+                                </Button>
+                            </>
                         )}
                         {/* Manual refresh — useful if realtime is down */}
                         {generating && (
