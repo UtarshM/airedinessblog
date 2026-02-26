@@ -356,7 +356,14 @@ FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words.
       ], GROQ_MODELS.section, Math.round(dist.h2Words * 1.5) + 100);
 
       completed++;
-      markdown += `## ${h2s[i]}\n\n${h2Content.trim()}\n\n`;
+
+      let sectionImageMarkdown = "";
+      if (generate_image) {
+        const sectionImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(`High quality illustration representing ${h2s[i]} for ${main_keyword}`)}?width=800&height=533&nologo=true`;
+        sectionImageMarkdown = `![${h2s[i]}](${sectionImageUrl})\n\n`;
+      }
+
+      markdown += `## ${h2s[i]}\n\n${sectionImageMarkdown}${h2Content.trim()}\n\n`;
       const nextSection = i < h2s.length - 1 ? h2s[i + 1] : "Conclusion";
       await updateProgress(supabase, contentId, {
         generated_content: markdown, sections_completed: completed, current_section: nextSection,
