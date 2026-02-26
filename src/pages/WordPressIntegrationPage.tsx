@@ -87,7 +87,7 @@ const WordPressIntegrationPage = () => {
                 </Button>
                 <div>
                     <h1 className="text-2xl font-bold flex items-center gap-2">
-                        <img src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png" alt="WordPress" className="h-6 w-6 object-contain" />
+                        <img src="https://cdn.simpleicons.org/wordpress/21759B" alt="WordPress" className="h-6 w-6 object-contain" />
                         WordPress Plugin Integration
                     </h1>
                 </div>

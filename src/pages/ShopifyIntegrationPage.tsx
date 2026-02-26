@@ -73,7 +73,7 @@ const ShopifyIntegrationPage = () => {
                 </Button>
                 <div>
                     <h1 className="text-2xl font-bold flex items-center gap-2">
-                        <Store className="h-6 w-6 text-indigo-500" />
+                        <img src="https://cdn.simpleicons.org/shopify/95BF47" alt="Shopify" className="h-6 w-6 object-contain" />
                         Connect Shopify Store
                     </h1>
                     <p className="text-muted-foreground mt-1">Configure your Shopify integration to auto-publish articles.</p>
