@@ -30,6 +30,7 @@ const SettingsPage = () => {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isChangingPassword, setIsChangingPassword] = useState(false);
+    const [showPasswordForm, setShowPasswordForm] = useState(false);
 
     // Preferences (stored in localStorage for now)
     const [defaultTone, setDefaultTone] = useState(() => localStorage.getItem("bf_default_tone") || "Professional");
@@ -189,36 +190,51 @@ const SettingsPage = () => {
                             <CardDescription>Update your password</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={handlePasswordChange} className="space-y-4">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="new-password">New Password</Label>
-                                        <Input
-                                            id="new-password"
-                                            type="password"
-                                            placeholder="••••••••"
-                                            value={newPassword}
-                                            onChange={(e) => setNewPassword(e.target.value)}
-                                            minLength={6}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="confirm-password">Confirm New Password</Label>
-                                        <Input
-                                            id="confirm-password"
-                                            type="password"
-                                            placeholder="••••••••"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            minLength={6}
-                                        />
-                                    </div>
-                                </div>
-                                <Button type="submit" disabled={isChangingPassword || !newPassword || !confirmPassword} size="sm">
-                                    {isChangingPassword ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                                    Update Password
+                            {!showPasswordForm ? (
+                                <Button variant="outline" onClick={() => setShowPasswordForm(true)}>
+                                    Change Password
                                 </Button>
-                            </form>
+                            ) : (
+                                <form onSubmit={handlePasswordChange} className="space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="new-password">New Password</Label>
+                                            <Input
+                                                id="new-password"
+                                                type="password"
+                                                placeholder="••••••••"
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                                minLength={6}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="confirm-password">Confirm New Password</Label>
+                                            <Input
+                                                id="confirm-password"
+                                                type="password"
+                                                placeholder="••••••••"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                                minLength={6}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button type="submit" disabled={isChangingPassword || !newPassword || !confirmPassword} size="sm">
+                                            {isChangingPassword ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                                            Update Password
+                                        </Button>
+                                        <Button type="button" variant="ghost" size="sm" onClick={() => {
+                                            setShowPasswordForm(false);
+                                            setNewPassword("");
+                                            setConfirmPassword("");
+                                        }}>
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </form>
+                            )}
                         </CardContent>
                     </Card>
                 )}
