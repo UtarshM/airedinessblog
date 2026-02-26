@@ -202,7 +202,8 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
     // Handle Featured Image Generation (Pollinations AI)
     let featuredImageUrl = content.featured_image_url;
     if (generate_image && !featuredImageUrl) {
-      featuredImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(`High quality blog post featured image representing ${main_keyword}`)}?width=1200&height=630&nologo=true`;
+      const featuredImagePrompt = `Professional high-resolution blog header photo, ${main_keyword}, modern clean aesthetic, vibrant colors, editorial quality, no text overlay, no watermark, photorealistic`;
+      featuredImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(featuredImagePrompt)}?width=1200&height=630&nologo=true`;
       await supabase.from("content_items").update({ featured_image_url: featuredImageUrl }).eq("id", contentId);
     }
 
@@ -359,8 +360,16 @@ FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words.
 
       let sectionImageMarkdown = "";
       if (generate_image) {
-        const sectionImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(`High quality illustration representing ${h2s[i]} for ${main_keyword}`)}?width=800&height=533&nologo=true`;
-        sectionImageMarkdown = `![${h2s[i]}](${sectionImageUrl})\n\n`;
+        // Use the LLM to generate a rich, detailed image prompt for this section
+        const imagePromptText = await callGroq([
+          { role: "system", content: "You generate short, vivid image descriptions for AI image generators. Return ONLY the description, no quotes, no explanation. Max 30 words. Focus on visual elements, colors, composition, and mood. Always end with: photorealistic, high resolution, no text." },
+          { role: "user", content: `Describe a single compelling image that visually represents this blog section: "${h2s[i]}" in the context of "${main_keyword}". The image should feel professional and editorial.` },
+        ], GROQ_MODELS.title, 80);
+
+        const cleanPrompt = imagePromptText.replace(/"/g, '').replace(/\n/g, ' ').trim();
+        const sectionImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanPrompt)}?width=800&height=533&nologo=true`;
+        const altText = h2s[i].replace(/"/g, '');
+        sectionImageMarkdown = `![${altText}](${sectionImageUrl})\n\n`;
       }
 
       markdown += `## ${h2s[i]}\n\n${sectionImageMarkdown}${h2Content.trim()}\n\n`;
