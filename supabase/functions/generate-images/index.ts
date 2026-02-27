@@ -20,10 +20,10 @@ async function generatePrompt(topic: string, context: string): Promise<string> {
             body: JSON.stringify({
                 model: "llama-3.1-8b-instant",
                 messages: [
-                    { role: "system", content: "You create short, vivid image prompts for AI image generators. Return ONLY the description in 25 words max. End with: photorealistic, high resolution, no text." },
-                    { role: "user", content: `Create an image prompt for: "${topic}" in the context of "${context}"` }
+                    { role: "system", content: "You are an expert AI image prompt engineer. Create vivid, detailed prompts for photorealistic image generation. Include: subject, environment, lighting (golden hour, soft diffused, etc.), camera angle, and mood. Output ONLY the prompt, no quotes, no explanation. Maximum 45 words. End with: DSLR photography, 4K ultra HD, sharp focus, no text, no watermark." },
+                    { role: "user", content: `Create a photorealistic image prompt for a blog about \"${context}\". The image should represent: \"${topic}\"` }
                 ],
-                max_tokens: 80,
+                max_tokens: 120,
                 temperature: 0.7,
             }),
         });
@@ -50,7 +50,7 @@ async function generateAndUpload(
 
     try {
         const res = await fetch(
-            "https://api.fireworks.ai/inference/v1/image_generation/accounts/fireworks/models/stable-diffusion-xl-1024-v1-0",
+            "https://api.fireworks.ai/inference/v1/image_generation/accounts/fireworks/models/playground-v2-5-1024px-aesthetic",
             {
                 method: "POST",
                 headers: {
@@ -60,11 +60,11 @@ async function generateAndUpload(
                 },
                 body: JSON.stringify({
                     prompt,
-                    negative_prompt: "text, watermark, logo, signature, ugly, blurry, low quality, distorted",
-                    height: Math.min(height, 1024),
-                    width: Math.min(width, 1024),
-                    num_inference_steps: 25,
-                    guidance_scale: 7,
+                    negative_prompt: "text, watermark, logo, signature, ugly, deformed, blurry, low quality, low resolution, bad anatomy, extra limbs, missing limbs, floating objects, cartoon, anime, painting",
+                    height: 768,
+                    width: 1344,
+                    num_inference_steps: 40,
+                    guidance_scale: 7.5,
                     samples: 1,
                 }),
             }

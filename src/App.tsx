@@ -20,6 +20,7 @@ import SettingsPage from "@/pages/SettingsPage";
 import CalendarPage from "@/pages/CalendarPage";
 import { ManagePostsPage, BrandIdentityPage } from "@/pages/Placeholders";
 import NotFound from "./pages/NotFound";
+import Index from "@/pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -32,8 +33,8 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
+              <Route path="/" element={<Index />} />
               <Route path="/auth" element={<AuthPage />} />
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route
                 element={
                   <ProtectedRoute>

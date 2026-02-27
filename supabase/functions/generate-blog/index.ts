@@ -40,56 +40,26 @@ function calculateEstimatedCredits(wordCount: number, hasH3: boolean, hasFAQ: bo
   return credits;
 }
 
-const SYSTEM_PROMPT = `Act as a senior SEO content strategist with 20+ years of hands-on experience in Google algorithms, EEAT, topical authority, NLP, and conversion-focused content. You write fully SEO-optimized, high-ranking, human-friendly blog posts that can rank on Google Page 1 for competitive keywords.
+const SYSTEM_PROMPT = `You are a highly opinionated, sharp-witted human industry expert who hates corporate jargon. Your writing MUST score 0% on AI detectors like ZeroGPT.
 
-STRICT RULES:
+CRITICAL INSTRUCTIONS FOR BYPASSING AI DETECTORS:
+1. MAXIMIZE BURSTINESS & PERPLEXITY: Your sentence lengths must swing wildly. Write a 3-word punchy sentence. Then follow it with a winding, 30-word explanation that connects disparate ideas—like this—before dropping another short fact.
+2. BAN THE AI VOCABULARY: NEVER use these words: "In today's fast-paced world", "At the end of the day", "When it comes to", "Let's dive in", "Crucial", "Vital", "Revolutionize", "Game-changer", "Tapestry", "Delve", "Moreover", "Furthermore", "Thus", "Hence", "In conclusion", "Ultimately".
+3. HUMAN QUIRKS: Start sentences with "And", "But", or "Because". Use contractions (don't, aren't, it's). Use rhetorical questions.
+4. PARAGRAPH CHAOS: Do not write paragraphs of equal length. Mix 1-sentence paragraphs with 3-sentence paragraphs.
+5. AGGRESSIVE & ACTIVE TONE: Speak directly to the reader ("you"). Don't hide behind passive voice. Be conversational, like an expert giving advice over a coffee.
+6. NO HEADINGS in your output (no h1, h2, h3, or ###). We construct headers separately.
+7. BOLDING: Bold concepts organically, not symmetrically.
+8. DATA: Include at least one real-world, widely known metric or benchmark estimate per section.
+9. TRUE HUMAN VERDICTS: Don't give "balanced AI" answers where both sides win. Take a stance. Tell them exactly what to do.
 
-1. PARAGRAPHS: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. This is the most critical rule. If a paragraph has 3 or more sentences, you have failed.
+If your writing sounds like a textbook, an AI, or a corporate brochure, you have failed entirely.`;
 
-2. SENTENCES: 10-15 words each. Short, extremely concise, direct. Avoid filler words.
-
-3. SIMPLE WORDS: Everyday common language. 7th-grade reading level. No complex or academic words.
-
-4. KEYWORD CONTROL: Total keyword density must NOT exceed 1.05%. Use the exact main keyword only 1-2 times per section (7-8 times total). Use natural variations, synonyms, and related phrases for all other mentions. NEVER repeat the exact keyword 3+ times in one section.
-
-5. TRANSITION CONTROL: AVOID overuse of "However", "Additionally", "Moreover", "Therefore". Use each MAX 1 time in the entire article. Prefer natural segues or no transition word at all. Use variety: Still, Yet, For this reason, On the other hand, Because of this, At the same time, Even so, That said, As a result, In contrast, Meanwhile.
-
-6. ACTIVE VOICE ONLY: No passive voice.
-
-7. BOLD: Use **bold** for key terms, product names, and data points.
-
-8. LISTS: Use dashes (-) for bullet points. NEVER use asterisks (*). NEVER use emoji or special symbols in lists.
-
-9. NO HEADINGS in body content. No h1, h2, h3, or ### in your output.
-
-10. DATA REQUIREMENT: Every section MUST include at least one of these:
-- Real user numbers or market size (use widely known public data)
-- Growth percentages or adoption rates
-- Cost comparisons or pricing benchmarks
-- Performance metrics (speed, engagement, conversion rates)
-- Regional or industry-specific data points
-Use REAL publicly known data. If exact numbers are uncertain, use reasonable ranges like "over 2 billion users" or "growth rates between 15-25% annually."
-
-11. EVALUATION CRITERIA: Judge every tool, platform, or approach using measurable criteria: performance, cost, growth rate, engagement, ease of use, ROI, risk level. Without criteria, there is no authority.
-
-12. BLOCKING RULES (content MUST NOT contain):
-- No repetition of the same idea in different words
-- No vague statements like "it is very useful" or "it helps a lot"
-- No motivational or inspirational language
-- No theory without a practical example
-- No academic or corporate tone
-- No claims without a reason or data to support them
-
-13. DECISION OUTPUT: Content must help the reader make a decision within 5 minutes of reading. Every section should move toward: what is best, who should choose it, why it wins, and when not to use it.
-
-14. BANNED PHRASES: Never use: "In today's", "It's important", "In conclusion", "Let's dive", "When it comes to", "At the end of the day", "studies show", "research indicates", "game-changer", "revolutionary".`;
-
-// Groq model mapping per task
 const GROQ_MODELS = {
-  title: "llama-3.1-8b-instant",
-  outline: "llama-3.1-8b-instant",
-  section: "llama-3.1-8b-instant",
-  faq: "llama-3.1-8b-instant",
+  title: "llama-3.3-70b-versatile",
+  outline: "llama-3.3-70b-versatile",
+  section: "llama-3.3-70b-versatile",
+  faq: "llama-3.3-70b-versatile",
 } as const;
 
 async function callGroq(messages: any[], model: string, maxTokens: number = 2000): Promise<string> {
@@ -302,7 +272,7 @@ KEYWORD RULES (TARGET DENSITY: ~1%):
 - Use synonyms, LSI terms, or variations for all other mentions to avoid keyword stuffing.
 - NEVER repeat the keyword in back-to-back sentences.
 
-FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No headings.
+FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word sentences. Keep paragraphs very short (1-3 sentences max). Simple words. Active voice. Dashes (-) for lists. No headings. No asterisks.
 - DO NOT start your response with the blog title. DO NOT repeat the title. JUST write the introduction paragraphs.` },
     ], GROQ_MODELS.section, Math.round(dist.introWords * 1.5) + 100);
 
@@ -347,7 +317,7 @@ BLOCKING RULES:
 - No theory without a practical example
 - Every claim must have a reason or data behind it
 
-FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No section heading in output.` },
+FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word sentences. Keep paragraphs very short (1-3 sentences max). Simple words. Active voice. Dashes (-) for lists. No section heading in output.` },
       ], GROQ_MODELS.section, Math.round(dist.h2Words * 1.5) + 100);
 
       completed++;
@@ -369,11 +339,10 @@ FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words.
 CRITICAL LENGTH: STRICTLY limit the ENTIRE output to around ${dist.conclusionWords + dist.faqWords} words combined. DO NOT WABBLE OR OVER-EXPLAIN.
 
 CONCLUSION (write first):
-- SENTENCE QUALITY: Write full, proper sentences. No fragments. AVOID "However", "Additionally", "Moreover", "Therefore". Use natural language.
+- BURSTINESS: Vary sentence lengths drastically. Use 3-word sentences alongside longer ones. Use natural, conversational language. AVOID formal transitions like "However", "Additionally".
 - DECISION SUMMARY: State clearly what is the best option, who should choose it, and why it wins.
 - WHEN NOT TO USE: Mention one scenario where a different approach is better. This builds trust.
 - FINAL VERDICT: End with a clear, actionable statement. The reader must know exactly what to do next.
-- Max 2 sentences per paragraph.
 - MUST use the EXACT keyword "${main_keyword}" exactly 1 time.
 - Do NOT start with "In conclusion" or "To sum up".
 - DO NOT INCLUDE A HEADING FOR THE CONCLUSION. Do NOT output "## Conclusion". Start writing the actual conclusion body immediately.
@@ -391,7 +360,7 @@ Then write FAQs:
 ### 3. [Common misconception or concern]?
 [Answer that corrects the misconception with evidence or logic. Full sentences.]
 
-FORMAT: MAXIMUM 2 sentences per paragraph. NO EXCEPTIONS. Sentences 10-15 words. Simple words. Active voice. Dashes (-) for lists, never asterisks. No fake stats — use real public data or logical reasoning.` },
+FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word sentences. Keep paragraphs very short (1-3 sentences max). Simple words. Active voice. Dashes (-) for lists. No fake stats.` },
     ], GROQ_MODELS.faq, Math.round((dist.conclusionWords + dist.faqWords) * 1.5) + 200);
 
     completed++;

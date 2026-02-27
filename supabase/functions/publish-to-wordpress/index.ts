@@ -101,6 +101,21 @@ serve(async (req) => {
         const titleRegex = new RegExp(`^${title.trim().replace(/[.*+?^$\\{\\}()|[\\]\\\\]/g, '\\\\$&')}\\s*\\n+`, 'i');
         markdownContent = markdownContent.replace(titleRegex, '').trim();
 
+        // Fetch section images and inject them into the markdown content
+        const { data: blogImages } = await supabase
+            .from("blog_images")
+            .select("*")
+            .eq("content_id", contentId)
+            .eq("status", "completed");
+
+        if (blogImages && blogImages.length > 0) {
+            blogImages.filter((img: any) => img.image_type === 'section' && img.section_heading).forEach((img: any) => {
+                // Find "## <section_heading>" (case-insensitive) and inject image markdown underneath
+                const headingRegex = new RegExp(`(##\\s+${img.section_heading.replace(/[.*+?^$\\{\\}()|[\\]\\\\]/g, '\\\\$&')})`, 'i');
+                markdownContent = markdownContent.replace(headingRegex, `$1\n\n![${img.section_heading}](${img.image_url})\n\n`);
+            });
+        }
+
         const htmlContent = marked.parse(markdownContent);
 
         // Use designated meta_description if it exists, otherwise extract from content
