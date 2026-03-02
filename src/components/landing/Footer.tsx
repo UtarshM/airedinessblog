@@ -8,7 +8,7 @@ export const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                     <div className="col-span-1 md:col-span-1">
                         <Link to="/" className="flex items-center space-x-2 mb-6">
-                            <img src="/logo.png" alt="FUPilot Logo" className="h-8 w-auto" />
+                            <img src="/fupilot.webp" alt="FUPilot Logo" className="h-8 w-auto" />
                         </Link>
                         <p className="text-muted-foreground text-sm mb-6 max-w-xs">
                             Grow organic traffic on auto-pilot. Generate SEO-optimized content and outrank your competitors while you sleep.

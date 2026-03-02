@@ -80,7 +80,7 @@ const AppSidebar = () => {
     <aside className="w-64 gradient-sidebar flex flex-col min-h-screen border-r border-sidebar-border">
       <div className="p-4 flex items-center gap-2 border-b border-sidebar-border/50">
         <Link to="/dashboard" className="flex items-center group flex-1">
-          <img src="/logo.png" alt="FUPilot Logo" className="h-8 w-auto" />
+          <img src="/fupilot.webp" alt="FUPilot Logo" className="h-8 w-auto" />
         </Link>
       </div>
 

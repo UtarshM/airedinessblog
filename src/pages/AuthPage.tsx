@@ -82,7 +82,7 @@ const AuthPage = () => {
       <div className="hidden lg:flex lg:w-1/2 gradient-sidebar items-center justify-center p-12">
         <div className="max-w-md text-center">
           <div className="flex items-center justify-center mb-8">
-            <img src="/logo.png" alt="FUPilot Logo" className="h-12 w-auto" />
+            <img src="/fupilot.webp" alt="FUPilot Logo" className="h-12 w-auto" />
           </div>
           <p className="text-lg" style={{ color: "hsl(220 14% 70%)" }}>
             Generate SEO-optimized blog content section-by-section with AI. Built for Indian SEO agencies.
@@ -94,7 +94,7 @@ const AuthPage = () => {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-sm">
           <div className="flex items-center mb-2 lg:hidden">
-            <img src="/logo.png" alt="FUPilot Logo" className="h-8 w-auto" />
+            <img src="/fupilot.webp" alt="FUPilot Logo" className="h-8 w-auto" />
           </div>
           <h2 className="text-2xl font-bold mb-1">
             {isLogin ? "Welcome back" : "Create your account"}
