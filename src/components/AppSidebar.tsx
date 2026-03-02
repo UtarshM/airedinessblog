@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import {
-  Sparkles,
   Edit,
   Layers,
   List,
@@ -80,11 +79,8 @@ const AppSidebar = () => {
   return (
     <aside className="w-64 gradient-sidebar flex flex-col min-h-screen border-r border-sidebar-border">
       <div className="p-4 flex items-center gap-2 border-b border-sidebar-border/50">
-        <Link to="/dashboard" className="flex items-center gap-2 group flex-1">
-          <div className="bg-primary/10 p-1.5 rounded-lg">
-            <Sparkles className="h-5 w-5 text-primary" />
-          </div>
-          <span className="text-xl font-bold tracking-tight">BlogForge</span>
+        <Link to="/dashboard" className="flex items-center group flex-1">
+          <img src="/logo.png" alt="FUPilot Logo" className="h-8 w-auto" />
         </Link>
       </div>
 
