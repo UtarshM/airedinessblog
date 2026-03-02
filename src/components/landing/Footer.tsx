@@ -8,12 +8,7 @@ export const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                     <div className="col-span-1 md:col-span-1">
                         <Link to="/" className="flex items-center space-x-2 mb-6">
-                            <div className="bg-primary/10 p-2 rounded-xl">
-                                <BrainCircuit className="h-6 w-6 text-primary" />
-                            </div>
-                            <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
-                                Rank.Scalezix
-                            </span>
+                            <img src="/logo.png" alt="FUPilot Logo" className="h-8 w-auto" />
                         </Link>
                         <p className="text-muted-foreground text-sm mb-6 max-w-xs">
                             Grow organic traffic on auto-pilot. Generate SEO-optimized content and outrank your competitors while you sleep.
@@ -67,7 +62,7 @@ export const Footer = () => {
 
                 <div className="pt-8 border-t border-border/40 text-center">
                     <p className="text-sm text-muted-foreground">
-                        &copy; {new Date().getFullYear()} Rank.Scalezix. All rights reserved.
+                        &copy; {new Date().getFullYear()} FUPilot. All rights reserved.
                     </p>
                 </div>
             </div>

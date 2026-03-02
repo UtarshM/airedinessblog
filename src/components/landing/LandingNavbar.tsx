@@ -26,12 +26,7 @@ export const LandingNavbar = () => {
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <Link to="/" className="flex items-center space-x-2">
-                        <div className="bg-primary/10 p-2 rounded-xl">
-                            <BrainCircuit className="h-6 w-6 text-primary" />
-                        </div>
-                        <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
-                            Rank.Scalezix
-                        </span>
+                        <img src="/logo.png" alt="FUPilot Logo" className="h-8 w-auto" />
                     </Link>
                 </div>
 
