@@ -216,34 +216,48 @@ async function generateBlog(supabase: any, contentId: string, userId: string) {
     let completed = 0;
 
     // 1. TITLE & META DESC
-    const titleAndMetaStr = await callGroq([
-      { role: "system", content: "You generate SEO blog titles and meta descriptions. Return ONLY a JSON object with 'title' and 'meta_description' string properties. No markdown formatting, no explanation." },
-      {
-        role: "user", content: `Create an SEO title and meta description for the keyword: "${main_keyword}".
+    let title = h1 || `${main_keyword} Guide`;
+    let metaDescription = "";
+
+    if (h1 && h1.trim().length > 0) {
+      const metaStr = await callGroq([
+        { role: "system", content: "You generate SEO meta descriptions. Return ONLY a JSON object with a 'meta_description' string property. No markdown." },
+        { role: "user", content: `Create an SEO meta description for a blog titled: "${h1}" about "${main_keyword}". STRICTLY 150-165 characters. Return ONLY valid JSON: {"meta_description": "..."}` },
+      ], GROQ_MODELS.title);
+      try {
+        const parsed = JSON.parse(metaStr.match(/\{[\s\S]*\}/)?.[0] || metaStr);
+        metaDescription = parsed.meta_description || "";
+      } catch (e) {
+        metaDescription = metaStr.replace(/[{}]/g, "").replace(/"meta_description":\s*/is, "").trim();
+      }
+    } else {
+      const titleAndMetaStr = await callGroq([
+        { role: "system", content: "You generate SEO blog titles and meta descriptions. Return ONLY a JSON object with 'title' and 'meta_description' string properties. No markdown formatting, no explanation." },
+        {
+          role: "user", content: `Create an SEO title and meta description for the keyword: "${main_keyword}".
 
 STRICT RULES:
 - MUST contain the EXACT, UNALTERED keyword: "${main_keyword}"
-- Title Length: 50-70 characters maximum
-- Meta Description Length: STRICTLY 150-160 characters. Provide a compelling summary that drives clicks.
+- Title Length: STRICTLY 50-65 characters
+- Title MUST be in strict Title Case
+- Meta Description Length: STRICTLY 150-165 characters. Provide a compelling summary that drives clicks.
 - Use simple, everyday words only
 - Return ONLY valid JSON format: {"title": "...", "meta_description": "..."}` },
-    ], GROQ_MODELS.title);
+      ], GROQ_MODELS.title);
 
-    let title = `${main_keyword} Guide`;
-    let metaDescription = "";
-    try {
-      let cleanJsonStr = titleAndMetaStr;
-      const jsonMatch = titleAndMetaStr.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        cleanJsonStr = jsonMatch[0];
+      try {
+        let cleanJsonStr = titleAndMetaStr.match(/\{[\s\S]*\}/)?.[0] || titleAndMetaStr;
+        const parsed = JSON.parse(cleanJsonStr);
+        title = parsed.title || title;
+        metaDescription = parsed.meta_description || "";
+      } catch (e) {
+        console.error("Failed to parse title/meta JSON", e);
+        title = titleAndMetaStr.replace(/[{}]/g, "").replace(/"meta_description":.*$/is, "").trim();
       }
-      const parsed = JSON.parse(cleanJsonStr);
-      title = parsed.title || title;
-      metaDescription = parsed.meta_description || "";
-    } catch (e) {
-      console.error("Failed to parse title/meta JSON", e);
-      title = titleAndMetaStr.replace(/[{}]/g, "").replace(/"meta_description":.*$/is, "").trim();
     }
+
+    // Enforce Title Case programmatically
+    title = title.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 
     completed = 1;
     markdown = `# ${title.trim()}\n\n`;
@@ -284,6 +298,17 @@ FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word senten
     cleanIntro = cleanIntro.replace(titleRegex, '').trim();
 
     markdown += `${cleanIntro}\n\n`;
+
+    // Add Table of Contents
+    if (h2s.length > 0) {
+      markdown += `## Table of Contents\n\n`;
+      h2s.forEach((h2: string) => {
+        const anchor = h2.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        markdown += `- [${h2}](#${anchor})\n`;
+      });
+      markdown += `\n`;
+    }
+
     await updateProgress(supabase, contentId, {
       generated_content: markdown, sections_completed: completed,
       current_section: h2s.length > 0 ? h2s[0] : "Conclusion",
@@ -366,7 +391,50 @@ FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word senten
     completed++;
     // Strip out any ## Conclusion if the model hallucinated it anyway
     const cleanClosing = closingContent.replace(/^##\s*Conclusion\s*/mi, '');
-    markdown += `## Conclusion\n\n${cleanClosing.trim()}\n\n`;
+
+    // Generate Schemas
+    let schemaHtml = "";
+    try {
+      const articleSchema = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": title.trim(),
+        "description": metaDescription.trim()
+      };
+
+      const faqRegex = /###\s*(?:\d+\.)?\s*(.*?)\n+([\s\S]*?)(?=\n*###|$)/g;
+      const faqEntities: any[] = [];
+      let match;
+      while ((match = faqRegex.exec(cleanClosing)) !== null) {
+        const question = match[1].trim();
+        const answer = match[2].trim().replace(/\n/g, ' ');
+        if (question && answer) {
+          faqEntities.push({
+            "@type": "Question",
+            "name": question,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": answer
+            }
+          });
+        }
+      }
+
+      const schemas: any[] = [articleSchema];
+      if (faqEntities.length > 0) {
+        schemas.push({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": faqEntities
+        });
+      }
+
+      schemaHtml = `\n\n<script type="application/ld+json">\n${JSON.stringify(schemas, null, 2)}\n</script>\n\n`;
+    } catch (err) {
+      console.error("Error generating schema:", err);
+    }
+
+    markdown += `## Conclusion\n\n${cleanClosing.trim()}${schemaHtml}\n\n`;
     await updateProgress(supabase, contentId, {
       generated_content: markdown, sections_completed: completed, current_section: "Done",
       status: "completed",

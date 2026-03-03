@@ -111,7 +111,21 @@ const ContentViewPage = () => {
   const [wpCategories, setWpCategories] = useState<{ id: number, name: string }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("none");
   const [fetchingCategories, setFetchingCategories] = useState(false);
+  const [wpIntegrations, setWpIntegrations] = useState<any[]>([]);
+  const [selectedIntegration, setSelectedIntegration] = useState<string>("none");
+  const [wpAuthors, setWpAuthors] = useState<{ id: number, name: string }[]>([]);
+  const [selectedAuthor, setSelectedAuthor] = useState<string>("none");
+  const [fetchingAuthors, setFetchingAuthors] = useState(false);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [canonicalUrl, setCanonicalUrl] = useState<string>("");
+
+  // Helper to strictly enforce Title Case
+  const toTitleCase = (str: string) => {
+    return str.replace(
+      /\w\S*/g,
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
+  };
 
   const fetchContent = useCallback(async () => {
     if (!id || !user) return;
@@ -127,7 +141,7 @@ const ContentViewPage = () => {
     } else {
       setContent(data as unknown as ContentItem);
       if (!editing) {
-        setEditTitle(data?.generated_title || data?.h1 || "");
+        setEditTitle(data?.generated_title ? toTitleCase(data.generated_title) : (data?.h1 ? toTitleCase(data.h1) : ""));
         setEditMetaDesc((data as any)?.meta_description || "");
         setEditContent(data?.generated_content || "");
       }
@@ -149,7 +163,7 @@ const ContentViewPage = () => {
         const updated = payload.new as unknown as ContentItem;
         setContent(updated);
         if (!editing) {
-          setEditTitle(updated.generated_title || updated.h1);
+          setEditTitle(updated?.generated_title ? toTitleCase(updated.generated_title) : (updated?.h1 ? toTitleCase(updated.h1) : ""));
           setEditMetaDesc(updated.meta_description || "");
           setEditContent(updated.generated_content || "");
         }
@@ -176,7 +190,7 @@ const ContentViewPage = () => {
     const { error } = await supabase
       .from("content_items")
       .update({
-        generated_title: editTitle,
+        generated_title: toTitleCase(editTitle),
         meta_description: editMetaDesc,
         generated_content: editContent
       })
@@ -192,6 +206,7 @@ const ContentViewPage = () => {
   const openPublishDialog = async () => {
     setPublishDialogOpen(true);
     setFetchingCategories(true);
+    setFetchingAuthors(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
@@ -204,27 +219,60 @@ const ContentViewPage = () => {
         .eq("is_active", true) as any);
 
       if (integrations && integrations.length > 0) {
-        const creds = integrations[0].credentials;
-        if (creds && creds.url && creds.username && creds.app_password) {
-          let cleanUrl = creds.url.trim();
-          if (cleanUrl.endsWith("/")) cleanUrl = cleanUrl.slice(0, -1);
-          const authString = btoa(`${creds.username}:${creds.app_password}`);
+        setWpIntegrations(integrations);
+        setSelectedIntegration(integrations[0].id);
 
-          const res = await fetch(`${cleanUrl}/wp-json/wp/v2/categories?per_page=100`, {
-            headers: { Authorization: `Basic ${authString}` }
-          });
-          if (res.ok) {
-            const cats = await res.json();
-            setWpCategories(cats);
-          }
-        }
+        // Fetch properties for the first integration
+        await fetchWpProperties(integrations[0].credentials);
+      } else {
+        setFetchingCategories(false);
+        setFetchingAuthors(false);
       }
     } catch (e) {
       console.error(e);
-    } finally {
       setFetchingCategories(false);
+      setFetchingAuthors(false);
     }
   };
+
+  const fetchWpProperties = async (creds: any) => {
+    setFetchingCategories(true);
+    setFetchingAuthors(true);
+    if (creds && creds.url && creds.username && creds.app_password) {
+      let cleanUrl = creds.url.trim();
+      if (cleanUrl.endsWith("/")) cleanUrl = cleanUrl.slice(0, -1);
+      const authString = btoa(`${creds.username}:${creds.app_password}`);
+
+      try {
+        const [catRes, authRes] = await Promise.all([
+          fetch(`${cleanUrl}/wp-json/wp/v2/categories?per_page=100`, { headers: { Authorization: `Basic ${authString}` } }),
+          fetch(`${cleanUrl}/wp-json/wp/v2/users?per_page=100`, { headers: { Authorization: `Basic ${authString}` } })
+        ]);
+
+        if (catRes.ok) {
+          const cats = await catRes.json();
+          setWpCategories(cats);
+        }
+        if (authRes.ok) {
+          const authors = await authRes.json();
+          setWpAuthors(authors);
+        }
+      } catch (e) {
+        console.error("Failed to fetch WP properties", e);
+      }
+    }
+    setFetchingCategories(false);
+    setFetchingAuthors(false);
+  };
+
+  useEffect(() => {
+    if (publishDialogOpen && selectedIntegration !== "none" && wpIntegrations.length > 0) {
+      const integration = wpIntegrations.find(int => int.id === selectedIntegration);
+      if (integration) {
+        fetchWpProperties(integration.credentials);
+      }
+    }
+  }, [selectedIntegration]);
 
   const handlePublish = async () => {
     setPublishing(true);
@@ -248,7 +296,14 @@ const ContentViewPage = () => {
         throw new Error("No active WordPress integration found. Please connect in Settings > Integrations.");
       }
 
-      const integration = integrations[0];
+      if (integrations && integrations.length > 0) {
+        // We will use selectedIntegration instead of [0]
+      }
+
+      const integration = selectedIntegration === "none" ? integrations[0] : integrations.find((i: any) => i.id === selectedIntegration);
+      if (!integration) {
+        throw new Error("Selected integration not found or inactive.");
+      }
       const creds = integration.credentials;
       if (!creds || !creds.url || !creds.username || !creds.app_password) {
         throw new Error("WordPress integration is missing credentials.");
@@ -278,6 +333,7 @@ const ContentViewPage = () => {
 
       // 3. Publish to WP via Edge Function
       const categoriesArray = selectedCategory !== "none" ? [parseInt(selectedCategory)] : undefined;
+      const authorId = selectedAuthor !== "none" ? parseInt(selectedAuthor) : undefined;
 
       console.log(`Sending publish request to edge function for ${integration.id}...`);
       const { data: wpData, error: invokeError } = await supabase.functions.invoke("publish-to-wordpress", {
@@ -285,7 +341,9 @@ const ContentViewPage = () => {
           contentId: content.id,
           integrationId: integration.id,
           publishStatus: publishStatus,
-          categories: categoriesArray
+          categories: categoriesArray,
+          authorId: authorId,
+          canonicalUrl: canonicalUrl.trim() || undefined
         },
       });
 
@@ -669,7 +727,7 @@ const ContentViewPage = () => {
               <Label>Blog Title (H1)</Label>
               <Input
                 value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
+                onChange={(e) => setEditTitle(toTitleCase(e.target.value))}
                 className="font-bold text-lg"
               />
             </div>
@@ -692,7 +750,7 @@ const ContentViewPage = () => {
             </div>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => {
-                setEditTitle(content?.generated_title || content?.h1 || "");
+                setEditTitle(content?.generated_title ? toTitleCase(content.generated_title) : (content?.h1 ? toTitleCase(content.h1) : ""));
                 setEditMetaDesc(content?.meta_description || "");
                 setEditContent(content?.generated_content || "");
                 setEditing(false);
@@ -732,6 +790,19 @@ const ContentViewPage = () => {
             </div>
 
             <div className="space-y-2">
+              <Label>Website / Integration</Label>
+              <Select value={selectedIntegration} onValueChange={setSelectedIntegration} disabled={wpIntegrations.length === 0}>
+                <SelectTrigger><SelectValue placeholder="Select WordPress Site" /></SelectTrigger>
+                <SelectContent>
+                  {wpIntegrations.map(int => (
+                    <SelectItem key={int.id} value={int.id}>{int.credentials?.url || int.id}</SelectItem>
+                  ))}
+                  {wpIntegrations.length === 0 && <SelectItem value="none">No Integrations Found</SelectItem>}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label>Category {fetchingCategories && <Loader2 className="inline h-3 w-3 animate-spin ml-2 text-primary" />}</Label>
               <Select value={selectedCategory} onValueChange={setSelectedCategory} disabled={fetchingCategories || wpCategories.length === 0}>
                 <SelectTrigger><SelectValue placeholder={fetchingCategories ? "Fetching Categories..." : "Select a Category (Optional)"} /></SelectTrigger>
@@ -742,6 +813,30 @@ const ContentViewPage = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Author {fetchingAuthors && <Loader2 className="inline h-3 w-3 animate-spin ml-2 text-primary" />}</Label>
+              <Select value={selectedAuthor} onValueChange={setSelectedAuthor} disabled={fetchingAuthors || wpAuthors.length === 0}>
+                <SelectTrigger><SelectValue placeholder={fetchingAuthors ? "Fetching Authors..." : "Select an Author (Optional)"} /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Default Author</SelectItem>
+                  {wpAuthors.map(author => (
+                    <SelectItem key={author.id} value={author.id.toString()}>{author.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Canonical URL <span className="text-muted-foreground font-normal">(Optional)</span></Label>
+              <Input
+                type="url"
+                value={canonicalUrl}
+                onChange={(e) => setCanonicalUrl(e.target.value)}
+                placeholder="https://example.com/original-article"
+              />
+              <p className="text-[11px] text-muted-foreground mt-1">Leave blank unless this post was originally published elsewhere.</p>
             </div>
 
             <div className="space-y-2 pt-2 border-t">

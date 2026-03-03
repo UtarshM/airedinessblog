@@ -22,8 +22,9 @@ serve(async (req) => {
     const prompt = `Create an SEO title for the keyword: "${keyword}".
 STRICT RULES:
 - MUST contain the exact keyword "${keyword}" once
-- Length: 50-70 characters maximum
+- Length: STRICTLY 50-65 characters
 - Word count: 6-12 words
+- MUST be formatted in strict Title Case (e.g., "The Quick Brown Fox Jumps Over the Lazy Dog")
 - Use simple, everyday words only
 - Make it specific and valuable (e.g. "How to...", "Why...", "Best...")
 - No clickbait, no all-caps, no complex words
@@ -51,6 +52,9 @@ STRICT RULES:
     const data = await response.json();
     let title = data.choices?.[0]?.message?.content || "";
     title = title.replace(/<think>[\s\S]*?<\/think>/g, "").replace(/^["']|["']$/g, "").trim();
+
+    // Enforce Title Case fallback programmatically
+    title = title.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 
     return new Response(JSON.stringify({ title }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

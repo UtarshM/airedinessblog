@@ -32,7 +32,7 @@ serve(async (req) => {
             });
         }
 
-        const { contentId, integrationId, publishStatus, categories } = await req.json();
+        const { contentId, integrationId, publishStatus, categories, authorId, canonicalUrl } = await req.json();
 
         if (!contentId) {
             return new Response(JSON.stringify({ error: "Content ID required" }), {
@@ -80,18 +80,18 @@ serve(async (req) => {
 
         // Use the first integration found (or specific one)
         const integration = integrations[0];
-        const creds = integration.credentials as { url?: string; username?: string; app_password?: string };
+        const creds = (integration.credentials || {}) as { url?: string; username?: string; app_password?: string };
         const { url: wpUrl, username, app_password } = creds;
 
         if (!wpUrl || !username || !app_password) {
-            return new Response(JSON.stringify({ error: "Invalid integration credentials" }), {
-                status: 400,
+            return new Response(JSON.stringify({ error: "Invalid integration credentials. Please check your WordPress settings." }), {
+                status: 200,
                 headers: { ...corsHeaders, "Content-Type": "application/json" },
             });
         }
 
         // 3. Prepare Content (Markdown -> HTML)
-        const title = content.generated_title || content.h1;
+        const title = content.generated_title || content.h1 || "Untitled Blog Post";
         let markdownContent = content.generated_content || "";
 
         // Strip the duplicate H1 from the top of the content so it doesn't appear in the WP body
@@ -179,8 +179,19 @@ serve(async (req) => {
             postPayload.categories = categories;
         }
 
+        if (authorId) {
+            postPayload.author = authorId;
+        }
+
         if (featuredMediaId) {
             postPayload.featured_media = featuredMediaId;
+        }
+
+        if (canonicalUrl) {
+            postPayload.meta = {
+                rank_math_canonical_url: canonicalUrl,
+                _yoast_wpseo_canonical: canonicalUrl,
+            };
         }
 
         const wpResponse = await fetch(endpoint, {
@@ -195,7 +206,10 @@ serve(async (req) => {
         if (!wpResponse.ok) {
             const errorText = await wpResponse.text();
             console.error("WordPress API Error:", wpResponse.status, errorText);
-            throw new Error(`WordPress API failed: ${wpResponse.status} - ${errorText.substring(0, 200)}`);
+            return new Response(JSON.stringify({ error: `WordPress API failed: ${wpResponse.status} - ${errorText.substring(0, 200)}` }), {
+                status: 200,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
         }
 
         const wpData = await wpResponse.json();
@@ -214,7 +228,7 @@ serve(async (req) => {
     } catch (e) {
         console.error("publish-to-wordpress error:", e);
         return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
-            status: 500,
+            status: 200, // Return 200 so the client can read the JSON error message
             headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
     }
