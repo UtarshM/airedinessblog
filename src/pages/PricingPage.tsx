@@ -325,18 +325,12 @@ const PricingPage = () => {
                         </div>
                     </div>
 
-                    <div className="bg-[#111827]/80 rounded-2xl p-6 border border-[#1F2937] max-w-lg mx-auto mb-8 text-left flex flex-col items-center">
-                        <p className="text-sm text-gray-400 mb-4 font-medium uppercase tracking-widest">Manual Setup</p>
-                        <div className="flex flex-col gap-3">
-                            <div className="flex items-center gap-3 bg-[#0A0D14] px-4 py-3 rounded-lg border border-[#1F2937]">
-                                <span className="text-xl">📞</span>
-                                <span className="text-white font-medium">8200010241</span>
-                            </div>
-                            <div className="flex items-center gap-3 bg-[#0A0D14] px-4 py-3 rounded-lg border border-[#1F2937]">
-                                <span className="text-xl">📧</span>
-                                <a href="mailto:scalezix@gmail.com" className="text-[#00FF66] font-medium hover:underline">scalezix@gmail.com</a>
-                            </div>
-                        </div>
+                    <div className="flex justify-center mb-8">
+                        <a href="mailto:scalezix@gmail.com?subject=Enterprise%20Inquiry%20-%20FUPilot">
+                            <Button className="bg-[#00FF66] text-black hover:bg-[#00CC52] font-semibold px-8 py-6 text-lg shadow-[0_0_20px_rgba(0,255,102,0.3)]">
+                                Contact Us
+                            </Button>
+                        </a>
                     </div>
 
                     <Button variant="outline" className="border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black">
