@@ -20,7 +20,6 @@ const GeneratePage = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [generatingTitle, setGeneratingTitle] = useState(false);
-  const [integrations, setIntegrations] = useState<any[]>([]);
 
   // Form State
   const [mainKeyword, setMainKeyword] = useState("");
@@ -42,10 +41,10 @@ const GeneratePage = () => {
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
   const [externalLinks, setExternalLinks] = useState("");
 
-  const [autoPublishTarget, setAutoPublishTarget] = useState("");
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
 
   // Structure Settings
+  const [structToc, setStructToc] = useState(false);
   const [structConclusion, setStructConclusion] = useState(true);
   const [structTables, setStructTables] = useState(true);
   const [structH3, setStructH3] = useState(true);
@@ -56,18 +55,7 @@ const GeneratePage = () => {
   const [structFaq, setStructFaq] = useState(true);
   const [structBold, setStructBold] = useState(true);
 
-  useEffect(() => {
-    const fetchIntegrations = async () => {
-      if (!user) return;
-      const { data } = await (supabase
-        .from("workspace_integrations" as any)
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("is_active", true) as any);
-      if (data) setIntegrations(data);
-    };
-    fetchIntegrations();
-  }, [user]);
+  // Moved fetchIntegrations out since it's removed
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,13 +71,6 @@ const GeneratePage = () => {
       if (articleSize.includes("Small")) wc = 800;
       if (articleSize.includes("Medium")) wc = 1300;
       if (articleSize.includes("Large")) wc = 2200;
-
-      // Ensure auto-publish setting is applied if selected
-      if (autoPublishTarget) {
-        // Logic to activate auto-publish for the chosen integration via Edge Function 
-        // would ideally store the `integrationId` on the `content_items` or apply it inline.
-        // For now, the existing Edge function uses the first active WP integration holding `auto_publish: true`.
-      }
 
       let uploadedImageUrl = null;
       if (selectedImageFile) {
@@ -132,7 +113,10 @@ const GeneratePage = () => {
       if (error) throw error;
 
       supabase.functions.invoke("generate-blog", {
-        body: { contentId: data.id },
+        body: {
+          contentId: data.id,
+          includeToc: structToc
+        },
       }).catch((err: any) => console.error("Generation invoke error:", err));
 
       toast.success("Generation started!");
@@ -166,8 +150,6 @@ const GeneratePage = () => {
       setGeneratingTitle(false);
     }
   };
-
-  const activeWpCount = integrations.filter(i => i.platform === "wordpress").length;
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -406,6 +388,12 @@ const GeneratePage = () => {
           <h3 className="font-bold text-lg">Structure Settings</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="flex flex-col gap-1.5 border-b pb-2">
+              <Label className="text-sm text-muted-foreground">Table of Contents</Label>
+              <button type="button" onClick={() => setStructToc(!structToc)} className="flex items-center gap-2 text-sm font-medium w-full text-left">
+                <CheckCircle2 className={`h-4 w-4 rounded-full ${structToc ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structToc ? "Yes" : "No"}
+              </button>
+            </div>
+            <div className="flex flex-col gap-1.5 border-b pb-2">
               <Label className="text-sm text-muted-foreground">Conclusion</Label>
               <button type="button" onClick={() => setStructConclusion(!structConclusion)} className="flex items-center gap-2 text-sm font-medium w-full text-left">
                 <CheckCircle2 className={`h-4 w-4 rounded-full ${structConclusion ? "text-primary bg-primary/10" : "text-muted-foreground"}`} /> {structConclusion ? "Yes" : "No"}
@@ -524,32 +512,6 @@ const GeneratePage = () => {
             placeholder="https://mysite.com/about, /pricing, https://mysite.com/blog/seo"
             className="bg-card min-h-[60px]"
           />
-        </div>
-
-
-
-        {/* Auto-Publish to Website */}
-        <div className="space-y-2 pb-6">
-          <Label className="font-bold flex items-center gap-2">Auto-Publish to Website</Label>
-          <div className="border bg-card rounded-lg p-4 text-sm mt-2">
-            <Label className="text-xs font-semibold block mb-1">Select Target Website(s)</Label>
-            <p className="text-xs text-muted-foreground mb-3">Choose one or more connected blogs where this post will be auto-published as a draft / or *</p>
-            {activeWpCount === 0 ? (
-              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 p-2.5 rounded text-xs text-amber-800 dark:text-amber-500">
-                No verified integrations available. Please setup integrations in <span className="font-semibold text-primary cursor-pointer" onClick={() => navigate('/integrations')}>integrations here</span>.
-              </div>
-            ) : (
-              <Select value={autoPublishTarget} onValueChange={setAutoPublishTarget}>
-                <SelectTrigger className="w-full bg-background"><SelectValue placeholder="Select WordPress Integration" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Do not auto-publish</SelectItem>
-                  {integrations.filter(i => i.platform === "wordpress").map(i => (
-                    <SelectItem key={i.id} value={i.id}>{i.credentials.url || "WordPress Site"}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </div>
         </div>
 
         {/* Bottom Bar */}

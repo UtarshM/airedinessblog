@@ -121,7 +121,7 @@ async function updateProgress(supabase: any, contentId: string, updates: any) {
 }
 
 // Background generation — runs after response is sent
-async function generateBlog(supabase: any, contentId: string, userId: string) {
+async function generateBlog(supabase: any, contentId: string, userId: string, includeToc: boolean = false) {
   try {
     const { data: content, error: fetchError } = await supabase
       .from("content_items").select("*")
@@ -300,7 +300,7 @@ FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word senten
     markdown += `${cleanIntro}\n\n`;
 
     // Add Table of Contents
-    if (h2s.length > 0) {
+    if (includeToc && h2s.length > 0) {
       markdown += `## Table of Contents\n\n`;
       h2s.forEach((h2: string) => {
         const anchor = h2.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -501,7 +501,7 @@ serve(async (req) => {
     if (!groqKey) throw new Error("GROQ_API_KEY not configured");
 
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const { contentId } = await req.json();
+    const { contentId, includeToc } = await req.json();
 
     // Verify user authentication
     const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
@@ -525,7 +525,7 @@ serve(async (req) => {
       });
     }
     // Start background generation
-    const generationPromise = generateBlog(supabase, contentId, user.id);
+    const generationPromise = generateBlog(supabase, contentId, user.id, !!includeToc);
 
     // Use EdgeRuntime.waitUntil to prevent the function from shutting down
     // immediately after the response is sent.
@@ -536,7 +536,7 @@ serve(async (req) => {
     } else {
       console.error("EdgeRuntime.waitUntil is not defined!");
       // If EdgeRuntime is missing, we must NOT await to ensure background execution.
-      generateBlog(supabase, contentId, user.id).catch(err => console.error("Background generation failed without waitUntil:", err));
+      generateBlog(supabase, contentId, user.id, !!includeToc).catch(err => console.error("Background generation failed without waitUntil:", err));
     }
 
     return new Response(JSON.stringify({ success: true, contentId }), {
