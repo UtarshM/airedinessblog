@@ -21,6 +21,8 @@ import CalendarPage from "@/pages/CalendarPage";
 import { ManagePostsPage, BrandIdentityPage } from "@/pages/Placeholders";
 import NotFound from "./pages/NotFound";
 import Index from "@/pages/Index";
+import PricingPage from "@/pages/PricingPage";
+import AEOAnalyticsPage from "@/pages/AEOAnalyticsPage";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +36,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/pricing" element={<PricingPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route
                 element={
@@ -48,6 +51,7 @@ const App = () => (
                 <Route path="/content/:id" element={<ContentViewPage />} />
                 <Route path="/manage-posts" element={<ManagePostsPage />} />
                 <Route path="/calendar" element={<CalendarPage />} />
+                <Route path="/aeo-analytics" element={<AEOAnalyticsPage />} />
                 <Route path="/brand-identity" element={<BrandIdentityPage />} />
                 <Route path="/integrations" element={<IntegrationsPage />} />
                 <Route path="/integrations/shopify" element={<ShopifyIntegrationPage />} />

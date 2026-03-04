@@ -10,7 +10,8 @@ import {
   Settings2,
   LogOut,
   FolderOpen,
-  Plus
+  Plus,
+  Activity
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "./ui/button";
@@ -30,6 +31,7 @@ const AppSidebar = () => {
     { to: "/bulk-generate", label: "Bulk Post Creation", icon: Layers },
     { to: "/manage-posts", label: "Manage Blog Posts", icon: List },
     { to: "/calendar", label: "Calendar", icon: Calendar, badge: "New" },
+    { to: "/aeo-analytics", label: "AEO Analytics", icon: Activity, badge: "Soon" },
   ];
 
   const brandLinks = [

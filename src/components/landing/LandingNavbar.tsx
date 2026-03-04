@@ -9,15 +9,15 @@ export const LandingNavbar = () => {
 
     const NavLinks = () => (
         <>
-            <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
+            <a href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
                 Features
             </a>
-            <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
+            <a href="/#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
                 How it Works
             </a>
-            <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
+            <Link to="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
                 Pricing
-            </a>
+            </Link>
         </>
     );
 

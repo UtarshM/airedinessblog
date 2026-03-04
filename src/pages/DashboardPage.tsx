@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ const DashboardPage = () => {
   const { user } = useAuth();
   const [items, setItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [credits, setCredits] = useState<{ total: number; used: number; remaining: number } | null>(null);
+  const [credits, setCredits] = useState<{ total: number; used: number; remaining: number; reset_date: string } | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -47,7 +47,7 @@ const DashboardPage = () => {
     if (user) {
       const { data: creditData } = await (supabase
         .from("workspace_credits" as any)
-        .select("total_credits, used_credits, locked_credits")
+        .select("total_credits, used_credits, locked_credits, reset_date")
         .eq("user_id", user.id)
         .single() as any);
 
@@ -55,24 +55,28 @@ const DashboardPage = () => {
         setCredits({
           total: creditData.total_credits,
           used: creditData.used_credits,
-          remaining: creditData.total_credits - creditData.used_credits - creditData.locked_credits
+          remaining: creditData.total_credits - creditData.used_credits - creditData.locked_credits,
+          reset_date: creditData.reset_date
         });
       } else {
-        // Auto-provision 50 credits for new users
+        // Auto-provision 5 credits for new users
         const { error: insertError } = await supabase
           .from("workspace_credits" as any)
           .insert({
             user_id: user.id,
-            total_credits: 50,
+            total_credits: 5,
             used_credits: 0,
             locked_credits: 0
           } as any);
 
         if (!insertError) {
-          setCredits({ total: 50, used: 0, remaining: 50 });
+          // Approximate reset date for fallback state
+          const nextMonth = new Date();
+          nextMonth.setMonth(nextMonth.getMonth() + 1);
+          setCredits({ total: 5, used: 0, remaining: 5, reset_date: nextMonth.toISOString() });
         } else {
           console.error("Failed to provision initial credits", insertError);
-          setCredits({ total: 0, used: 0, remaining: 0 });
+          setCredits({ total: 0, used: 0, remaining: 0, reset_date: new Date().toISOString() });
         }
       }
     }
@@ -142,12 +146,44 @@ const DashboardPage = () => {
           <p className="text-muted-foreground text-sm mt-1">Ready to create high-quality, SEO-optimized blog content?</p>
         </div>
         <div className="flex items-center gap-4">
-          <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800 hidden sm:flex px-3 py-1 text-xs">
-            {credits?.remaining ?? "—"} Credits
-          </Badge>
           <Button variant="default" className="shadow-sm">Quick Tour</Button>
         </div>
       </div>
+
+      {/* Plan Info Card */}
+      {credits && (
+        <div className="bg-gradient-to-r from-card to-card/50 border rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
+
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Current Plan</span>
+              <Badge variant="outline" className={`${credits.total === 5 ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary border-primary/20'}`}>
+                {credits.total === 5 ? "Starter Plan" : credits.total === 30 ? "Pro Plan" : "Scale Plan"}
+              </Badge>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold">{credits.remaining}</span>
+              <span className="text-muted-foreground font-medium">/ {credits.total} Credits Remaining</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              Renews / Expires on: <span className="font-medium text-foreground">{new Date(credits.reset_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            </p>
+          </div>
+
+          <div className="flex-shrink-0 w-full md:w-auto">
+            {credits.total === 5 ? (
+              <Button asChild className="w-full md:w-auto shadow-sm bg-primary text-primary-foreground hover:bg-primary/90">
+                <Link to="/pricing">Upgrade to Pro</Link>
+              </Button>
+            ) : (
+              <Button asChild variant="outline" className="w-full md:w-auto shadow-sm border-primary/20 text-primary hover:bg-primary/5">
+                <Link to="/pricing">Renew Plan</Link>
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Tip of the Day */}
       <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 flex items-start gap-3 text-sm">

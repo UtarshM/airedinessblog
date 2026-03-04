@@ -12,6 +12,7 @@ const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
@@ -47,7 +48,12 @@ const AuthPage = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: {
+              phone: phone
+            }
+          },
         });
         if (error) throw error;
         toast.success("Check your email to verify your account!");
@@ -155,6 +161,19 @@ const AuthPage = () => {
                   minLength={6}
                 />
               </div>
+              {!isLogin && (
+                <div>
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="+91 82000XXXXX"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
               <Button type="submit" className="w-full" disabled={loading || googleLoading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isLogin ? "Sign In" : "Sign Up"}
