@@ -40,20 +40,16 @@ function calculateEstimatedCredits(wordCount: number, hasH3: boolean, hasFAQ: bo
   return credits;
 }
 
-const SYSTEM_PROMPT = `You are a highly opinionated, sharp-witted human industry expert who hates corporate jargon. Your writing MUST score 0% on AI detectors like ZeroGPT.
+const SYSTEM_PROMPT = `You are an advanced SEO, AEO, and content optimization engine.
+Your job is to generate long-form blog article sections that strictly follow modern SEO, AEO (Answer Engine Optimization), and content readability best practices similar to tools like Yoast, SurferSEO, and Clearscope.
 
-CRITICAL INSTRUCTIONS FOR BYPASSING AI DETECTORS:
-1. MAXIMIZE BURSTINESS & PERPLEXITY: Your sentence lengths must swing wildly. Write a 3-word punchy sentence. Then follow it with a winding, 30-word explanation that connects disparate ideas—like this—before dropping another short fact.
-2. BAN THE AI VOCABULARY: NEVER use these words: "In today's fast-paced world", "At the end of the day", "When it comes to", "Let's dive in", "Crucial", "Vital", "Revolutionize", "Game-changer", "Tapestry", "Delve", "Moreover", "Furthermore", "Thus", "Hence", "In conclusion", "Ultimately".
-3. HUMAN QUIRKS: Start sentences with "And", "But", or "Because". Use contractions (don't, aren't, it's). Use rhetorical questions.
-4. PARAGRAPH CHAOS: Do not write paragraphs of equal length. Mix 1-sentence paragraphs with 3-sentence paragraphs.
-5. AGGRESSIVE & ACTIVE TONE: Speak directly to the reader ("you"). Don't hide behind passive voice. Be conversational, like an expert giving advice over a coffee.
-6. NO HEADINGS in your output (no h1, h2, h3, or ###). We construct headers separately.
-7. BOLDING: Bold concepts organically, not symmetrically.
-8. DATA: Include at least one real-world, widely known metric or benchmark estimate per section.
-9. TRUE HUMAN VERDICTS: Don't give "balanced AI" answers where both sides win. Take a stance. Tell them exactly what to do.
-
-If your writing sounds like a textbook, an AI, or a corporate brochure, you have failed entirely.`;
+CONTENT RULES:
+- Keyword Optimization: Use semantic keyword variations. Use LSI keywords naturally. Avoid keyword stuffing.
+- Quality: Sentence length under 20 words on average. Paragraph length: 2–4 sentences. Use transition words sparingly. Maintain high readability.
+- Readability: Use simple language. Avoid passive voice where possible. Write for an 8th–10th grade reading level. Use bullet points and lists for clarity.
+- E-E-A-T Signals: Include expert tone, credible explanations, trustworthy factual information, and references where applicable.
+- AEO & Featured Snippets: Write direct, clear answers. Use definition-style structures.
+- ALWAYS output pure markdown sections without wrapping them in explanatory text. Do NOT output overarching markdown code fences (like \`\`\`markdown).`;
 
 const GROQ_MODELS = {
   title: "llama-3.3-70b-versatile",
@@ -221,8 +217,8 @@ async function generateBlog(supabase: any, contentId: string, userId: string, in
 
     if (h1 && h1.trim().length > 0) {
       const metaStr = await callGroq([
-        { role: "system", content: "You generate SEO meta descriptions. Return ONLY a JSON object with a 'meta_description' string property. No markdown." },
-        { role: "user", content: `Create an SEO meta description for a blog titled: "${h1}" about "${main_keyword}". STRICTLY 150-165 characters. Return ONLY valid JSON: {"meta_description": "..."}` },
+        { role: "system", content: "You generate SEO meta descriptions. Return ONLY a JSON object with a 'meta_description' string property." },
+        { role: "user", content: `Create an SEO meta description for a blog titled: "${h1}" about "${main_keyword}". STRICTLY 140-160 characters. Include the primary keyword and a robust Call-to-Action. Make it highly attractive for click-through rate. Return ONLY valid JSON: {"meta_description": "..."}` },
       ], GROQ_MODELS.title);
       try {
         const parsed = JSON.parse(metaStr.match(/\{[\s\S]*\}/)?.[0] || metaStr);
@@ -232,16 +228,12 @@ async function generateBlog(supabase: any, contentId: string, userId: string, in
       }
     } else {
       const titleAndMetaStr = await callGroq([
-        { role: "system", content: "You generate SEO blog titles and meta descriptions. Return ONLY a JSON object with 'title' and 'meta_description' string properties. No markdown formatting, no explanation." },
+        { role: "system", content: "You generate SEO blog titles and meta descriptions. Return ONLY a JSON object with 'title' and 'meta_description' string properties." },
         {
-          role: "user", content: `Create an SEO title and meta description for the keyword: "${main_keyword}".
-
+          role: "user", content: `Create an SEO title and meta description for the primary keyword: "${main_keyword}".
 STRICT RULES:
-- MUST contain the EXACT, UNALTERED keyword: "${main_keyword}"
-- Title Length: STRICTLY 50-65 characters
-- Title MUST be in strict Title Case
-- Meta Description Length: STRICTLY 150-165 characters. Provide a compelling summary that drives clicks.
-- Use simple, everyday words only
+- SEO TITLE: Include the primary keyword near the beginning. Use power words. Keep length between 50-60 characters. Make engaging and click-worthy.
+- META DESCRIPTION: Include primary keyword, a call-to-action, attractive for CTR, strictly 140-160 characters.
 - Return ONLY valid JSON format: {"title": "...", "meta_description": "..."}` },
       ], GROQ_MODELS.title);
 
@@ -271,23 +263,16 @@ STRICT RULES:
     const intro = await callGroq([
       { role: "system", content: dynamicSystemPrompt },
       {
-        role: "user", content: `Write the introduction for a blog titled "${title.trim()}" about "${main_keyword}".${secondaryKw ? ` Also reference: ${secondaryKw}.` : ""} Tone: ${tone}.
-CRITICAL LENGTH: STRICTLY limit your response to around ${dist.introWords} words. DO NOT WRITE MORE THAN THIS.
+        role: "user", content: `Write the INTRODUCTION for a blog titled "${title.trim()}" about the primary keyword: "${main_keyword}".${secondaryKw ? ` Secondary Keywords: ${secondaryKw}.` : ""} Tone: ${tone}.
+CRITICAL LENGTH: ~${dist.introWords} words. Do not greatly exceed this.
 
-STRUCTURE:
-1. PROBLEM STATEMENT: State the real problem the reader faces. Use a specific number or data point to anchor it (e.g. user counts, market size, adoption rate).
-2. GAP: Show why current approaches fail. Name the specific gap — cost, speed, quality, or scale.
-3. WHAT THIS ARTICLE DELIVERS: Tell the reader exactly what they will get — a comparison, a ranking, a strategy, or a clear answer.
-
-DATA RULE: Include at least 1 real data point (user count, market stat, growth rate). Use publicly known numbers.
-
-KEYWORD RULES (TARGET DENSITY: ~1%):
-- MUST use the EXACT keyword "${main_keyword}" exactly 1 time. Do not skip it.
-- Use synonyms, LSI terms, or variations for all other mentions to avoid keyword stuffing.
-- NEVER repeat the keyword in back-to-back sentences.
-
-FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word sentences. Keep paragraphs very short (1-3 sentences max). Simple words. Active voice. Dashes (-) for lists. No headings. No asterisks.
-- DO NOT start your response with the blog title. DO NOT repeat the title. JUST write the introduction paragraphs.` },
+SEO & AEO OPTIMIZATION RULES FOR INTRO:
+- Primary keyword ("${main_keyword}") MUST be prominently mentioned within the very first 100 words.
+- Clearly explain what the article will cover and directly match the Search Intent.
+- Target readability level 8th-10th grade. No passive voice. Sentence length under 20 words on avg.
+- Paragraphs must be 2-4 sentences max.
+- Write naturally with transition words. 
+- Return JUST the introduction body content. No heading. Do NOT duplicate the title.` },
     ], GROQ_MODELS.section, Math.round(dist.introWords * 1.5) + 100);
 
     completed++;
@@ -319,30 +304,14 @@ FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word senten
       const h2Content = await callGroq([
         { role: "system", content: dynamicSystemPrompt },
         {
-          role: "user", content: `Write the section "${h2s[i]}" for a blog about "${main_keyword}".${secondaryKw ? ` Reference: ${secondaryKw}.` : ""} Tone: ${tone}.
-CRITICAL LENGTH: STRICTLY limit your response to around ${dist.h2Words} words. DO NOT WRITE MORE THAN THIS.
+          role: "user", content: `Write the body content for the section heading "${h2s[i]}" for an SEO blog about "${main_keyword}".${secondaryKw ? ` Secondary Keywords: ${secondaryKw}.` : ""} Tone: ${tone}.
+CRITICAL LENGTH: limit output to ~${dist.h2Words} words. 
 
-STRUCTURE:
-1. CORE CLAIM: State the main point with a supporting data point (user number, market stat, growth rate, cost figure).
-2. HOW IT WORKS: Explain the mechanism in plain terms. Why does this matter? What changes because of it?
-3. COMPARISON OR EVIDENCE: Compare options, show before/after, or provide a real-world example. Use measurable criteria (cost, speed, engagement, ROI).
-4. PRACTICAL LIST: Include 3-5 items using dashes (-) with **bold labels** and short explanations. Each item must be specific, not generic.
-5. BOTTOM LINE: End with a clear verdict — what works, what does not, and for whom.
-
-DATA RULE: Include at least 1 real number in this section (user count, percentage, pricing, performance metric). Use publicly known data.
-
-KEYWORD RULES (TARGET DENSITY: ~1%):
-- MUST use the EXACT keyword "${main_keyword}" between 1 and 2 times in this section (never 0, never 3+).
-- Use synonyms, LSI terms, or variations for all other mentions to avoid keyword stuffing.
-- NEVER repeat the keyword in consecutive sentences.
-
-BLOCKING RULES:
-- No vague claims like "it is useful" or "it helps a lot"
-- No repeating the same idea in different words
-- No theory without a practical example
-- Every claim must have a reason or data behind it
-
-FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word sentences. Keep paragraphs very short (1-3 sentences max). Simple words. Active voice. Dashes (-) for lists. No section heading in output.` },
+CONTENT GUIDELINES:
+- E-E-A-T Signals: Use an expert tone, credible explanations, and factual trustworthy information.
+- AEO Optimization: When addressing questions or steps, use a direct Answer Paragraph, bullet lists, or numbered steps. Use Definition-style structures for featured snippets.
+- Readability: Sentences under 20 words on average. Paragraphs 2-4 sentences. 
+- Format: Utilize markdown formatting (bolding), lists for clarity. Do NOT include the section heading itself in the output. Just the content.` },
       ], GROQ_MODELS.section, Math.round(dist.h2Words * 1.5) + 100);
 
       completed++;
@@ -360,32 +329,35 @@ FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word senten
     const closingContent = await callGroq([
       { role: "system", content: dynamicSystemPrompt },
       {
-        role: "user", content: `Write the conclusion AND FAQs for the blog "${title.trim()}" about "${main_keyword}". Tone: ${tone}.
-CRITICAL LENGTH: STRICTLY limit the ENTIRE output to around ${dist.conclusionWords + dist.faqWords} words combined. DO NOT WABBLE OR OVER-EXPLAIN.
+        role: "user", content: `Write the "Key Takeaways" AND "FAQ Section" for the SEO blog "${title.trim()}" about "${main_keyword}". Tone: ${tone}.
+CRITICAL LENGTH: target around ${dist.conclusionWords + dist.faqWords} words combined.
 
-CONCLUSION (write first):
-- BURSTINESS: Vary sentence lengths drastically. Use 3-word sentences alongside longer ones. Use natural, conversational language. AVOID formal transitions like "However", "Additionally".
-- DECISION SUMMARY: State clearly what is the best option, who should choose it, and why it wins.
-- WHEN NOT TO USE: Mention one scenario where a different approach is better. This builds trust.
-- FINAL VERDICT: End with a clear, actionable statement. The reader must know exactly what to do next.
-- MUST use the EXACT keyword "${main_keyword}" exactly 1 time.
-- Do NOT start with "In conclusion" or "To sum up".
-- DO NOT INCLUDE A HEADING FOR THE CONCLUSION. Do NOT output "## Conclusion". Start writing the actual conclusion body immediately.
+REQUIRED STRUCTURE:
 
-Then write FAQs:
+## Key Takeaways
+[Provide a bulleted summary of the main insights and actionable points drawn from an article about ${main_keyword}.]
 
 ## Frequently Asked Questions
 
-### 1. [Specific question about ${main_keyword} with a data angle]?
-[2-3 sentence answer with a real number or benchmark. Write full sentences. Use **bold** for key terms.]
+### 1. [Create highly-relevant semantic Question 1]?
+[Direct, clear Answer Engine Optimized (AEO) answer. 2-3 sentences. Highly factual.]
 
-### 2. [How/Why comparison question]?
-[Answer with clear comparison and measurable criteria. Full sentences.]
+### 2. [Create highly-relevant semantic Question 2]?
+[Direct AEO structure answer.]
 
-### 3. [Common misconception or concern]?
-[Answer that corrects the misconception with evidence or logic. Full sentences.]
+### 3. [Create highly-relevant semantic Question 3]?
+[Direct AEO structure answer.]
 
-FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word sentences. Keep paragraphs very short (1-3 sentences max). Simple words. Active voice. Dashes (-) for lists. No fake stats.` },
+### 4. [Create highly-relevant semantic Question 4]?
+[Direct AEO structure answer.]
+
+### 5. [Create highly-relevant semantic Question 5]?
+[Direct AEO structure answer.]
+
+SEO & AEO RULES:
+- Target readability level 8th-10th grade. No passive voice. 
+- Use semantic variations of the primary keyword in the Q&As.
+- Keep answers structured with clear explanations. Use bold for key terms.` },
     ], GROQ_MODELS.faq, Math.round((dist.conclusionWords + dist.faqWords) * 1.5) + 200);
 
     completed++;
@@ -434,7 +406,7 @@ FORMAT: Use extreme burstiness. Mix 4-word sentences with flowing 25-word senten
       console.error("Error generating schema:", err);
     }
 
-    markdown += `## Conclusion\n\n${cleanClosing.trim()}${schemaHtml}\n\n`;
+    markdown += `${cleanClosing.trim()}${schemaHtml}\n\n`;
     await updateProgress(supabase, contentId, {
       generated_content: markdown, sections_completed: completed, current_section: "Done",
       status: "completed",
