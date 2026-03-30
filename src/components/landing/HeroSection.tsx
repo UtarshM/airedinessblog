@@ -55,8 +55,7 @@ export const HeroSection = () => {
                             </div>
                         </div>
 
-                        {/* Dashboard Abstract Representation */}
-                        <div className="p-8 grid grid-cols-12 gap-6 h-full">
+                        <div className="p-8 grid grid-cols-12 gap-6 h-full relative">
                             {/* Sidebar */}
                             <div className="col-span-3 hidden md:flex flex-col gap-4 border-r pr-6 h-full">
                                 <div className="h-8 w-2/3 bg-primary/20 rounded-md mb-8"></div>
@@ -87,11 +86,12 @@ export const HeroSection = () => {
                                         { icon: <Search className="h-5 w-5 text-indigo-500" /> },
                                         { icon: <Sparkles className="h-5 w-5 text-purple-500" /> }
                                     ].map((item, i) => (
-                                        <div key={i} className="bg-background/80 rounded-xl border p-4 shadow-sm flex flex-col gap-3">
-                                            <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                                        <div key={i} className="bg-background/80 rounded-xl border p-4 shadow-sm flex flex-col gap-3 group relative overflow-hidden">
+                                            <div className="absolute -right-4 -top-4 w-12 h-12 bg-primary/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                                            <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center relative z-10">
                                                 {item.icon}
                                             </div>
-                                            <div className="space-y-2 mt-2">
+                                            <div className="space-y-2 mt-2 relative z-10">
                                                 <div className="h-6 w-1/2 bg-foreground/20 rounded-md"></div>
                                                 <div className="h-3 w-1/3 bg-foreground/10 rounded-md"></div>
                                             </div>
