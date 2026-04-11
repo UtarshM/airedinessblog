@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 
 export const HeroSection = () => {
     return (
-        <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+        <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden bg-mesh">
             {/* Background Gradients */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-primary/20 rounded-[100%] blur-[120px] -z-10" />
             <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[100px] -z-10" />
@@ -13,24 +13,24 @@ export const HeroSection = () => {
             <div className="container mx-auto px-4 md:px-8 text-center">
                 <Badge variant="outline" className="mb-6 px-4 py-1 border-primary/30 bg-primary/5 text-primary">
                     <Sparkles className="h-4 w-4 mr-2" />
-                    The Ultimate SEO Companion
+                    Get Agents, Not Just Co-Pilots
                 </Badge>
 
                 <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 max-w-5xl mx-auto leading-tight">
-                    Grow Organic Traffic on <br className="hidden md:block" />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-500 to-indigo-600">
-                        Auto-Pilot
+                    AI Agents that <br className="hidden md:block" />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF66] via-blue-500 to-purple-600">
+                        Build For You
                     </span>
                 </h1>
 
                 <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-                    Get traffic and outrank competitors with SEO-optimized content, keyword research, and multi-platform publishing while you sleep.
+                    Meet your autonomous AI marketing team. They don't just assist—they execute. Brand tracking, content generation, and multi-channel publishing on 100% autopilot.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
                     <Link to="/auth">
-                        <Button size="lg" className="h-14 px-8 text-lg w-full sm:w-auto rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all">
-                            Start ranking for free
+                        <Button size="lg" className="h-14 px-8 text-lg w-full sm:w-auto rounded-full bg-[#00FF66] text-black hover:bg-[#00CC52] shadow-lg shadow-[#00FF66]/20 hover:shadow-[#00FF66]/40 hover:-translate-y-0.5 transition-all font-bold">
+                            Onboard Your Agents
                             <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
                     </Link>
@@ -40,7 +40,7 @@ export const HeroSection = () => {
                 {/* Dashboard Mockup Header */}
                 <div className="relative max-w-6xl mx-auto">
                     <div className="absolute -inset-1 bg-gradient-to-tr from-primary/30 to-purple-500/30 rounded-2xl blur-xl opacity-50"></div>
-                    <div className="relative rounded-2xl border border-border/50 bg-background/50 backdrop-blur-xl shadow-2xl overflow-hidden aspect-[16/9] md:aspect-[21/9]">
+                    <div className="relative rounded-2xl border border-border/50 bg-background/50 backdrop-blur-xl shadow-2xl overflow-hidden aspect-[16/9] md:aspect-[21/9] animate-float">
                         {/* Top Bar Fake UI */}
                         <div className="h-12 border-b bg-muted/30 flex items-center px-4 gap-2">
                             <div className="flex space-x-2">

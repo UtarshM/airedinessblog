@@ -10,16 +10,16 @@ export const CTASection = () => {
 
             <div className="container mx-auto px-4 relative z-10 border border-primary/20 rounded-3xl bg-background/40 backdrop-blur-xl md:p-24 p-10 text-center shadow-2xl">
                 <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
-                    Ready to scale your <br /> organic growth?
+                    Ready to scale with your <br /> <span className="text-[#00FF66]">AI Agent Team?</span>
                 </h2>
                 <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-                    Join thousands of founders, marketers, and creators who use Rank.Scalezix to dominate their niche.
+                    Join thousands of founders and marketers deploying autonomous agents to dominate their markets.
                 </p>
 
                 <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
                     <Link to="/auth">
-                        <Button size="lg" className="h-14 px-10 text-lg rounded-full shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1 transition-all">
-                            Start ranking for free
+                        <Button size="lg" className="h-14 px-10 text-lg rounded-full bg-[#00FF66] text-black hover:bg-[#00CC52] font-bold shadow-xl shadow-[#00FF66]/20 hover:shadow-[#00FF66]/40 hover:-translate-y-1 transition-all">
+                            Onboard Your Agents
                         </Button>
                     </Link>
                     <p className="text-sm text-muted-foreground mt-4 sm:mt-0 sm:ml-4 sm:text-left hidden sm:block">

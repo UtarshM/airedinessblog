@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export const GenieSection = () => {
     return (
-        <section className="relative py-24 overflow-hidden bg-gradient-to-b from-background via-primary/5 to-background">
+        <section className="relative py-24 overflow-hidden bg-mesh">
             {/* Magical background blur */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-primary/10 rounded-full blur-[100px] -z-10" />
 
@@ -47,10 +47,10 @@ export const GenieSection = () => {
                         </div>
                         
                         {/* Floating chat bubble */}
-                        <div className="absolute top-0 md:top-10 -right-4 md:-right-10 bg-background border-2 border-primary/30 p-4 rounded-2xl shadow-2xl max-w-xs animate-bounce duration-[4000ms] z-20 hidden sm:block">
-                            <p className="text-sm font-semibold text-primary mb-1">Your wish is my command! 🧞‍♂️</p>
-                            <p className="text-xs text-muted-foreground leading-relaxed">I'll automatically research, write, and index your content while you focus on your business.</p>
-                            <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-background border-b-2 border-l-2 border-primary/30 transform -rotate-45"></div>
+                        <div className="absolute top-0 md:top-10 -right-4 md:-right-10 bg-background border-2 border-[#00FF66]/30 p-4 rounded-2xl shadow-2xl max-w-xs animate-bounce duration-[4000ms] z-20 hidden sm:block">
+                            <p className="text-sm font-semibold text-[#00FF66] mb-1">Onboarding Complete! 🤖</p>
+                            <p className="text-xs text-muted-foreground leading-relaxed">I've assigned your Brand, Social, and Digital agents. They're already analyzing your competitors.</p>
+                            <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-background border-b-2 border-l-2 border-[#00FF66]/30 transform -rotate-45"></div>
                         </div>
                     </div>
 
@@ -62,22 +62,22 @@ export const GenieSection = () => {
                         
                         <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6 leading-tight">
                             Meet your <br/>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">Ranking Genie</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF66] to-blue-600">Agent Commander</span>
                         </h2>
                         
                         <p className="text-lg text-muted-foreground mb-8 max-w-xl">
-                            Stop rubbing the magic lamp. With our powerful AI agent, you don't need three wishes. You can command infinite SEO-optimized blog posts, automatic interlinking, and perfect AEO structure with one click.
+                            Stop managing tools and start managing results. With our Agent Commander, you don't just get a co-pilot; you get a fully autonomous team that researches, writes, and publishes for you.
                         </p>
 
                         <div className="space-y-4 mb-8 w-full max-w-xl">
                             {
                                 [
-                                    "Analyzes competitor keywords invisibly.",
-                                    "Writes 2,000+ words with expert precision.",
-                                    "Publishes straight to your WordPress or Shopify."
+                                    "Autonomous competitor intelligence gathering.",
+                                    "Dynamic content execution across all channels.",
+                                    "Instant multi-platform distribution and sync."
                                 ].map((feature, i) => (
-                                    <div key={i} className="flex items-center gap-3 bg-secondary/30 p-3 rounded-lg border border-border/50">
-                                        <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center shrink-0">
+                                    <div key={i} className="flex items-center gap-3 glass-card hover-glow p-4 rounded-xl transition-all duration-300">
+                                        <div className="h-8 w-8 rounded-full bg-[#00FF66]/20 text-[#00FF66] flex items-center justify-center shrink-0">
                                             <Zap className="h-4 w-4" />
                                         </div>
                                         <span className="font-medium text-foreground">{feature}</span>
@@ -86,8 +86,8 @@ export const GenieSection = () => {
                             }
                         </div>
 
-                        <Button size="lg" className="rounded-full shadow-lg shadow-primary/20 hover:-translate-y-1 transition-all h-14 px-8 text-base">
-                            Unleash the Genie
+                        <Button size="lg" className="rounded-full bg-[#00FF66] text-black hover:bg-[#00CC52] font-bold shadow-lg shadow-[#00FF66]/20 hover:-translate-y-1 transition-all h-14 px-8 text-base">
+                            Deploy Your Team
                             <ChevronRight className="ml-2 h-5 w-5" />
                         </Button>
                     </div>

@@ -8,7 +8,7 @@ import { Check, X, Shield, Zap, TrendingUp, Clock, Globe, ArrowRight } from "luc
 const PricingPage = () => {
 
     return (
-        <div className="min-h-screen bg-[#0A0D14] text-white font-sans selection:bg-[#00FF66]/30 selection:text-[#00FF66] overflow-x-hidden">
+        <div className="min-h-screen bg-mesh text-white font-sans selection:bg-[#00FF66]/30 selection:text-[#00FF66] overflow-x-hidden">
             {/* Navbar must adapt to dark mode manually if it doesn't support it out of the box. 
           Assuming LandingNavbar respects the current context, or we just force the dark styling. */}
             <div className="dark">
@@ -20,16 +20,16 @@ const PricingPage = () => {
                 <section className="text-center space-y-16">
                     <div className="space-y-4 max-w-2xl mx-auto">
                         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-                            Choose Your <span className="text-[#00FF66]">Growth</span> <br /> Plan
+                            Choose Your <span className="text-[#00FF66]">Agent</span> <br /> Team Size
                         </h1>
                         <p className="text-gray-400 text-lg">
-                            Lock in this exclusive pricing today and dramatically scale your organic traffic on autopilot.
+                            Deploy autonomous marketing agents that build your brand 24/7. Choose the plan that fits your growth velocity.
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
                         {/* Free Plan */}
-                        <div className="p-8 rounded-2xl bg-[#111827] border border-[#1F2937] hover:border-[#374151] transition-colors flex flex-col h-full text-left">
+                        <div className="p-8 rounded-2xl glass-card hover-glow transition-all duration-500 flex flex-col h-full text-left">
                             <div className="mb-8">
                                 <span className="text-gray-400 font-medium tracking-widest text-sm uppercase">Starter</span>
                                 <h3 className="text-3xl font-bold mt-2">Free</h3>
@@ -53,7 +53,7 @@ const PricingPage = () => {
                         </div>
 
                         {/* Pro Plan */}
-                        <div className="p-8 rounded-2xl bg-[#111827] border-2 border-[#00FF66] shadow-[0_0_30px_rgba(0,255,102,0.15)] relative flex flex-col h-full text-left">
+                        <div className="p-8 rounded-2xl glass-card border-2 border-[#00FF66] shadow-[0_0_30px_rgba(0,255,102,0.15)] hover-glow transition-all duration-500 relative flex flex-col h-full text-left">
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#00FF66] text-black font-bold uppercase tracking-wider text-[10px] px-3 py-1 rounded-full">
                                 Most Popular
                             </div>
@@ -88,7 +88,7 @@ const PricingPage = () => {
                         </div>
 
                         {/* Custom Plan */}
-                        <div className="p-8 rounded-2xl bg-[#111827] border border-[#1F2937] hover:border-[#374151] transition-colors flex flex-col h-full text-left">
+                        <div className="p-8 rounded-2xl glass-card hover-glow transition-all duration-500 flex flex-col h-full text-left">
                             <div className="mb-8">
                                 <span className="text-gray-400 font-medium tracking-widest text-sm uppercase">Scale</span>
                                 <h3 className="text-3xl font-bold mt-2">$99<span className="text-xl text-gray-400 font-medium">/mo</span></h3>
@@ -176,57 +176,65 @@ const PricingPage = () => {
                 </section>
 
                 {/* === COST COMPARISON === */}
-                <section className="max-w-4xl mx-auto space-y-10 text-center">
-                    <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">The Value</p>
-                    <h2 className="text-3xl md:text-4xl font-bold">The Real <span className="text-[#00FF66]">Cost Comparison</span></h2>
+                <section className="max-w-5xl mx-auto space-y-16 text-center">
+                    <div className="space-y-4">
+                        <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">The Comparison</p>
+                        <h2 className="text-3xl md:text-5xl font-bold">Why <span className="text-[#00FF66]">Choose Agents?</span></h2>
+                    </div>
 
-                    <div className="overflow-x-auto rounded-xl border border-[#1F2937] bg-[#111827]">
-                        <table className="w-full text-left text-sm">
+                    <div className="overflow-x-auto rounded-2xl border border-[#1F2937] bg-[#111827] shadow-2xl">
+                        <table className="w-full text-left text-sm whitespace-nowrap">
                             <thead className="bg-[#1F2937]/50 border-b border-[#1F2937]">
                                 <tr>
-                                    <th className="p-4 font-semibold text-gray-300">Feature</th>
-                                    <th className="p-4 font-semibold text-gray-300">Human Writer</th>
-                                    <th className="p-4 font-semibold text-gray-300">Generic AI</th>
-                                    <th className="p-4 font-semibold text-white bg-[#00FF66]/10 border-b-2 border-[#00FF66]">FUPilot</th>
+                                    <th className="p-6 font-semibold text-gray-400">Feature / Capability</th>
+                                    <th className="p-6 font-bold text-white bg-[#00FF66]/10 border-x border-[#00FF66]/20 relative">
+                                        <div className="absolute top-0 left-0 w-full h-1 bg-[#00FF66]"></div>
+                                        FUPilot AI
+                                    </th>
+                                    <th className="p-6 font-semibold text-gray-400">Other AI Tools</th>
+                                    <th className="p-6 font-semibold text-gray-400">Marketing Agencies</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[#1F2937]">
-                                <tr>
-                                    <td className="p-4 text-gray-400">Cost Per Article</td>
-                                    <td className="p-4 text-gray-300">$150 - $300</td>
-                                    <td className="p-4 text-gray-300">$0.02 (API Cost)</td>
-                                    <td className="p-4 text-[#00FF66] font-bold bg-[#00FF66]/5">~$1.63</td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 text-gray-400">Delivery Time</td>
-                                    <td className="p-4 text-red-400 flex items-center gap-1"><X className="h-4 w-4" /> 3-5 Days</td>
-                                    <td className="p-4 text-gray-300">Instant</td>
-                                    <td className="p-4 text-[#00FF66] flex items-center gap-1 bg-[#00FF66]/5"><Check className="h-4 w-4" /> 1 Minute</td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 text-gray-400">Live SERP Research</td>
-                                    <td className="p-4 text-[#00FF66]"><Check className="h-4 w-4" /></td>
-                                    <td className="p-4 text-red-400"><X className="h-4 w-4" /></td>
-                                    <td className="p-4 text-[#00FF66] bg-[#00FF66]/5"><Check className="h-4 w-4" /></td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 text-gray-400">Automatic WordPress Sync</td>
-                                    <td className="p-4 text-red-400"><X className="h-4 w-4" /></td>
-                                    <td className="p-4 text-red-400"><X className="h-4 w-4" /></td>
-                                    <td className="p-4 text-[#00FF66] bg-[#00FF66]/5"><Check className="h-4 w-4" /></td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 text-gray-400">SEO Schema Injection</td>
-                                    <td className="p-4 text-red-400"><X className="h-4 w-4" /></td>
-                                    <td className="p-4 text-red-400"><X className="h-4 w-4" /></td>
-                                    <td className="p-4 text-[#00FF66] bg-[#00FF66]/5"><Check className="h-4 w-4" /></td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 text-gray-400">AEO Engine Analytics</td>
-                                    <td className="p-4 text-gray-500">-</td>
-                                    <td className="p-4 text-gray-500">-</td>
-                                    <td className="p-4 text-[#00FF66] bg-[#00FF66]/5"><span className="text-xs uppercase bg-[#00FF66]/20 text-[#00FF66] px-2 py-1 rounded-full font-bold">Coming Soon</span></td>
-                                </tr>
+                                {[
+                                    { f: "Marketing Strategy + Execution", c1: true, c2: "X (just content generation)", c3: true },
+                                    { f: "Multi-Channel Campaigns (SEO, Paid, UGC, Email, etc.)", c1: true, c2: "X (usually single channel)", c3: true },
+                                    { f: "Specialized Roles (Agents)", c1: true, c2: false, c3: "✔ (human)" },
+                                    { f: "Instant Onboarding / No Setup", c1: true, c2: "! (needs prompts/workflows)", c3: "X (takes time/contracts)" },
+                                    { f: "Ongoing competitor & market research to identify gaps", c1: true, c2: false, c3: "X (takes time/research needed)" },
+                                    { f: "Affordable & Scalable", c1: true, c2: true, c3: "X (high retainers)" },
+                                    { f: "Always Available / No Delays", c1: true, c2: true, c3: "X (limited hours)" },
+                                    { f: "Built for All Team Sizes", c1: true, c2: true, c3: "! (mostly mid/large biz)" }
+                                ].map((row, i) => (
+                                    <tr key={i} className="hover:bg-white/[0.02] transition-colors">
+                                        <td className="p-6 text-gray-300 font-medium">{row.f}</td>
+                                        <td className="p-6 bg-[#00FF66]/5 border-x border-[#00FF66]/10 text-center">
+                                            <div className="flex justify-center">
+                                                <div className="bg-[#00FF66] rounded-sm p-0.5">
+                                                    <Check className="h-4 w-4 text-black stroke-[3]" />
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="p-6 text-gray-400 text-center">
+                                            {typeof row.c2 === "string" ? (
+                                                <span className={row.c2.startsWith("X") ? "text-red-500" : "text-amber-500"}>{row.c2}</span>
+                                            ) : row.c2 === true ? (
+                                                <div className="flex justify-center"><Check className="h-4 w-4 text-[#00FF66]" /></div>
+                                            ) : (
+                                                <div className="flex justify-center"><X className="h-4 w-4 text-red-500" /></div>
+                                            )}
+                                        </td>
+                                        <td className="p-6 text-gray-400 text-center">
+                                            {typeof row.c3 === "string" ? (
+                                                <span className={row.c3.startsWith("X") ? "text-red-500" : "text-emerald-500"}>{row.c3}</span>
+                                            ) : row.c3 === true ? (
+                                                <div className="flex justify-center"><Check className="h-4 w-4 text-[#00FF66]" /></div>
+                                            ) : (
+                                                <div className="flex justify-center"><X className="h-4 w-4 text-red-500" /></div>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
