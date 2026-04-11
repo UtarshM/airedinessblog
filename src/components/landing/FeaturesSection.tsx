@@ -1,36 +1,36 @@
-import { Clock, Search, Zap, BarChart3, Globe, TrendingUp } from "lucide-react";
+import { FileText, Search, Zap, BarChart3, Globe, PenTool } from "lucide-react";
 
 export const FeaturesSection = () => {
     const features = [
         {
-            icon: <TrendingUp className="h-6 w-6 text-emerald-500" />,
-            title: "Brand Marketing Agent",
-            description: "Master your market with competitor tracking, trends analysis, and content gap insights. Fuel your entire action engine with timely recommendations."
-        },
-        {
-            icon: <Globe className="h-6 w-6 text-blue-500" />,
-            title: "Social Media Agent",
-            description: "Maintain a consistent brand voice across LinkedIn, X, and Meta. Automated ideation, image generation, and multi-platform publishing."
-        },
-        {
-            icon: <Zap className="h-6 w-6 text-amber-500" />,
-            title: "Digital Marketing Agent",
-            description: "Execute precision-targeted campaigns with keyword research, ad group composition, and optimized ad copy generation on autopilot."
-        },
-        {
-            icon: <Clock className="h-6 w-6 text-indigo-500" />,
-            title: "Always Available",
-            description: "Your agents work 24/7. No sick days, no time zones, just continuous execution of your marketing strategy."
+            icon: <PenTool className="h-6 w-6 text-primary" />,
+            title: "AI-Powered Content",
+            description: "Generate highly engaging, long-form articles that mimic human writing and pass AI detection."
         },
         {
             icon: <Search className="h-6 w-6 text-purple-500" />,
-            title: "Specialized Specialized Roles",
-            description: "Deploy specific agents for specific tasks. Onboard new capabilities instantly without complex setup or human contracts."
+            title: "Advanced SEO Tools",
+            description: "Perform keyword research, competitor analysis, and optimize your content for search engines directly."
         },
         {
-            icon: <BarChart3 className="h-6 w-6 text-primary" />,
-            title: "Performance Tracking",
-            description: "Detailed measurement and optimization for every campaign, ensuring your agents are always delivering peak ROI."
+            icon: <Zap className="h-6 w-6 text-amber-500" />,
+            title: "Bulk Generation",
+            description: "Create hundreds of articles at once and populate an entire blog within minutes, not months."
+        },
+        {
+            icon: <Globe className="h-6 w-6 text-indigo-500" />,
+            title: "Multi-Platform Export",
+            description: "One-click publishing to WordPress, Shopify, Webflow, Notion, and customized webhooks."
+        },
+        {
+            icon: <FileText className="h-6 w-6 text-emerald-500" />,
+            title: "Content Calendar",
+            description: "Visually plan, schedule, and organize your content strategy with our intuitive calendar interface."
+        },
+        {
+            icon: <BarChart3 className="h-6 w-6 text-blue-500" />,
+            title: "Rank Tracking",
+            description: "Monitor your domain's rating, track keyword positions, and see your organic traffic grow over time."
         }
     ];
 
@@ -39,10 +39,10 @@ export const FeaturesSection = () => {
             <div className="container mx-auto px-4 md:px-8">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">
-                        Meet Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF66] to-blue-500">Autonomous Team</span>
+                        Everything you need to <span className="text-primary">dominate search</span>
                     </h2>
                     <p className="text-lg text-muted-foreground">
-                        Why hire a co-pilot when you can hire a specialized agent? Deploy a team that executes across every channel.
+                        Rank.Scalezix replaces a dozen scattered SEO tools with one unified, incredibly powerful ecosystem.
                     </p>
                 </div>
 
@@ -50,7 +50,7 @@ export const FeaturesSection = () => {
                     {features.map((feature, idx) => (
                         <div
                             key={idx}
-                            className="group glass-card p-8 rounded-2xl hover-glow transition-all duration-500 relative overflow-hidden"
+                            className="group bg-background p-8 rounded-2xl border hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 relative overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-all duration-500 text-foreground pointer-events-none">
                                 {feature.icon}

@@ -155,13 +155,13 @@ const GeneratePage = () => {
     <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <span className="bg-blue-100 text-blue-600 p-1.5 rounded-lg">
-                <Sparkles className="h-5 w-5" />
-              </span>
-              Autonomous Content Agent
-            </h1>
-            <p className="text-muted-foreground text-sm mt-1 ml-10">Brief your agent and deploy it to build your content library.</p>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <span className="bg-blue-100 text-blue-600 p-1.5 rounded-lg">
+              <FileText className="h-5 w-5" />
+            </span>
+            1-Click Blog Post
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1 ml-10">Generate a high-quality article in 1 click.</p>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-amber-200">
@@ -517,11 +517,11 @@ const GeneratePage = () => {
         {/* Bottom Bar */}
         <div className="pt-6 border-t flex flex-col items-center gap-2">
           <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-0 rounded-full font-medium">Estimated blog generation time: 5-10 minutes</Badge>
-          <Button type="submit" className="w-[300px] bg-[#0A2540] hover:bg-[#0A2540]/90 text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all font-bold" size="lg" disabled={loading}>
+          <Button type="submit" className="w-[300px] shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow" size="lg" disabled={loading}>
             {loading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : null}
-            Deploy Agent & Execute Task
+            Generate Blog Post
           </Button>
         </div>
       </form>

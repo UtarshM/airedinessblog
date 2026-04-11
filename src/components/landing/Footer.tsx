@@ -11,7 +11,7 @@ export const Footer = () => {
                             <img src="/fupilot.webp" alt="FUPilot Logo" className="h-8 w-auto" />
                         </Link>
                         <p className="text-muted-foreground text-sm mb-6 max-w-xs">
-                            Deploy your own autonomous AI marketing team. Research, write, and execute multi-channel strategies 24/7 on autopilot.
+                            Grow organic traffic on auto-pilot. Generate SEO-optimized content and outrank your competitors while you sleep.
                         </p>
                         <div className="flex space-x-4">
                             <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
