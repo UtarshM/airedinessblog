@@ -2,14 +2,12 @@ import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { ProblemSection } from "@/components/landing/ProblemSection";
 import { SolutionSection } from "@/components/landing/SolutionSection";
-import { GenieSection } from "@/components/landing/GenieSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { FeatureDeepDive } from "@/components/landing/FeatureDeepDive";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { SocialProof } from "@/components/landing/SocialProof";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
-import { GenieAssistant } from "@/components/GenieAssistant";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
@@ -30,7 +28,6 @@ const Index = () => {
         <HeroSection />
         <ProblemSection />
         <SolutionSection />
-        <GenieSection />
         <FeaturesSection />
         <FeatureDeepDive />
         <HowItWorksSection />
@@ -51,10 +48,6 @@ const Index = () => {
       </div>
 
       <Footer />
-      {/* Animated Genie floating at bottom right - Shifted up for mobile CTA */}
-      <div className="mb-20 md:mb-0">
-        <GenieAssistant />
-      </div>
     </div>
   );
 };
