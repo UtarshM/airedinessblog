@@ -1,402 +1,219 @@
+import { Link } from "react-router-dom";
+import { Check, X, ArrowRight, Zap, Info, Shield, Users, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { Footer } from "@/components/landing/Footer";
-import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Link } from "react-router-dom";
-import { Check, X, Shield, Zap, TrendingUp, Clock, Globe, ArrowRight } from "lucide-react";
+import { PricingCalculator } from "@/components/landing/PricingCalculator";
 
 const PricingPage = () => {
-
     return (
-        <div className="min-h-screen bg-[#0A0D14] text-white font-sans selection:bg-[#00FF66]/30 selection:text-[#00FF66] overflow-x-hidden">
-            {/* Navbar must adapt to dark mode manually if it doesn't support it out of the box. 
-          Assuming LandingNavbar respects the current context, or we just force the dark styling. */}
-            <div className="dark">
-                <LandingNavbar />
-            </div>
+        <div className="min-h-screen bg-mesh text-white font-sans selection:bg-[#00FF66]/30 selection:text-[#00FF66] overflow-x-hidden">
+            <LandingNavbar />
 
             <main className="py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-32">
-                {/* === HEADER & PRICING CARDS === */}
-                <section className="text-center space-y-16">
-                    <div className="space-y-4 max-w-2xl mx-auto">
-                        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-                            Choose Your <span className="text-[#00FF66]">Growth</span> <br /> Plan
+                {/* === HEADER === */}
+                <section className="text-center space-y-8">
+                    <div className="space-y-4 max-w-3xl mx-auto">
+                        <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">The Future of Efficiency</p>
+                        <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight leading-tight">
+                            Build Your <span className="text-[#00FF66]">Autonomous</span> <br /> Marketing Team
                         </h1>
-                        <p className="text-gray-400 text-lg">
-                            Lock in this exclusive pricing today and dramatically scale your organic traffic on autopilot.
+                        <p className="text-gray-400 text-xl max-w-2xl mx-auto">
+                            Deploy world-class agents that handle research, code, design, and analytics with zero management required.
                         </p>
                     </div>
+                </section>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
-                        {/* Free Plan */}
-                        <div className="p-8 rounded-2xl bg-[#111827] border border-[#1F2937] hover:border-[#374151] transition-colors flex flex-col h-full text-left">
-                            <div className="mb-8">
-                                <span className="text-gray-400 font-medium tracking-widest text-sm uppercase">Starter</span>
-                                <h3 className="text-3xl font-bold mt-2">Free</h3>
-                                <p className="text-gray-400 mt-2 text-sm">$0/month</p>
-                                <div className="h-px w-full bg-[#1F2937] my-6"></div>
-                                <p className="text-sm text-gray-400">Perfect to test the waters. Generates up to 5 articles.</p>
+                {/* === PRICING TIERS === */}
+                <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {/* FREE TIER */}
+                    <div className="glass-card p-10 rounded-3xl border-white/5 flex flex-col justify-between">
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="text-2xl font-bold text-white">Free</h3>
+                                <p className="text-sm text-gray-400 mt-2 italic font-medium">"Get a taste of our agents' capabilities to help you clearly define what your business needs for growth"</p>
                             </div>
-                            <ul className="space-y-4 flex-1 mb-8">
-                                {["5 AI Articles / Month", "Standard AI Research", "Standard Post Types", "Standard Image Gen", "1 Brand Kits"].map((feature, i) => (
-                                    <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
-                                        <Check className="h-5 w-5 text-[#00FF66] shrink-0" />
-                                        <span>{feature}</span>
-                                    </li>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-5xl font-black">$0</span>
+                                <span className="text-gray-500 font-semibold">/ month</span>
+                            </div>
+                            <div className="space-y-4 pt-6 border-t border-white/5">
+                                <p className="text-xs text-gray-300">Get a limited first look at a full-stack marketing team in action.</p>
+                                {[
+                                    { n: "Lyra", d: "Organic social media to grow your audience and engagement." },
+                                    { n: "Aris", d: "Content marketing, SEO, and AEO to boost your visibility." },
+                                    { n: "Kash", d: "Performance marketing for high-impact campaigns." },
+                                    { n: "Veda", d: "Brand analytics, competitor tracking, and market research." }
+                                ].map((agent, i) => (
+                                    <div key={i} className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-2">
+                                            <Check className="h-4 w-4 text-[#00FF66]" />
+                                            <span className="font-bold text-sm text-white">{agent.n}</span>
+                                        </div>
+                                        <p className="text-[11px] text-gray-500 pl-6 leading-relaxed">{agent.d}</p>
+                                    </div>
                                 ))}
-                            </ul>
-                            <Link to="/auth">
-                                <Button variant="outline" className="w-full text-white border-white/20 hover:bg-white hover:text-black">
-                                    Get Started Free
+                            </div>
+                        </div>
+                        <div className="pt-10">
+                            <Link to="/auth" className="w-full">
+                                <Button variant="outline" className="w-full h-14 rounded-2xl font-bold border-white/10 hover:bg-white/5 bg-transparent text-white">
+                                    Start Free Trial
                                 </Button>
                             </Link>
                         </div>
+                    </div>
 
-                        {/* Pro Plan */}
-                        <div className="p-8 rounded-2xl bg-[#111827] border-2 border-[#00FF66] shadow-[0_0_30px_rgba(0,255,102,0.15)] relative flex flex-col h-full text-left">
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#00FF66] text-black font-bold uppercase tracking-wider text-[10px] px-3 py-1 rounded-full">
-                                Most Popular
-                            </div>
-                            <div className="mb-8">
-                                <span className="text-[#00FF66] font-medium tracking-widest text-sm uppercase">Pro</span>
-                                <h3 className="text-4xl font-bold mt-2">$49<span className="text-xl text-gray-400 font-medium">/mo</span></h3>
-                                <p className="text-gray-400 mt-2 text-sm">~ $1.63 per article</p>
-                                <div className="h-px w-full bg-[#1F2937] my-6"></div>
-                                <p className="text-sm font-semibold text-white">Generates up to 30 highly optimized articles.</p>
-                            </div>
-                            <ul className="space-y-4 flex-1 mb-8">
-                                {[
-                                    "30 AI Articles / Month",
-                                    "In-Depth SERP Intelligence",
-                                    "Internal Link Building",
-                                    "Premium Image Generation",
-                                    "Auto-Publish to WordPress",
-                                    "Custom Structure Controls",
-                                    "Unlimited Brand Kits",
-                                ].map((feature, i) => (
-                                    <li key={i} className="flex items-start gap-3 text-sm text-gray-200 font-medium">
-                                        <Check className="h-5 w-5 text-[#00FF66] shrink-0" />
-                                        <span>{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                            <a href="mailto:scalezix@gmail.com?subject=Upgrade%20to%20Pro%20Plan">
-                                <Button className="w-full bg-[#00FF66] text-black hover:bg-[#00CC52] font-semibold text-lg py-6 shadow-[0_0_20px_rgba(0,255,102,0.3)]">
-                                    Contact to Upgrade
-                                </Button>
-                            </a>
+                    {/* GROWTH TIER */}
+                    <div className="glass-card p-10 rounded-3xl border-[#00FF66]/30 relative transform lg:scale-105 shadow-2xl shadow-[#00FF66]/10 flex flex-col justify-between overflow-hidden">
+                        <div className="absolute top-0 right-0 bg-[#00FF66] text-black text-[10px] font-black px-4 py-1 rounded-bl-xl uppercase tracking-widest">
+                            Most Popular
                         </div>
-
-                        {/* Custom Plan */}
-                        <div className="p-8 rounded-2xl bg-[#111827] border border-[#1F2937] hover:border-[#374151] transition-colors flex flex-col h-full text-left">
-                            <div className="mb-8">
-                                <span className="text-gray-400 font-medium tracking-widest text-sm uppercase">Scale</span>
-                                <h3 className="text-3xl font-bold mt-2">$99<span className="text-xl text-gray-400 font-medium">/mo</span></h3>
-                                <p className="text-gray-400 mt-2 text-sm">~ $0.99 per article</p>
-                                <div className="h-px w-full bg-[#1F2937] my-6"></div>
-                                <p className="text-sm text-gray-400">For agencies and high-volume niche site builders.</p>
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="text-2xl font-bold text-white">Growth</h3>
+                                <p className="text-sm text-gray-300 mt-2 font-medium">Unlock advanced capabilities across organic and paid, enabling you to become your own expert marketing agency.</p>
                             </div>
-                            <ul className="space-y-4 flex-1 mb-8">
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-5xl font-black">$600</span>
+                                <span className="text-gray-400 font-semibold text-xs leading-none">/ month <br/> per agent</span>
+                            </div>
+                            <div className="space-y-4 pt-6 border-t border-[#00FF66]/20">
+                                <p className="text-xs text-[#00FF66] font-bold">Unlock full access to all agents with advanced tools, unlimited content creation, BI integration, and automated campaign management.</p>
                                 {[
-                                    "100 AI Articles / Month",
-                                    "Everything in Pro",
-                                    "Priority Email Support",
-                                    "Multiple WordPress Sites",
-                                    "Bulk Generation (Up to 50 at once)",
-                                    "Custom Formatting Templates",
-                                    "AEO Analytics Module (Coming Soon)"
-                                ].map((feature, i) => (
-                                    <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
-                                        <Check className="h-5 w-5 text-[#00FF66] shrink-0" />
-                                        <span>{feature}</span>
-                                    </li>
+                                    { n: "Lyra", d: "Organic social media to grow your audience and engagement." },
+                                    { n: "Aris", d: "Content marketing, SEO, and AEO to boost your visibility." },
+                                    { n: "Kash", d: "Performance marketing for high-impact campaigns." },
+                                    { n: "Veda", d: "Brand analytics, competitor tracking, and market research." }
+                                ].map((agent, i) => (
+                                    <div key={i} className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-2">
+                                            <Check className="h-4 w-4 text-[#00FF66]" />
+                                            <span className="font-bold text-sm text-white">{agent.n}</span>
+                                        </div>
+                                        <p className="text-[11px] text-gray-400 pl-6 leading-relaxed">{agent.d}</p>
+                                    </div>
                                 ))}
-                            </ul>
-                            <a href="mailto:scalezix@gmail.com?subject=Upgrade%20to%20Scale%20Plan">
-                                <Button variant="outline" className="w-full text-white border-white/20 hover:bg-white hover:text-black">
-                                    Contact to Upgrade
+                            </div>
+                        </div>
+                        <div className="pt-10">
+                            <Link to="/auth" className="w-full">
+                                <Button className="w-full h-14 bg-[#00FF66] text-black hover:bg-[#00CC52] font-black rounded-2xl shadow-lg shadow-[#00FF66]/20">
+                                    Contact Us
                                 </Button>
-                            </a>
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* ENTERPRISE TIER */}
+                    <div className="glass-card p-10 rounded-3xl border-white/5 flex flex-col justify-between">
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="text-2xl font-bold text-white">Enterprise Edge</h3>
+                                <p className="text-xs text-[#00FF66] font-black mt-1 uppercase tracking-widest">(Powered by custom AI models)</p>
+                                <p className="text-sm text-gray-400 mt-3 font-medium">The Complete AI Marketing Powerhouse for businesses ready to lead the future.</p>
+                            </div>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-4xl font-black">Custom</span>
+                            </div>
+                            <div className="space-y-4 pt-6 border-t border-white/5">
+                                <p className="text-xs text-gray-300">For enterprises looking to redefine their marketing operations:</p>
+                                {[
+                                    "Dedicated account management for tailored support.",
+                                    "Enterprise-grade security with SSO and advanced controls.",
+                                    "Custom integrations for your specific workflows.",
+                                    "Full-scale AI agents to handle research, strategy, execution, and optimization.",
+                                    "Tailored model training on your brand data."
+                                ].map((feature, i) => (
+                                    <div key={i} className="flex items-start gap-3">
+                                        <Shield className="h-4 w-4 text-blue-400 mt-1 shrink-0" />
+                                        <span className="text-xs font-medium text-gray-300 leading-relaxed">{feature}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="pt-10">
+                            <Link to="/auth" className="w-full">
+                                <Button variant="outline" className="w-full h-14 rounded-2xl font-bold border-white/10 hover:bg-white/5 bg-transparent text-white">
+                                    Contact Sales
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </section>
 
-                {/* === BUILT FOR FOUNDERS === */}
-                <section className="max-w-4xl mx-auto text-center space-y-10">
-                    <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">Use Cases</p>
-                    <h2 className="text-3xl md:text-4xl font-bold">Built For <span className="text-[#00FF66]">Founders Who Move Fast</span></h2>
+                {/* === CALCULATOR === */}
+                <PricingCalculator />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-[#111827] p-6 rounded-xl border border-[#1F2937] text-left">
-                            <h3 className="font-bold text-lg mb-2">Solopreneurs</h3>
-                            <p className="text-sm text-gray-400">Building multiple side-projects while working a 9-5. Let FUPilot handle the organic marketing so you can focus on building the product.</p>
-                        </div>
-                        <div className="bg-[#111827] p-6 rounded-xl border border-[#1F2937] text-left">
-                            <h3 className="font-bold text-lg mb-2">Content Marketers</h3>
-                            <p className="text-sm text-gray-400">Scaling B2B SaaS traffic. Publish well-researched, high-quality, long-form content consistently without the massive agency retainer.</p>
-                        </div>
-                        <div className="bg-[#111827] p-6 rounded-xl border border-[#1F2937] text-left">
-                            <h3 className="font-bold text-lg mb-2">Agencies</h3>
-                            <p className="text-sm text-gray-400">Managing SEO for 10+ clients. Instantly deliver a month's worth of optimized content, expanding your margins substantially.</p>
-                        </div>
-                        <div className="bg-[#111827] p-6 rounded-xl border border-[#1F2937] text-left">
-                            <h3 className="font-bold text-lg mb-2">Niche Site Owners</h3>
-                            <p className="text-sm text-gray-400">Building a portfolio of monetized websites. Crank out 100s of informational guides per month, completely hands-off.</p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* === FIVE AI AGENTS === */}
-                <section className="max-w-3xl mx-auto space-y-10">
-                    <div className="text-center space-y-2">
-                        <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">The Workflow</p>
-                        <h2 className="text-3xl md:text-4xl font-bold">Five AI Agents Working <span className="text-[#00FF66]">24/7 for You</span></h2>
-                        <p className="text-gray-400 text-sm">Our deeply integrated multi-agent architecture runs like a top-tier editorial team.</p>
-                    </div>
-
+                {/* === BOLD DIFFERENTIATION === */}
+                <section className="max-w-5xl mx-auto space-y-16 text-center">
                     <div className="space-y-4">
-                        {[
-                            { title: "Research Agent", desc: "Scrapes the top 20 Google SERP results for your keyword to extract LSI keywords, search intent, and structural patterns." },
-                            { title: "Writer Agent", desc: "Crafts engaging, bursty, and unpredictable paragraphs designed specifically to bypass AI detection and sound deeply human." },
-                            { title: "SEO Agent", desc: "Ensures optimal keyword density, naturally weaves internal links, and generates Schema markup (FAQ & BlogPosting)." },
-                            { title: "Visuals Agent", desc: "Customizes highly contextual featured images via Pollinations AI specifically suited to the article's core topic." },
-                            { title: "Publishing Agent", desc: "Formats perfect Markdown and automatically pushes the finished draft to your WordPress site with meta tags intact." }
-                        ].map((agent, i) => (
-                            <div key={i} className="flex gap-4 p-5 rounded-xl border border-[#1F2937] bg-gradient-to-r from-[#111827] to-[#0A0D14] items-start">
-                                <div className="bg-[#00FF66]/20 p-2 rounded-full border border-[#00FF66]/50">
-                                    <Check className="h-4 w-4 text-[#00FF66]" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-lg text-white group-hover:text-[#00FF66] transition-colors">{agent.title} <span className="text-[#00FF66] text-sm font-medium ml-2 border border-[#00FF66]/30 bg-[#00FF66]/10 px-2 py-0.5 rounded-full">v2.0</span></h4>
-                                    <p className="text-sm text-gray-400 mt-1">{agent.desc}</p>
-                                </div>
-                            </div>
-                        ))}
+                        <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">Boldly Superior</p>
+                        <h2 className="text-3xl md:text-5xl font-bold">Why <span className="text-[#00FF66]">AI Agents</span> Win</h2>
                     </div>
-                </section>
 
-                {/* === COST COMPARISON === */}
-                <section className="max-w-4xl mx-auto space-y-10 text-center">
-                    <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">The Value</p>
-                    <h2 className="text-3xl md:text-4xl font-bold">The Real <span className="text-[#00FF66]">Cost Comparison</span></h2>
-
-                    <div className="overflow-x-auto rounded-xl border border-[#1F2937] bg-[#111827]">
-                        <table className="w-full text-left text-sm">
-                            <thead className="bg-[#1F2937]/50 border-b border-[#1F2937]">
+                    <div className="overflow-x-auto rounded-[32px] border border-white/10 bg-black/40 backdrop-blur-3xl shadow-2xl">
+                        <table className="w-full text-left text-sm whitespace-nowrap">
+                            <thead className="bg-white/5 border-b border-white/10">
                                 <tr>
-                                    <th className="p-4 font-semibold text-gray-300">Feature</th>
-                                    <th className="p-4 font-semibold text-gray-300">Human Writer</th>
-                                    <th className="p-4 font-semibold text-gray-300">Generic AI</th>
-                                    <th className="p-4 font-semibold text-white bg-[#00FF66]/10 border-b-2 border-[#00FF66]">FUPilot</th>
+                                    <th className="p-8 font-semibold text-gray-400">Capability</th>
+                                    <th className="p-8 font-bold text-white bg-[#00FF66]/10 border-x border-[#00FF66]/20 relative">
+                                        <div className="absolute top-0 left-0 w-full h-1 bg-[#00FF66]"></div>
+                                        FUPilot AI Agents
+                                    </th>
+                                    <th className="p-8 font-semibold text-gray-400">Traditional Tools</th>
+                                    <th className="p-8 font-semibold text-gray-400">AI Co-pilots</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-[#1F2937]">
-                                <tr>
-                                    <td className="p-4 text-gray-400">Cost Per Article</td>
-                                    <td className="p-4 text-gray-300">$150 - $300</td>
-                                    <td className="p-4 text-gray-300">$0.02 (API Cost)</td>
-                                    <td className="p-4 text-[#00FF66] font-bold bg-[#00FF66]/5">~$1.63</td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 text-gray-400">Delivery Time</td>
-                                    <td className="p-4 text-red-400 flex items-center gap-1"><X className="h-4 w-4" /> 3-5 Days</td>
-                                    <td className="p-4 text-gray-300">Instant</td>
-                                    <td className="p-4 text-[#00FF66] flex items-center gap-1 bg-[#00FF66]/5"><Check className="h-4 w-4" /> 1 Minute</td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 text-gray-400">Live SERP Research</td>
-                                    <td className="p-4 text-[#00FF66]"><Check className="h-4 w-4" /></td>
-                                    <td className="p-4 text-red-400"><X className="h-4 w-4" /></td>
-                                    <td className="p-4 text-[#00FF66] bg-[#00FF66]/5"><Check className="h-4 w-4" /></td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 text-gray-400">Automatic WordPress Sync</td>
-                                    <td className="p-4 text-red-400"><X className="h-4 w-4" /></td>
-                                    <td className="p-4 text-red-400"><X className="h-4 w-4" /></td>
-                                    <td className="p-4 text-[#00FF66] bg-[#00FF66]/5"><Check className="h-4 w-4" /></td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 text-gray-400">SEO Schema Injection</td>
-                                    <td className="p-4 text-red-400"><X className="h-4 w-4" /></td>
-                                    <td className="p-4 text-red-400"><X className="h-4 w-4" /></td>
-                                    <td className="p-4 text-[#00FF66] bg-[#00FF66]/5"><Check className="h-4 w-4" /></td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 text-gray-400">AEO Engine Analytics</td>
-                                    <td className="p-4 text-gray-500">-</td>
-                                    <td className="p-4 text-gray-500">-</td>
-                                    <td className="p-4 text-[#00FF66] bg-[#00FF66]/5"><span className="text-xs uppercase bg-[#00FF66]/20 text-[#00FF66] px-2 py-1 rounded-full font-bold">Coming Soon</span></td>
-                                </tr>
+                            <tbody className="divide-y divide-white/5">
+                                {[
+                                    { f: "Effort Required", c1: "0 Man-hours", c2: "High (Manual)", c3: "Medium (Prompting)" },
+                                    { f: "Execution Logic", c1: "Autonomous", c2: "Manual Input", c3: "Suggestion-based" },
+                                    { f: "Availability", c1: "24/7/365", c2: "User-dependent", c3: "User-dependent" },
+                                    { f: "Core Outcome", c1: "Results", c2: "Features", c3: "Advice" },
+                                    { f: "Scalability", c1: "Infinite", c2: "Linear", c3: "Linear" },
+                                    { f: "Management", c1: "None", c2: "Full-time", c3: "Assisted" }
+                                ].map((row, i) => (
+                                    <tr key={i} className="hover:bg-white/[0.02] transition-colors">
+                                        <td className="p-8 text-gray-300 font-medium">{row.f}</td>
+                                        <td className="p-8 bg-[#00FF66]/5 border-x border-[#00FF66]/10 text-[#00FF66] font-bold text-center">{row.c1}</td>
+                                        <td className="p-8 text-gray-400 text-center">{row.c2}</td>
+                                        <td className="p-8 text-gray-400 text-center">{row.c3}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
                 </section>
 
-                {/* === COMING SOON: AEO ANALYTICS === */}
-                <section className="max-w-4xl mx-auto rounded-3xl border-2 border-dashed border-[#00FF66]/30 bg-[#111827]/50 p-10 text-center relative overflow-hidden backdrop-blur-sm">
-                    <div className="inline-block bg-[#00FF66]/10 text-[#00FF66] px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-4 border border-[#00FF66]/20">
-                        Coming Soon to All Paid Plans
-                    </div>
-                    <h2 className="text-3xl font-bold mb-3">AEO Analytics Dashboard</h2>
-                    <p className="text-gray-400 max-w-xl mx-auto mb-6">Track <span className="text-white font-medium">Answer Engine Optimization (AEO)</span> performance. Monitor your visibility on Perplexity, ChatGPT Search, and Google AI Overviews in real-time.</p>
-
-                    <div className="flex justify-center flex-wrap gap-4 text-sm text-gray-300">
-                        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></div> LLM Citation Tracking</div>
-                        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></div> AI Overview Ranking</div>
-                        <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></div> Conversational Queries</div>
-                    </div>
-                </section>
-
-                {/* === TESTIMONIALS === */}
-                <section className="max-w-5xl mx-auto space-y-10 text-center">
-                    <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">Social Proof</p>
-                    <h2 className="text-3xl md:text-4xl font-bold">Real Results from <span className="text-[#00FF66]">Real Founders</span></h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                        <div className="bg-[#111827] p-6 rounded-xl border border-[#1F2937]">
-                            <div className="flex text-[#00FF66] mb-4">
-                                {[...Array(5)].map((_, i) => <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>)}
-                            </div>
-                            <p className="text-gray-300 text-sm italic mb-4">"I completely fired my expensive content agency out of nowhere. FUPilot is outputting 30 articles a month that genuinely sound like I wrote them. Traffic is up 240% since last quarter."</p>
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center font-bold text-gray-400">MK</div>
-                                <div>
-                                    <h4 className="font-bold text-white text-sm">Marcus K.</h4>
-                                    <p className="text-xs text-gray-500">SaaS Founder</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-[#111827] p-6 rounded-xl border border-[#1F2937]">
-                            <div className="flex text-[#00FF66] mb-4">
-                                {[...Array(5)].map((_, i) => <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>)}
-                            </div>
-                            <p className="text-gray-300 text-sm italic mb-4">"The auto-publish to WordPress feature is insane. I just map out the keywords, come back an hour later, and my niche site is populated with fully formatted, perfectly internal-linked drafts."</p>
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center font-bold text-gray-400">SP</div>
-                                <div>
-                                    <h4 className="font-bold text-white text-sm">Sarah P.</h4>
-                                    <p className="text-xs text-gray-500">Niche Site Investor</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* === STATS BOARD === */}
-                <section className="max-w-4xl mx-auto space-y-10 text-center">
-                    <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">Deliverability</p>
-                    <h2 className="text-3xl md:text-4xl font-bold">Publication-Ready <span className="text-[#00FF66]">Every Single Time</span></h2>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="bg-[#111827] p-6 rounded-xl border border-[#1F2937]">
-                            <h3 className="text-2xl font-bold text-[#00FF66]">1,200 - 2,000</h3>
-                            <p className="text-xs text-gray-400 uppercase tracking-widest mt-2">Words Per Article</p>
-                        </div>
-                        <div className="bg-[#111827] p-6 rounded-xl border border-[#1F2937]">
-                            <h3 className="text-2xl font-bold text-[#00FF66]">90+</h3>
-                            <p className="text-xs text-gray-400 uppercase tracking-widest mt-2">SEO Score</p>
-                        </div>
-                        <div className="bg-[#111827] p-6 rounded-xl border border-[#1F2937]">
-                            <h3 className="text-2xl font-bold text-[#00FF66]">100%</h3>
-                            <p className="text-xs text-gray-400 uppercase tracking-widest mt-2">Undetectable</p>
-                        </div>
-                        <div className="bg-[#111827] p-6 rounded-xl border border-[#1F2937]">
-                            <h3 className="text-2xl font-bold text-[#00FF66]">0%</h3>
-                            <p className="text-xs text-gray-400 uppercase tracking-widest mt-2">Plagiarism</p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* === ENTERPRISE CTA === */}
-                <section className="max-w-4xl mx-auto rounded-3xl bg-gradient-to-br from-[#111827] to-[#0A0D14] border-2 border-[#1F2937] p-10 text-center relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-8 h-full shadow-[0_0_150px_rgba(0,255,102,0.1)] rounded-full -z-10 blur-3xl mix-blend-screen overflow-visible"></div>
-                    <h2 className="text-3xl font-bold mb-3">Need <span className="text-[#00FF66]">500+ Articles</span>/Month?</h2>
-                    <p className="text-gray-400 mb-8 max-w-xl mx-auto">We offer dedicated clusters, customized edge functions, and bulk API access for large-scale operations.</p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left max-w-2xl mx-auto mb-8">
-                        <div className="space-y-2">
-                            <li className="flex items-center gap-2 text-sm text-gray-300"><Check className="h-4 w-4 text-[#00FF66]" /> Dedicated Server Architecture</li>
-                            <li className="flex items-center gap-2 text-sm text-gray-300"><Check className="h-4 w-4 text-[#00FF66]" /> Dedicated Account Manager</li>
-                        </div>
-                        <div className="space-y-2">
-                            <li className="flex items-center gap-2 text-sm text-gray-300"><Check className="h-4 w-4 text-[#00FF66]" /> Volume Discount Pricing</li>
-                            <li className="flex items-center gap-2 text-sm text-gray-300"><Check className="h-4 w-4 text-[#00FF66]" /> Priority API Access</li>
-                        </div>
-                    </div>
-
-                    <div className="flex justify-center mb-8">
-                        <a href="mailto:scalezix@gmail.com?subject=Enterprise%20Inquiry%20-%20FUPilot">
-                            <Button className="bg-[#00FF66] text-black hover:bg-[#00CC52] font-semibold px-8 py-6 text-lg shadow-[0_0_20px_rgba(0,255,102,0.3)]">
-                                Contact Us
-                            </Button>
-                        </a>
-                    </div>
-
-                    <Button variant="outline" className="border-[#00FF66] text-[#00FF66] hover:bg-[#00FF66] hover:text-black">
-                        Contact Enterprise Sales
-                    </Button>
-                </section>
-
-                {/* === FAQ === */}
-                <section className="max-w-2xl mx-auto space-y-10">
-                    <div className="text-center">
-                        <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">FAQ</p>
-                        <h2 className="text-3xl font-bold mt-2">Questions? <span className="text-[#00FF66]">We've Got You Covered</span></h2>
-                    </div>
-
-                    <Accordion type="single" collapsible className="w-full text-left bg-[#111827] rounded-xl border border-[#1F2937] px-6">
-                        <AccordionItem value="item-1" className="border-b-[#1F2937]">
-                            <AccordionTrigger className="text-white hover:text-[#00FF66]">Do I need my own OpenAI / Groq API Keys?</AccordionTrigger>
-                            <AccordionContent className="text-gray-400">
-                                No! The subscription cost completely covers the intensive LLM processing, SERP research scraping, and image generation. It works out of the box.
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="item-2" className="border-b-[#1F2937]">
-                            <AccordionTrigger className="text-white hover:text-[#00FF66]">Does it really auto-publish to WordPress?</AccordionTrigger>
-                            <AccordionContent className="text-gray-400">
-                                Yes. You connect your WordPress site securely via Application Passwords. Once an article finishes generating, it will automatically push a perfectly formatted draft (or published post) directly into your WP admin screen with images and SEO metadata intact.
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="item-3" className="border-b-[#1F2937]">
-                            <AccordionTrigger className="text-white hover:text-[#00FF66]">Will this bypass AI detectors?</AccordionTrigger>
-                            <AccordionContent className="text-gray-400">
-                                FUPilot utilizes complex prompt engineering targeting "perplexity" and "burstiness", mimicking human neuro-divergent writing patterns. It regularly scores 95%+ human on strict detectors like Originality.ai.
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="item-4" className="border-none">
-                            <AccordionTrigger className="text-white hover:text-[#00FF66]">What if I don't use all my credits?</AccordionTrigger>
-                            <AccordionContent className="text-gray-400">
-                                Your credits reset on your billing date every month. We highly recommend utilizing the Bulk Generate tool to ensure you get the absolute maximum ROI from your subscription limit each month!
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
-                </section>
-
                 {/* === FINAL CTA === */}
-                <section className="max-w-3xl mx-auto text-center space-y-8 bg-[#00FF66] text-black rounded-3xl p-12">
-                    <div className="space-y-4">
-                        <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight">Ready to Reclaim <span className="underline decoration-4 underline-offset-4 decoration-black/20">120+ Hours</span> Per Month?</h2>
-                        <p className="font-medium text-black/70 max-w-xl mx-auto text-lg">
-                            Join the hundreds of founders automating their growth marketing safely and optimally.
+                <section className="glass-card p-16 rounded-[40px] text-center space-y-8 max-w-5xl mx-auto overflow-hidden relative border-white/5">
+                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#00FF66]/20 blur-[100px] rounded-full"></div>
+                    <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-blue-500/20 blur-[100px] rounded-full"></div>
+                    
+                    <div className="relative z-10 space-y-6">
+                        <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-tight italic">
+                            Stop Hiring Helpers. <br />
+                            <span className="text-[#00FF66] not-italic underline decoration-blue-500/50">Start Deploying Executors.</span>
+                        </h2>
+                        <p className="text-gray-400 text-xl max-w-2xl mx-auto font-medium">
+                            Join the next generation of founders who have replaced their manual workflows with autonomous agents.
                         </p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div className="relative z-10 flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
                         <Link to="/auth">
-                            <Button className="bg-black text-white hover:bg-gray-800 font-bold px-8 py-6 text-lg w-full sm:w-auto shadow-2xl">
-                                Get Started Now
+                            <Button className="bg-[#00FF66] text-black hover:bg-[#00CC52] font-black h-20 px-16 text-2xl rounded-3xl shadow-2xl shadow-[#00FF66]/30 transition-transform hover:scale-105 active:scale-95">
+                                Deploy Your Agents Now
                             </Button>
                         </Link>
                     </div>
-                    <p className="text-xs text-black/50 font-semibold tracking-wider uppercase">Cancel Anytime. No Long-term Contracts.</p>
+                    <p className="relative z-10 text-[10px] text-gray-500 font-extrabold uppercase tracking-[0.4em]">Autonomous Workforce Platform v2.0</p>
                 </section>
 
             </main>
 
-            <div className="dark">
-                <Footer />
-            </div>
+            <Footer />
         </div>
     );
 };

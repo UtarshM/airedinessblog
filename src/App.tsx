@@ -23,12 +23,13 @@ import NotFound from "./pages/NotFound";
 import Index from "@/pages/Index";
 import PricingPage from "@/pages/PricingPage";
 import AEOAnalyticsPage from "@/pages/AEOAnalyticsPage";
+import AgentsPage from "@/pages/AgentsPage";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" disableTransitionOnChange>
       <AuthProvider>
         <TooltipProvider>
           <Toaster />
@@ -37,6 +38,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/agents" element={<AgentsPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route
                 element={

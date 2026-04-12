@@ -15,6 +15,9 @@ export const LandingNavbar = () => {
             <a href="/#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
                 How it Works
             </a>
+            <Link to="/agents" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
+                Agents
+            </Link>
             <Link to="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
                 Pricing
             </Link>
@@ -40,8 +43,8 @@ export const LandingNavbar = () => {
                         <Button variant="ghost" className="font-semibold">Log in</Button>
                     </Link>
                     <Link to="/auth">
-                        <Button className="font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all rounded-full px-6">
-                            Get Started
+                        <Button className="font-bold bg-[#00FF66] text-black hover:bg-[#00CC52] shadow-lg shadow-[#00FF66]/20 hover:shadow-[#00FF66]/40 transition-all rounded-full px-6">
+                            Deploy Agents
                         </Button>
                     </Link>
                 </div>
@@ -64,7 +67,7 @@ export const LandingNavbar = () => {
                                     <Button variant="outline" className="w-full">Log in</Button>
                                 </Link>
                                 <Link to="/auth" onClick={() => setIsOpen(false)}>
-                                    <Button className="w-full">Get Started</Button>
+                                    <Button className="w-full bg-[#00FF66] text-black hover:bg-[#00CC52] font-bold">Deploy Agents</Button>
                                 </Link>
                             </div>
                         </SheetContent>

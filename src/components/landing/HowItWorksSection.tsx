@@ -6,18 +6,18 @@ export const HowItWorksSection = () => {
     const steps = [
         {
             number: "01",
-            title: "Discover Opportunities",
-            description: "Enter a base keyword. Our AI analyzes search volume, competition, and user intent to find the perfect low-competition, high-traffic terms."
+            title: "Analyze",
+            description: "Agents crawl your data, understand your market, and identify 100% of your growth opportunities."
         },
         {
             number: "02",
-            title: "Generate Content",
-            description: "Our context-aware LLM generates long-form, perfectly structured, SEO-optimized articles with rich imagery and formatting within seconds."
+            title: "Plan",
+            description: "They build sophisticated strategies and multi-channel workflows tailored to your specific goals."
         },
         {
             number: "03",
-            title: "Publish & Outrank",
-            description: "Push content instantly to your integrated platforms like WordPress or Shopify. Watch your traffic scale on auto-pilot."
+            title: "Execute",
+            description: "They autonomously run campaigns, automate tasks, and optimize results in real-time."
         }
     ];
 
@@ -28,23 +28,23 @@ export const HowItWorksSection = () => {
 
                     <div className="lg:w-1/2">
                         <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">
-                            Three steps to <br className="hidden md:block" />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">
-                                SEO mastery
+                            From Setup to <br className="hidden md:block" />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF66] to-blue-500">
+                                Autonomous Growth
                             </span>
                         </h2>
                         <p className="text-lg text-muted-foreground mb-8">
-                            No complex workflows or massive learning curves. Rank.Scalezix makes building an SEO empire straightforward.
+                            Softwares used to be a tool you operated. FUPilot is a workforce that operates itself. 
                         </p>
 
                         <div className="space-y-8 mt-12">
                             {steps.map((step, idx) => (
                                 <div key={idx} className="flex gap-6 items-start group">
-                                    <div className="flex-shrink-0 mt-1 h-12 w-12 rounded-full border-2 border-primary/20 bg-primary/5 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300">
+                                    <div className="flex-shrink-0 mt-1 h-12 w-12 rounded-full border-2 border-[#00FF66]/20 bg-[#00FF66]/5 flex items-center justify-center group-hover:bg-[#00FF66] group-hover:text-black group-hover:border-[#00FF66] transition-all duration-300">
                                         <span className="font-bold">{step.number}</span>
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{step.title}</h3>
+                                        <h3 className="text-xl font-bold mb-2 group-hover:text-[#00FF66] transition-colors">{step.title}</h3>
                                         <p className="text-muted-foreground leading-relaxed">{step.description}</p>
                                     </div>
                                 </div>
@@ -53,8 +53,8 @@ export const HowItWorksSection = () => {
 
                         <div className="mt-12">
                             <Link to="/auth">
-                                <Button className="rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all font-semibold">
-                                    Try it yourself
+                                <Button className="rounded-full bg-[#00FF66] text-black hover:bg-[#00CC52] font-bold shadow-lg shadow-[#00FF66]/20 hover:shadow-[#00FF66]/40 transition-all">
+                                    Trial Your Agents
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
