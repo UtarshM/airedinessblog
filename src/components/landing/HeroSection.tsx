@@ -16,7 +16,7 @@ export const HeroSection = () => {
                     Autonomous AI Agent Platform
                 </Badge>
 
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 max-w-5xl mx-auto leading-tight">
+                <h1 className="text-6xl md:text-7xl font-black tracking-tighter mb-8 max-w-5xl mx-auto leading-[0.9] md:leading-tight">
                     Stop Working. Deploy <br className="hidden md:block" />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF66] via-blue-500 to-purple-600">
                         Agents That Grow

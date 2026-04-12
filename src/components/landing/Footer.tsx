@@ -60,9 +60,12 @@ export const Footer = () => {
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-border/40 text-center">
+                <div className="pt-8 border-t border-border/40 text-center space-y-2">
                     <p className="text-sm text-muted-foreground">
                         &copy; {new Date().getFullYear()} FUPilot. All rights reserved.
+                    </p>
+                    <p className="text-[10px] text-muted-foreground/30 font-mono uppercase tracking-[0.2em]">
+                        Build v4.0.0 - Premium Autonomous Deployment - Verified for teampression.com
                     </p>
                 </div>
             </div>
