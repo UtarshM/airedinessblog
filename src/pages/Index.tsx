@@ -11,6 +11,8 @@ import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { GenieAssistant } from "@/components/GenieAssistant";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Sparkles } from "lucide-react";
 
 const Index = () => {
   // Add smooth scrolling for anchor links
