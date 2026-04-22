@@ -112,8 +112,8 @@ const Index = () => {
                       <div className="flex items-center gap-4">
                          <Bot className="w-8 h-8 text-neon-blue" />
                          <div>
-                           <p className="font-bold text-white">Sales Agent</p>
-                           <p className="text-xs text-neon-blue">Executing • 1,240 Leads Processed</p>
+                           <p className="font-bold text-white">Content Generation</p>
+                           <p className="text-xs text-neon-blue">Executing • 1,240 Assets Created</p>
                          </div>
                       </div>
                       <div className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold">100% HEALTHY</div>
@@ -122,7 +122,7 @@ const Index = () => {
                       <div className="flex items-center gap-4">
                          <Bot className="w-8 h-8 text-neon-purple" />
                          <div>
-                           <p className="font-bold text-white">Marketing Agent</p>
+                           <p className="font-bold text-white">Ad Optimization</p>
                            <p className="text-xs text-neon-purple">Executing • 4 Campaigns Active</p>
                          </div>
                       </div>
@@ -157,8 +157,8 @@ const Index = () => {
 
               <GlowCard glowColor="purple" className="bg-[#0A0D14] z-10">
                 <div className="w-12 h-12 rounded-full bg-neon-purple text-white font-black flex items-center justify-center text-xl mb-6 shadow-[0_0_20px_rgba(112,0,255,0.5)]">2</div>
-                <h3 className="text-2xl font-bold mb-4">Assign Agents</h3>
-                <p className="text-gray-400">Select the Co-Agents you need. Feed them your playbooks and SOPs via natural language.</p>
+                <h3 className="text-2xl font-bold mb-4">Assign Tasks</h3>
+                <p className="text-gray-400">Select the marketing functions you need. Feed them your playbooks and SOPs via natural language.</p>
               </GlowCard>
 
               <GlowCard glowColor="pink" className="bg-[#0A0D14] z-10">

@@ -2,63 +2,63 @@ import { useState } from "react";
 import { GlowCard } from "./GlowCard";
 import { BarChart3, MessageSquare, Target, Zap, CheckCircle2 } from "lucide-react";
 
-type AgentType = "marketing" | "sales" | "crm" | "ops";
+type AgentType = "content" | "social" | "ads" | "seo";
 
 export const AgentShowcase = () => {
-  const [activeAgent, setActiveAgent] = useState<AgentType>("marketing");
+  const [activeAgent, setActiveAgent] = useState<AgentType>("content");
 
   const agents = {
-    marketing: {
-      title: "Marketing Agent",
+    content: {
+      title: "Content Generation",
       icon: <Target className="w-6 h-6 text-neon-pink" />,
       color: "pink",
-      description: "Autonomously researches, writes, and deploys high-converting campaigns across all your channels.",
+      description: "Autonomously researches, writes, and deploys high-converting content across all your channels.",
       capabilities: [
-        "SEO-optimized content generation",
-        "Social media scheduling & posting",
-        "Ad copy variations & A/B testing",
-        "Competitor analysis monitoring"
+        "SEO-optimized blog posts",
+        "Landing page copy generation",
+        "Email newsletter sequences",
+        "Competitor content analysis"
       ],
       stats: { metric: "+340%", label: "Content Output" }
     },
-    sales: {
-      title: "Sales Agent",
+    social: {
+      title: "Social Media Management",
       icon: <Zap className="w-6 h-6 text-neon-blue" />,
       color: "blue",
-      description: "Qualifies leads 24/7, handles initial discovery, and books meetings directly into your calendar.",
+      description: "Manages your social presence 24/7, handles engagement, and schedules posts for maximum reach.",
       capabilities: [
-        "Instant lead response via WhatsApp/Email",
-        "Automated follow-up sequences",
-        "Objection handling based on your playbook",
-        "Meeting scheduling & reminders"
+        "Multi-platform post scheduling",
+        "Automated engagement replies",
+        "Trend monitoring & newsjacking",
+        "Audience sentiment analysis"
       ],
-      stats: { metric: "5x", label: "Meeting Booked Rate" }
+      stats: { metric: "5x", label: "Engagement Rate" }
     },
-    crm: {
-      title: "CRM Agent",
+    ads: {
+      title: "Performance Ads",
       icon: <MessageSquare className="w-6 h-6 text-neon-purple" />,
       color: "purple",
-      description: "Keeps your pipeline spotless. Updates records, logs interactions, and scores leads without manual data entry.",
+      description: "Optimizes your ad spend continuously. Creates variations, tests copy, and allocates budget to winning campaigns.",
       capabilities: [
-        "Automated data enrichment",
-        "Lead scoring based on intent signals",
-        "Stale pipeline alerts & cleanups",
-        "Meeting note summarization"
+        "Automated A/B testing",
+        "Dynamic bid adjustments",
+        "Ad creative generation",
+        "ROAS tracking & reporting"
       ],
-      stats: { metric: "0hrs", label: "Manual Data Entry" }
+      stats: { metric: "-40%", label: "Cost Per Acquisition" }
     },
-    ops: {
-      title: "Operations Agent",
+    seo: {
+      title: "SEO Optimization",
       icon: <BarChart3 className="w-6 h-6 text-[#00FF66]" />,
       color: "green",
-      description: "Connects the dots between your tools. Monitors workflows, handles internal alerts, and generates reports.",
+      description: "Connects the dots in your search strategy. Monitors rankings, fixes technical issues, and builds internal links.",
       capabilities: [
-        "Cross-platform data syncing",
-        "Custom report generation & delivery",
-        "Anomaly detection in metrics",
-        "Internal Slack/Discord notifications"
+        "Keyword gap analysis",
+        "Automated internal linking",
+        "Technical SEO auditing",
+        "Search intent mapping"
       ],
-      stats: { metric: "100%", label: "Workflow Automation" }
+      stats: { metric: "100%", label: "Technical Health" }
     }
   };
 

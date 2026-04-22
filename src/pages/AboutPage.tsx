@@ -53,11 +53,7 @@ const AboutPage = () => {
               <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
                 "In 5 years, the most successful companies won't be the ones with the largest headcount. They will be the ones with the smartest orchestration of AI agents."
               </p>
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 rounded-full bg-white/10 mb-4 border border-white/20" />
-                <h4 className="font-bold text-lg">Placeholder Founder</h4>
-                <p className="text-gray-500">CEO, CoAgent.ai</p>
-              </div>
+
             </div>
           </div>
         </div>

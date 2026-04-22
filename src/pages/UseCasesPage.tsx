@@ -30,7 +30,7 @@ const UseCasesPage = () => {
                   </div>
                   <div>
                     <h4 className="text-neon-blue font-semibold mb-2 uppercase tracking-wide">The Solution</h4>
-                    <p className="text-gray-300">Deploy a dedicated Marketing Co-Agent for each client. Automate reporting, social posting, and ad optimizations.</p>
+                    <p className="text-gray-300">Deploy dedicated AI marketing functions for each client. Automate reporting, social posting, and ad optimizations.</p>
                   </div>
                   <div className="pt-4 border-t border-white/10">
                     <h4 className="text-[#00FF66] font-semibold mb-2 uppercase tracking-wide">The Result</h4>
@@ -54,21 +54,21 @@ const UseCasesPage = () => {
                   <Rocket className="w-8 h-8 text-neon-blue" />
                 </div>
                 <h2 className="text-4xl font-bold mb-4">SaaS Startups</h2>
-                <p className="text-xl text-gray-400">Don't waste funding on massive SDR teams. Let Sales Agents handle inbound and outbound at a fraction of the cost.</p>
+                <p className="text-xl text-gray-400">Don't waste funding on massive marketing teams. Let our AI handle inbound and outbound content at a fraction of the cost.</p>
               </div>
               <GlowCard glowColor="blue">
                 <div className="space-y-6">
                   <div>
                     <h4 className="text-neon-purple font-semibold mb-2 uppercase tracking-wide">The Problem</h4>
-                    <p className="text-gray-300">Burning runway on sales hires that take 3 months to ramp up and quit after 6 months.</p>
+                    <p className="text-gray-300">Burning runway on marketing hires that take 3 months to ramp up and quit after 6 months.</p>
                   </div>
                   <div>
                     <h4 className="text-neon-blue font-semibold mb-2 uppercase tracking-wide">The Solution</h4>
-                    <p className="text-gray-300">Instantly deploy Sales Agents trained on your docs. They qualify leads 24/7 and book demos for your founders.</p>
+                    <p className="text-gray-300">Instantly deploy AI marketing functions trained on your brand guidelines. They generate content 24/7 and drive traffic for your founders.</p>
                   </div>
                   <div className="pt-4 border-t border-white/10">
                     <h4 className="text-[#00FF66] font-semibold mb-2 uppercase tracking-wide">The Result</h4>
-                    <p className="text-3xl font-bold">3x Pipeline Velocity</p>
+                    <p className="text-3xl font-bold">3x Traffic Velocity</p>
                   </div>
                 </div>
               </GlowCard>
@@ -80,11 +80,11 @@ const UseCasesPage = () => {
                 <div className="space-y-6">
                   <div>
                     <h4 className="text-neon-purple font-semibold mb-2 uppercase tracking-wide">The Problem</h4>
-                    <p className="text-gray-300">Siloed data across HubSpot, Salesforce, Outreach, and internal tools creating massive operational drag.</p>
+                    <p className="text-gray-300">Siloed data across HubSpot, Google Analytics, ad platforms, and internal tools creating massive operational drag.</p>
                   </div>
                   <div>
                     <h4 className="text-neon-blue font-semibold mb-2 uppercase tracking-wide">The Solution</h4>
-                    <p className="text-gray-300">Ops Agents act as the central nervous system, identifying discrepancies, syncing data, and alerting on anomalies.</p>
+                    <p className="text-gray-300">AI acts as the central nervous system, identifying discrepancies, optimizing ad spend, and alerting on anomalies.</p>
                   </div>
                   <div className="pt-4 border-t border-white/10">
                     <h4 className="text-[#00FF66] font-semibold mb-2 uppercase tracking-wide">The Result</h4>
@@ -97,7 +97,7 @@ const UseCasesPage = () => {
                   <Building2 className="w-8 h-8 text-neon-pink" />
                 </div>
                 <h2 className="text-4xl font-bold mb-4">Enterprise-Lite</h2>
-                <p className="text-xl text-gray-400">Connect the dots in your tech stack. Operations Agents ensure your data is perfect so leadership can make real decisions.</p>
+                <p className="text-xl text-gray-400">Connect the dots in your tech stack. Automated SEO and Analytics ensure your marketing data is perfect so leadership can make real decisions.</p>
               </div>
             </div>
 

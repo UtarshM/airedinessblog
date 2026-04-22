@@ -28,14 +28,14 @@ export const AnimatedHero = () => {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-black text-white tracking-tight mb-8 leading-[1.1] animate-slide-in" style={{ animationDelay: '100ms' }}>
-            Meet Your AI Co-Agents.<br />
+            Meet Your Digital Marketing <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">
-              They don't assist. They execute.
+              Co-Agents.
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed animate-slide-in" style={{ animationDelay: '200ms' }}>
-            Replace hours of manual work with autonomous agents that run your marketing, sales, and operations — end to end.
+            A full-stack, high-autonomy AI marketing team. From strategy and planning to flawless execution, let our agents help you achieve unprecedented growth with zero manual effort.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16 animate-slide-in" style={{ animationDelay: '300ms' }}>
@@ -81,8 +81,8 @@ export const AnimatedHero = () => {
             <Sparkles className="w-5 h-5 text-neon-blue" />
           </div>
           <div>
-            <p className="text-white font-semibold text-sm">Marketing Agent</p>
-            <p className="text-neon-blue text-xs">Campaign Deployed</p>
+            <p className="text-white font-semibold text-sm">Campaign Deployed</p>
+            <p className="text-neon-blue text-xs">Autonomous Execution</p>
           </div>
         </div>
       </div>
@@ -93,8 +93,8 @@ export const AnimatedHero = () => {
             <Zap className="w-5 h-5 text-neon-purple" />
           </div>
           <div>
-            <p className="text-white font-semibold text-sm">Sales Agent</p>
-            <p className="text-neon-purple text-xs">Meeting Booked</p>
+            <p className="text-white font-semibold text-sm">Content Generated</p>
+            <p className="text-neon-purple text-xs">SEO Optimized</p>
           </div>
         </div>
       </div>
