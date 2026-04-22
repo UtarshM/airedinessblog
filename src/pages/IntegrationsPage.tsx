@@ -172,6 +172,22 @@ const IntegrationsPage = () => {
                         linkUrl="/integrations/shopify"
                     />
 
+                    <AppCard
+                        title="Webflow"
+                        description="Direct integration with Webflow CMS to publish AI-optimized content automatically."
+                        icon={BookOpen}
+                        platformId="webflow"
+                        comingSoon={true}
+                    />
+
+                    <AppCard
+                        title="Framer"
+                        description="Sync your Framer CMS with FUPilot to maintain AI visibility on your site."
+                        icon={BookOpen}
+                        platformId="framer"
+                        comingSoon={true}
+                    />
+
                 </div>
             )}
         </div>

@@ -13,18 +13,18 @@ export const HeroSection = () => {
             <div className="container mx-auto px-4 md:px-8 text-center">
                 <Badge variant="outline" className="mb-6 px-4 py-1 border-primary/30 bg-primary/5 text-primary">
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Autonomous AI Agent Platform
+                    10X Your Marketing Team, Without 10Xing Your Budget!
                 </Badge>
 
-                <h1 className="text-6xl md:text-7xl font-black tracking-tighter mb-8 max-w-5xl mx-auto leading-[0.9] md:leading-tight">
-                    Stop Working. Deploy <br className="hidden md:block" />
+                <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 max-w-5xl mx-auto leading-[0.85] md:leading-tight">
+                    Enterprise-Grade Marketing <br className="hidden md:block" />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF66] via-blue-500 to-purple-600">
-                        Agents That Grow
-                    </span> Your Business.
+                        Without the Overhead.
+                    </span>
                 </h1>
 
                 <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-                    FUPilot is the world’s first autonomous workforce. No tools to manage. No teams to hire. Just digital agents that analyze, plan, and execute your growth 24/7.
+                    Help your team do more with less, without the cost of expensive agencies. Our expert AI marketing agents integrate into your existing workflow, helping you outperform and outscale the competition at a fraction of the cost.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">

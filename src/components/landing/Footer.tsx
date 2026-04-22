@@ -11,7 +11,7 @@ export const Footer = () => {
                             <img src="/fupilot.webp" alt="FUPilot Logo" className="h-8 w-auto" />
                         </Link>
                         <p className="text-muted-foreground text-sm mb-6 max-w-xs">
-                            Stop Managing Tools. Start Scaling. FUPilot is the world’s first autonomous workforce of digital agents that analyze, plan, and execute your growth 24/7.
+                            Win customers in the Agentic Web. FUPilot identifies content that drives AI visibility and creates it for you automatically.
                         </p>
                         <div className="flex space-x-4">
                             <a href="#" className="text-muted-foreground hover:text-primary transition-colors">

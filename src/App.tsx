@@ -25,6 +25,12 @@ import PricingPage from "@/pages/PricingPage";
 import AEOAnalyticsPage from "@/pages/AEOAnalyticsPage";
 import AgentsPage from "@/pages/AgentsPage";
 
+import FeaturesPage from "@/pages/FeaturesPage";
+import UseCasesPage from "@/pages/UseCasesPage";
+import AboutPage from "@/pages/AboutPage";
+import ContactPage from "@/pages/ContactPage";
+import BlogPage from "@/pages/BlogPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,6 +43,11 @@ const App = () => (
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/features" element={<FeaturesPage />} />
+              <Route path="/use-cases" element={<UseCasesPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/blog" element={<BlogPage />} />
               <Route path="/pricing" element={<PricingPage />} />
               <Route path="/agents" element={<AgentsPage />} />
               <Route path="/auth" element={<AuthPage />} />

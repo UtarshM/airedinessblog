@@ -1,221 +1,114 @@
+import { MarketingNavbar } from "@/components/marketing/MarketingNavbar";
+import { MarketingFooter } from "@/components/marketing/MarketingFooter";
+import { GlowCard } from "@/components/marketing/GlowCard";
+import { CheckCircle2, ArrowRight } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, X, ArrowRight, Zap, Info, Shield, Users, TrendingUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { LandingNavbar } from "@/components/landing/LandingNavbar";
-import { Footer } from "@/components/landing/Footer";
-import { PricingCalculator } from "@/components/landing/PricingCalculator";
 
 const PricingPage = () => {
-    return (
-        <div className="min-h-screen bg-mesh text-white font-sans selection:bg-[#00FF66]/30 selection:text-[#00FF66] overflow-x-hidden">
-            <LandingNavbar />
+  const [annual, setAnnual] = useState(true);
 
-            <main className="py-20 px-4 md:px-8 max-w-7xl mx-auto space-y-32">
-                {/* === HEADER === */}
-                <section className="text-center space-y-8">
-                    <div className="space-y-4 max-w-3xl mx-auto">
-                        <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">The Future of Efficiency</p>
-                        <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight leading-tight">
-                            Build Your <span className="text-[#00FF66]">Autonomous</span> <br /> Marketing Team
-                        </h1>
-                        <p className="text-gray-400 text-xl max-w-2xl mx-auto">
-                            Deploy world-class agents that handle research, code, design, and analytics with zero management required.
-                        </p>
-                    </div>
-                </section>
+  return (
+    <div className="min-h-screen bg-[#050505] text-white">
+      <MarketingNavbar />
+      
+      <main className="pt-32 pb-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h1 className="text-5xl font-black mb-6">
+              Hire an <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue to-neon-purple">Agent.</span> Not a team.
+            </h1>
+            <p className="text-xl text-gray-400 mb-8">
+              A fraction of the cost of a human employee. 10x the output. Zero onboarding time.
+            </p>
 
-                {/* === PRICING TIERS === */}
-                <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* FREE TIER */}
-                    <div className="glass-card p-10 rounded-3xl border-white/5 flex flex-col justify-between">
-                        <div className="space-y-6">
-                            <div>
-                                <h3 className="text-2xl font-bold text-white">Free</h3>
-                                <p className="text-sm text-gray-400 mt-2 italic font-medium">"Get a taste of our agents' capabilities to help you clearly define what your business needs for growth"</p>
-                            </div>
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-5xl font-black">$0</span>
-                                <span className="text-gray-500 font-semibold">/ month</span>
-                            </div>
-                            <div className="space-y-4 pt-6 border-t border-white/5">
-                                <p className="text-xs text-gray-300">Get a limited first look at a full-stack marketing team in action.</p>
-                                {[
-                                    { n: "Lyra", d: "Organic social media to grow your audience and engagement." },
-                                    { n: "Aris", d: "Content marketing, SEO, and AEO to boost your visibility." },
-                                    { n: "Kash", d: "Performance marketing for high-impact campaigns." },
-                                    { n: "Veda", d: "Brand analytics, competitor tracking, and market research." }
-                                ].map((agent, i) => (
-                                    <div key={i} className="flex flex-col gap-1">
-                                        <div className="flex items-center gap-2">
-                                            <Check className="h-4 w-4 text-[#00FF66]" />
-                                            <span className="font-bold text-sm text-white">{agent.n}</span>
-                                        </div>
-                                        <p className="text-[11px] text-gray-500 pl-6 leading-relaxed">{agent.d}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="pt-10">
-                            <Link to="/auth" className="w-full">
-                                <Button variant="outline" className="w-full h-14 rounded-2xl font-bold border-white/10 hover:bg-white/5 bg-transparent text-white">
-                                    Start Free Trial
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
+            <div className="inline-flex items-center gap-2 p-1 bg-white/5 border border-white/10 rounded-full">
+              <button 
+                onClick={() => setAnnual(false)}
+                className={`px-6 py-2 rounded-full font-medium transition-all ${!annual ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}`}
+              >
+                Monthly
+              </button>
+              <button 
+                onClick={() => setAnnual(true)}
+                className={`px-6 py-2 rounded-full font-medium transition-all ${annual ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}`}
+              >
+                Annually <span className="text-neon-blue text-xs ml-1">Save 20%</span>
+              </button>
+            </div>
+          </div>
 
-                    {/* GROWTH TIER */}
-                    <div className="glass-card p-10 rounded-3xl border-[#00FF66]/30 relative transform lg:scale-105 shadow-2xl shadow-[#00FF66]/10 flex flex-col justify-between overflow-hidden">
-                        <div className="absolute top-0 right-0 bg-[#00FF66] text-black text-[10px] font-black px-4 py-1 rounded-bl-xl uppercase tracking-widest">
-                            Most Popular
-                        </div>
-                        <div className="space-y-6">
-                            <div>
-                                <h3 className="text-2xl font-bold text-white">Growth</h3>
-                                <p className="text-sm text-gray-300 mt-2 font-medium">Unlock advanced capabilities across organic and paid, enabling you to become your own expert marketing agency.</p>
-                            </div>
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-5xl font-black">$600</span>
-                                <span className="text-gray-400 font-semibold text-xs leading-none">/ month <br/> per agent</span>
-                            </div>
-                            <div className="space-y-4 pt-6 border-t border-[#00FF66]/20">
-                                <p className="text-xs text-[#00FF66] font-bold">Unlock full access to all agents with advanced tools, unlimited content creation, BI integration, and automated campaign management.</p>
-                                {[
-                                    { n: "Lyra", d: "Organic social media to grow your audience and engagement." },
-                                    { n: "Aris", d: "Content marketing, SEO, and AEO to boost your visibility." },
-                                    { n: "Kash", d: "Performance marketing for high-impact campaigns." },
-                                    { n: "Veda", d: "Brand analytics, competitor tracking, and market research." }
-                                ].map((agent, i) => (
-                                    <div key={i} className="flex flex-col gap-1">
-                                        <div className="flex items-center gap-2">
-                                            <Check className="h-4 w-4 text-[#00FF66]" />
-                                            <span className="font-bold text-sm text-white">{agent.n}</span>
-                                        </div>
-                                        <p className="text-[11px] text-gray-400 pl-6 leading-relaxed">{agent.d}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="pt-10">
-                            <Link to="/auth" className="w-full">
-                                <Button className="w-full h-14 bg-[#00FF66] text-black hover:bg-[#00CC52] font-black rounded-2xl shadow-lg shadow-[#00FF66]/20">
-                                    Contact Us
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Starter */}
+            <GlowCard glowColor="blue" className="border-white/10 flex flex-col">
+              <h3 className="text-2xl font-bold mb-2">Starter Agent</h3>
+              <p className="text-gray-400 mb-6 min-h-[48px]">Perfect for solopreneurs looking to automate the basics.</p>
+              <div className="mb-8">
+                <span className="text-5xl font-black">${annual ? '299' : '349'}</span>
+                <span className="text-gray-400">/mo</span>
+              </div>
+              <ul className="flex flex-col gap-4 mb-8 flex-grow">
+                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-blue shrink-0" /><span className="text-gray-300">1 Core Agent (Sales or Marketing)</span></li>
+                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-blue shrink-0" /><span className="text-gray-300">1,000 Executions / month</span></li>
+                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-blue shrink-0" /><span className="text-gray-300">Standard integrations</span></li>
+                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-blue shrink-0" /><span className="text-gray-300">Community support</span></li>
+              </ul>
+              <Link to="/auth">
+                <button className="w-full py-3 rounded-xl border border-white/20 hover:bg-white/5 transition-colors font-semibold">Start Free Trial</button>
+              </Link>
+            </GlowCard>
 
-                    {/* ENTERPRISE TIER */}
-                    <div className="glass-card p-10 rounded-3xl border-white/5 flex flex-col justify-between">
-                        <div className="space-y-6">
-                            <div>
-                                <h3 className="text-2xl font-bold text-white">Enterprise Edge</h3>
-                                <p className="text-xs text-[#00FF66] font-black mt-1 uppercase tracking-widest">(Powered by custom AI models)</p>
-                                <p className="text-sm text-gray-400 mt-3 font-medium">The Complete AI Marketing Powerhouse for businesses ready to lead the future.</p>
-                            </div>
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-4xl font-black">Custom</span>
-                            </div>
-                            <div className="space-y-4 pt-6 border-t border-white/5">
-                                <p className="text-xs text-gray-300">For enterprises looking to redefine their marketing operations:</p>
-                                {[
-                                    "Dedicated account management for tailored support.",
-                                    "Enterprise-grade security with SSO and advanced controls.",
-                                    "Custom integrations for your specific workflows.",
-                                    "Full-scale AI agents to handle research, strategy, execution, and optimization.",
-                                    "Tailored model training on your brand data."
-                                ].map((feature, i) => (
-                                    <div key={i} className="flex items-start gap-3">
-                                        <Shield className="h-4 w-4 text-blue-400 mt-1 shrink-0" />
-                                        <span className="text-xs font-medium text-gray-300 leading-relaxed">{feature}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="pt-10">
-                            <Link to="/auth" className="w-full">
-                                <Button variant="outline" className="w-full h-14 rounded-2xl font-bold border-white/10 hover:bg-white/5 bg-transparent text-white">
-                                    Contact Sales
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
-                </section>
+            {/* Growth (Highlighted) */}
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-b from-neon-blue to-neon-purple rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity" />
+              <GlowCard glowColor="purple" className="border-neon-purple/50 bg-[#0A0D14] h-full flex flex-col transform md:-translate-y-4">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 bg-gradient-to-r from-neon-blue to-neon-purple rounded-full text-xs font-bold uppercase tracking-wider">
+                  Most Popular
+                </div>
+                <h3 className="text-2xl font-bold mb-2">Growth Team</h3>
+                <p className="text-gray-400 mb-6 min-h-[48px]">A full autonomous team for growing startups and agencies.</p>
+                <div className="mb-8">
+                  <span className="text-5xl font-black">${annual ? '899' : '999'}</span>
+                  <span className="text-gray-400">/mo</span>
+                </div>
+                <ul className="flex flex-col gap-4 mb-8 flex-grow">
+                  <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-purple shrink-0" /><span className="text-white font-medium">Full Agent Roster (All 4 Types)</span></li>
+                  <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-purple shrink-0" /><span className="text-gray-300">10,000 Executions / month</span></li>
+                  <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-purple shrink-0" /><span className="text-gray-300">Advanced custom playbooks</span></li>
+                  <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-purple shrink-0" /><span className="text-gray-300">Cross-agent memory sync</span></li>
+                  <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-purple shrink-0" /><span className="text-gray-300">Priority 24/7 Support</span></li>
+                </ul>
+                <Link to="/auth">
+                  <button className="w-full py-3 rounded-xl bg-white text-black hover:bg-gray-200 transition-colors font-bold text-lg">Deploy Agents</button>
+                </Link>
+              </GlowCard>
+            </div>
 
-                {/* === CALCULATOR === */}
-                <PricingCalculator />
-
-                {/* === BOLD DIFFERENTIATION === */}
-                <section className="max-w-5xl mx-auto space-y-16 text-center">
-                    <div className="space-y-4">
-                        <p className="text-[#00FF66] font-semibold tracking-widest text-sm uppercase">Boldly Superior</p>
-                        <h2 className="text-3xl md:text-5xl font-bold">Why <span className="text-[#00FF66]">AI Agents</span> Win</h2>
-                    </div>
-
-                    <div className="overflow-x-auto rounded-[32px] border border-white/10 bg-black/40 backdrop-blur-3xl shadow-2xl">
-                        <table className="w-full text-left text-sm whitespace-nowrap">
-                            <thead className="bg-white/5 border-b border-white/10">
-                                <tr>
-                                    <th className="p-8 font-semibold text-gray-400">Capability</th>
-                                    <th className="p-8 font-bold text-white bg-[#00FF66]/10 border-x border-[#00FF66]/20 relative">
-                                        <div className="absolute top-0 left-0 w-full h-1 bg-[#00FF66]"></div>
-                                        FUPilot AI Agents
-                                    </th>
-                                    <th className="p-8 font-semibold text-gray-400">Traditional Tools</th>
-                                    <th className="p-8 font-semibold text-gray-400">AI Co-pilots</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/5">
-                                {[
-                                    { f: "Effort Required", c1: "0 Man-hours", c2: "High (Manual)", c3: "Medium (Prompting)" },
-                                    { f: "Execution Logic", c1: "Autonomous", c2: "Manual Input", c3: "Suggestion-based" },
-                                    { f: "Availability", c1: "24/7/365", c2: "User-dependent", c3: "User-dependent" },
-                                    { f: "Core Outcome", c1: "Results", c2: "Features", c3: "Advice" },
-                                    { f: "Scalability", c1: "Infinite", c2: "Linear", c3: "Linear" },
-                                    { f: "Management", c1: "None", c2: "Full-time", c3: "Assisted" }
-                                ].map((row, i) => (
-                                    <tr key={i} className="hover:bg-white/[0.02] transition-colors">
-                                        <td className="p-8 text-gray-300 font-medium">{row.f}</td>
-                                        <td className="p-8 bg-[#00FF66]/5 border-x border-[#00FF66]/10 text-[#00FF66] font-bold text-center">{row.c1}</td>
-                                        <td className="p-8 text-gray-400 text-center">{row.c2}</td>
-                                        <td className="p-8 text-gray-400 text-center">{row.c3}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                {/* === FINAL CTA === */}
-                <section className="glass-card p-16 rounded-[40px] text-center space-y-8 max-w-5xl mx-auto overflow-hidden relative border-white/5">
-                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#00FF66]/20 blur-[100px] rounded-full"></div>
-                    <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-blue-500/20 blur-[100px] rounded-full"></div>
-                    
-                    <div className="relative z-10 space-y-6">
-                        <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-tight italic">
-                            Stop Hiring Helpers. <br />
-                            <span className="text-[#00FF66] not-italic underline decoration-blue-500/50">Start Deploying Executors.</span>
-                        </h2>
-                        <p className="text-gray-400 text-xl max-w-2xl mx-auto font-medium">
-                            Join the next generation of founders who have replaced their manual workflows with autonomous agents.
-                        </p>
-                    </div>
-
-                    <div className="relative z-10 flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-                        <Link to="/auth">
-                            <Button className="bg-[#00FF66] text-black hover:bg-[#00CC52] font-black h-20 px-16 text-2xl rounded-3xl shadow-2xl shadow-[#00FF66]/30 transition-transform hover:scale-105 active:scale-95">
-                                Deploy Your Agents Now
-                            </Button>
-                        </Link>
-                    </div>
-                    <p className="relative z-10 text-[10px] text-gray-500 font-extrabold uppercase tracking-[0.4em]">Autonomous Workforce Platform v2.0</p>
-                </section>
-
-            </main>
-
-            <Footer />
+            {/* Scale */}
+            <GlowCard glowColor="pink" className="border-white/10 flex flex-col">
+              <h3 className="text-2xl font-bold mb-2">Scale</h3>
+              <p className="text-gray-400 mb-6 min-h-[48px]">Unlimited autonomous execution for enterprise operations.</p>
+              <div className="mb-8">
+                <span className="text-5xl font-black">Custom</span>
+              </div>
+              <ul className="flex flex-col gap-4 mb-8 flex-grow">
+                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-pink shrink-0" /><span className="text-gray-300">Unlimited Agents</span></li>
+                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-pink shrink-0" /><span className="text-gray-300">Unlimited Executions</span></li>
+                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-pink shrink-0" /><span className="text-gray-300">Custom Agent Builder API</span></li>
+                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-pink shrink-0" /><span className="text-gray-300">Dedicated Success Manager</span></li>
+                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-neon-pink shrink-0" /><span className="text-gray-300">On-prem deployment options</span></li>
+              </ul>
+              <Link to="/contact">
+                <button className="w-full py-3 rounded-xl border border-white/20 hover:bg-white/5 transition-colors font-semibold flex items-center justify-center gap-2">Contact Sales <ArrowRight className="w-4 h-4" /></button>
+              </Link>
+            </GlowCard>
+          </div>
         </div>
-    );
+      </main>
+
+      <MarketingFooter />
+    </div>
+  );
 };
 
 export default PricingPage;
