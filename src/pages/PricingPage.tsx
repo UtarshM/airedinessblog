@@ -67,7 +67,7 @@ const PricingPage = () => {
                 <h3 className="text-2xl font-bold mb-2">Pro Plan</h3>
                 <p className="text-gray-400 mb-6 min-h-[48px]">A full autonomous team for growing startups and agencies.</p>
                 <div className="mb-8">
-                  <span className="text-5xl font-black">${annual ? '129' : '149'}</span>
+                  <span className="text-5xl font-black">$149</span>
                   <span className="text-gray-400">/mo</span>
                 </div>
                 <ul className="flex flex-col gap-4 mb-8 flex-grow">
