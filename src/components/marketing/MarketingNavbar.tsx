@@ -24,12 +24,12 @@ export const MarketingNavbar = () => {
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="bg-neon-blue/10 p-2 rounded-lg border border-neon-blue/20 group-hover:border-neon-blue/50 transition-colors">
-              <Sparkles className="w-5 h-5 text-neon-blue" />
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-neon-blue to-neon-purple flex items-center justify-center">
+              <span className="text-sm font-black text-white">S</span>
             </div>
-            <span className="font-bold text-xl tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-neon-blue group-hover:to-neon-purple transition-all duration-300">
-              CoAgent<span className="text-neon-purple">.ai</span>
+            <span className="font-black text-xl tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-neon-blue group-hover:to-neon-purple transition-all duration-300">
+              Solo<span className="text-neon-blue">Web</span>
             </span>
           </Link>
 

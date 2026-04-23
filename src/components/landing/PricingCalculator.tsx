@@ -174,7 +174,7 @@ export const PricingCalculator = () => {
                                             <span className="text-[#00FF66]">${totalCurrentCost.toLocaleString()}/mo</span>
                                         </div>
                                         <div className="flex justify-between font-bold text-gray-300">
-                                            <span>FUPilot ({selectedAgents.length} Agents)</span>
+                                            <span>SoloWeb ({selectedAgents.length} Agents)</span>
                                             <span className="text-blue-500">${fupilotCost}/mo</span>
                                         </div>
                                     </div>

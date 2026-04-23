@@ -20,7 +20,7 @@ export const QuizSection = () => {
             </h2>
             
             <p className="text-xl text-muted-foreground leading-relaxed">
-              Take our quick quiz to see if FUPilot fits your goals, your workflow, and your team structure — no matter the size or industry.
+              Take our quick quiz to see if SoloWeb fits your goals, your workflow, and your team structure — no matter the size or industry.
             </p>
 
             <Button size="lg" className="h-16 px-10 text-xl bg-[#00FF66] text-black hover:bg-[#00CC52] font-black rounded-2xl shadow-xl shadow-[#00FF66]/20 transition-all hover:scale-105 active:scale-95 group">

@@ -16,7 +16,7 @@ export const SocialProof = () => {
                         {
                             name: "Marcus K.",
                             role: "SaaS Founder",
-                            text: "I completely fired my expensive content agency out of nowhere. FUPilot is outputting 30 articles a month that genuinely sound like I wrote them. Traffic is up 240% since last quarter.",
+                            text: "I completely fired my expensive content agency out of nowhere. SoloWeb is outputting 30 articles a month that genuinely sound like I wrote them. Traffic is up 240% since last quarter.",
                             stars: 5
                         },
                         {
@@ -28,7 +28,7 @@ export const SocialProof = () => {
                         {
                             name: "David L.",
                             role: "Agency Director",
-                            text: "Managing 15 clients used to be a nightmare. Now I deploy the FUPilot Analytics and Marketing agents, and they handle the heavy lifting for me. Our margins have tripled.",
+                            text: "Managing 15 clients used to be a nightmare. Now I deploy the SoloWeb Analytics and Marketing agents, and they handle the heavy lifting for me. Our margins have tripled.",
                             stars: 5
                         }
                     ].map((item, idx) => (

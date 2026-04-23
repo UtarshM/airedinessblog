@@ -142,8 +142,8 @@ const DashboardPage = () => {
       {/* Welcome Header */}
       <div className="flex items-center justify-between border-b pb-4">
         <div>
-          <h1 className="text-2xl font-bold">Welcome back to BlogForge</h1>
-          <p className="text-muted-foreground text-sm mt-1">Ready to create high-quality, SEO-optimized blog content?</p>
+          <h1 className="text-2xl font-bold">Welcome back to <span className="text-gradient">SoloWeb</span></h1>
+          <p className="text-muted-foreground text-sm mt-1">Your AI-powered marketing platform. Select a project to get started.</p>
         </div>
         <div className="flex items-center gap-4">
           <Button variant="default" className="shadow-sm">Quick Tour</Button>

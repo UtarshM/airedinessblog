@@ -14,7 +14,7 @@ export const SolutionSection = () => {
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF66] to-blue-500">Agents Deliver Results.</span>
                         </h2>
                         <p className="text-xl text-muted-foreground leading-relaxed">
-                            Software used to be a tool you operated. FUPilot is a workforce that operates itself. 
+                            Software used to be a tool you operated. SoloWeb is a workforce that operates itself. 
                             Our agents don't suggest improvements—they execute them. They don't assist your team—they replace the manual workflows that hold you back.
                         </p>
 
