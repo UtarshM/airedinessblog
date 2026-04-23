@@ -1,79 +1,247 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useProjects } from "@/hooks/useProjects";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { Globe, Loader2, CheckCircle2, ArrowRight } from "lucide-react";
 
 interface CreateProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+interface BrandData {
+  brand_name: string;
+  brand_tagline: string;
+  brand_description: string;
+  og_image_url: string;
+}
+
+async function fetchSiteMetadata(url: string): Promise<Partial<BrandData>> {
+  try {
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxyUrl);
+    const data = await res.json();
+    const html: string = data.contents;
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    const getMeta = (name: string) =>
+      doc.querySelector(`meta[name="${name}"]`)?.getAttribute("content") ||
+      doc.querySelector(`meta[property="${name}"]`)?.getAttribute("content") ||
+      "";
+
+    const title =
+      getMeta("og:site_name") ||
+      getMeta("og:title") ||
+      doc.querySelector("title")?.textContent ||
+      "";
+    const description =
+      getMeta("og:description") || getMeta("description") || "";
+    const tagline = getMeta("og:title") || "";
+    const image = getMeta("og:image") || "";
+
+    return {
+      brand_name: title.trim(),
+      brand_tagline: tagline.trim(),
+      brand_description: description.trim(),
+      og_image_url: image.trim(),
+    };
+  } catch {
+    return {};
+  }
+}
+
 export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogProps) {
-  const [name, setName] = useState("");
+  const { user } = useAuth();
+  const { canAddProject, currentPlan, projectLimit, addProject } = useProjects();
+  const [step, setStep] = useState<1 | 2>(1);
   const [domain, setDomain] = useState("");
-  const { addProject } = useProjects();
+  const [isFetching, setIsFetching] = useState(false);
+  const [fetched, setFetched] = useState(false);
+  const [brand, setBrand] = useState<BrandData>({
+    brand_name: "",
+    brand_tagline: "",
+    brand_description: "",
+    og_image_url: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const normalizeUrl = (raw: string) => {
+    if (!raw.startsWith("http://") && !raw.startsWith("https://")) {
+      return `https://${raw}`;
+    }
+    return raw;
+  };
+
+  const handleFetch = async () => {
+    if (!domain) return;
+    setIsFetching(true);
+    const url = normalizeUrl(domain);
+    const meta = await fetchSiteMetadata(url);
+    setBrand({
+      brand_name: meta.brand_name || domain,
+      brand_tagline: meta.brand_tagline || "",
+      brand_description: meta.brand_description || "",
+      og_image_url: meta.og_image_url || "",
+    });
+    setFetched(true);
+    setIsFetching(false);
+    setStep(2);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !domain) return;
-
+    if (!user) return;
+    if (!canAddProject) {
+      toast.error(`Your ${currentPlan} plan is limited to ${projectLimit} project(s). Upgrade to add more.`);
+      return;
+    }
+    setIsSubmitting(true);
     try {
-      await addProject.mutateAsync({ name, domain });
-      onOpenChange(false);
-      setName("");
-      setDomain("");
-    } catch (error) {
-      // Error is handled by the mutation's onError
+      // Insert project with brand data
+      const { error } = await supabase.from("projects").insert([
+        {
+          user_id: user.id,
+          name: brand.brand_name || domain,
+          domain: normalizeUrl(domain),
+          brand_name: brand.brand_name,
+          brand_tagline: brand.brand_tagline,
+          brand_description: brand.brand_description,
+          og_image_url: brand.og_image_url,
+        },
+      ]);
+      if (error) throw error;
+      toast.success("Project created!");
+      handleClose();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create project");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  const handleClose = () => {
+    onOpenChange(false);
+    setStep(1);
+    setDomain("");
+    setFetched(false);
+    setBrand({ brand_name: "", brand_tagline: "", brand_description: "", og_image_url: "" });
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle>Create Project</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Globe className="h-5 w-5 text-primary" />
+            {step === 1 ? "Add Your Website" : "Brand Workspace Setup"}
+          </DialogTitle>
           <DialogDescription>
-            Add a new project to your workspace. You can manage content specifically for this domain.
+            {step === 1
+              ? "Enter your website URL and we'll automatically fetch your brand details."
+              : "Review and edit your brand information before creating the project."}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
+
+        {step === 1 && (
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="domain">Website URL</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="domain"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  placeholder="example.com"
+                  onKeyDown={(e) => e.key === "Enter" && handleFetch()}
+                />
+                <Button onClick={handleFetch} disabled={!domain || isFetching}>
+                  {isFetching ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>Fetch <ArrowRight className="ml-1 h-4 w-4" /></>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                We'll scan your website for the brand name, tagline, and description.
+              </p>
+            </div>
+            <Button variant="ghost" className="w-full text-muted-foreground" onClick={() => { setStep(2); }}>
+              Skip — Enter manually
+            </Button>
+          </div>
+        )}
+
+        {step === 2 && (
+          <form onSubmit={handleSubmit} className="py-2 space-y-4">
+            {brand.og_image_url && (
+              <div className="w-full h-28 rounded-lg overflow-hidden border">
+                <img src={brand.og_image_url} alt="OG" className="w-full h-full object-cover" />
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="brand_name">Brand Name</Label>
               <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="My Blog"
-                className="col-span-3"
+                id="brand_name"
+                value={brand.brand_name}
+                onChange={(e) => setBrand({ ...brand, brand_name: e.target.value })}
+                placeholder="My Brand"
+                required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="domain" className="text-right">
-                Domain
-              </Label>
+            <div className="space-y-2">
+              <Label htmlFor="brand_tagline">Brand Tagline</Label>
               <Input
-                id="domain"
+                id="brand_tagline"
+                value={brand.brand_tagline}
+                onChange={(e) => setBrand({ ...brand, brand_tagline: e.target.value })}
+                placeholder="AI-Powered Marketing Automation"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="brand_description">Brand Description</Label>
+              <Textarea
+                id="brand_description"
+                value={brand.brand_description}
+                onChange={(e) => setBrand({ ...brand, brand_description: e.target.value })}
+                placeholder="Describe your brand..."
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="domain_display">Website Domain</Label>
+              <Input
+                id="domain_display"
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
                 placeholder="example.com"
-                className="col-span-3"
+                required
               />
             </div>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={addProject.isPending || !name || !domain}>
-              {addProject.isPending ? "Creating..." : "Create Project"}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter className="gap-2">
+              <Button type="button" variant="outline" onClick={() => setStep(1)}>
+                Back
+              </Button>
+              <Button type="submit" disabled={isSubmitting || !brand.brand_name || !domain}>
+                {isSubmitting ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating...</>
+                ) : (
+                  <><CheckCircle2 className="mr-2 h-4 w-4" /> Create Project</>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );
