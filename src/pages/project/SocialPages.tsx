@@ -40,8 +40,8 @@ export function SocialPostsPage() {
   const { project } = useProject();
   const qc = useQueryClient();
 
-  // Step: "connect" | "scanning" | "dashboard" | "ideas"
-  const [step, setStep] = useState<"connect" | "scanning" | "dashboard" | "ideas">("connect");
+  // Step: "dashboard" | "connect" | "scanning" | "ideas"
+  const [step, setStep] = useState<"dashboard" | "connect" | "scanning" | "ideas">("dashboard");
   const [igInput, setIgInput] = useState("");
   const [profile, setProfile] = useState<InstagramProfile | null>(null);
   const [ideas, setIdeas] = useState<PostIdea[]>([]);
@@ -118,15 +118,14 @@ export function SocialPostsPage() {
   };
 
   const handleGenerateIdeas = async () => {
-    if (!profile) return;
     setGeneratingIdeas(true);
     setStep("ideas");
     const generated = await generatePostIdeas({
       brandName: project.brand_name || project.name,
       brandDescription: project.brand_description || "",
-      instagramBio: profile.bio,
-      recentCaptions: profile.recentCaptions,
-      recentHashtags: profile.recentHashtags,
+      instagramBio: profile?.bio || "",
+      recentCaptions: profile?.recentCaptions || [],
+      recentHashtags: profile?.recentHashtags || [],
     });
     setIdeas(generated);
     setGeneratingIdeas(false);
@@ -202,14 +201,25 @@ export function SocialPostsPage() {
           <p className="text-sm text-muted-foreground mt-0.5">Create and schedule Instagram content with AI</p>
         </div>
         <div className="flex gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-white/10 text-muted-foreground"
-            onClick={() => { setStep("connect"); setIgInput(""); }}
-          >
-            <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Change Account
-          </Button>
+          {profile ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-white/10 text-muted-foreground"
+              onClick={() => { setStep("connect"); setIgInput(""); }}
+            >
+              <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Change Account
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-white/10 text-muted-foreground"
+              onClick={() => { setStep("connect"); setIgInput(""); }}
+            >
+              <Instagram className="h-3.5 w-3.5 mr-1.5" /> Connect Instagram
+            </Button>
+          )}
           <Button
             size="sm"
             className="bg-gradient-to-r from-[#00f0ff] to-[#7000ff] text-white"
@@ -220,8 +230,8 @@ export function SocialPostsPage() {
         </div>
       </div>
 
-      {/* Instagram Profile Card */}
-      {profile && (
+      {/* Instagram Profile Card OR Default Generate Card */}
+      {profile ? (
         <div className="rounded-xl border border-white/10 bg-white/5 p-5 flex items-start gap-5">
           <div className="relative shrink-0">
             {profile.profilePicUrl ? (
@@ -261,6 +271,23 @@ export function SocialPostsPage() {
           >
             <Sparkles className="h-4 w-4 mr-2" />
             Generate Post Ideas
+          </Button>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-white/10 bg-white/5 p-6 flex flex-col sm:flex-row items-center gap-5 justify-between">
+          <div>
+            <h3 className="font-bold text-lg mb-1">Generate AI Post Ideas</h3>
+            <p className="text-sm text-muted-foreground">
+              Create engaging content based on your project's brand name and description. Connect your Instagram for personalized suggestions.
+            </p>
+          </div>
+          <Button
+            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white shrink-0 shadow-lg shadow-pink-500/20"
+            onClick={handleGenerateIdeas}
+            disabled={generatingIdeas}
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Generate Ideas
           </Button>
         </div>
       )}
