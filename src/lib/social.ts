@@ -1,0 +1,213 @@
+// ────────────────────────────────────────────────────────────────────────────
+// Instagram Profile Scraper (public profiles via CORS proxy)
+// ────────────────────────────────────────────────────────────────────────────
+
+export interface InstagramProfile {
+  handle: string;
+  fullName: string;
+  bio: string;
+  profilePicUrl: string;
+  followersCount: string;
+  postsCount: string;
+  isPrivate: boolean;
+  recentCaptions: string[];
+  recentHashtags: string[];
+}
+
+function extractHashtags(text: string): string[] {
+  const matches = text.match(/#[\w]+/g) || [];
+  return [...new Set(matches)].slice(0, 30);
+}
+
+function cleanHandle(input: string): string {
+  return input
+    .replace(/https?:\/\/(www\.)?instagram\.com\/?/i, "")
+    .replace(/\/$/, "")
+    .replace(/@/g, "")
+    .trim();
+}
+
+export async function fetchInstagramProfile(handleOrUrl: string): Promise<InstagramProfile> {
+  const handle = cleanHandle(handleOrUrl);
+  const url = `https://www.instagram.com/${handle}/`;
+
+  try {
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxyUrl);
+    const data = await res.json();
+    const html: string = data.contents || "";
+
+    // Try to extract JSON data embedded in the page
+    let profileData: any = {};
+
+    // Method 1: try _sharedData JSON
+    const sharedDataMatch = html.match(/window\._sharedData\s*=\s*({.+?});<\/script>/);
+    if (sharedDataMatch) {
+      try {
+        const parsed = JSON.parse(sharedDataMatch[1]);
+        const user = parsed?.entry_data?.ProfilePage?.[0]?.graphql?.user;
+        if (user) {
+          profileData = user;
+        }
+      } catch {}
+    }
+
+    // Method 2: try __additionalDataLoaded JSON
+    if (!profileData.username) {
+      const additionalMatch = html.match(/"user":\s*({.+?"edge_followed_by".+?})/);
+      if (additionalMatch) {
+        try {
+          profileData = JSON.parse(additionalMatch[1]);
+        } catch {}
+      }
+    }
+
+    // Extract meta tags as fallback
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const getMeta = (prop: string) =>
+      doc.querySelector(`meta[property="${prop}"]`)?.getAttribute("content") ||
+      doc.querySelector(`meta[name="${prop}"]`)?.getAttribute("content") ||
+      "";
+
+    const ogDesc = getMeta("og:description");
+    const ogImage = getMeta("og:image");
+    const ogTitle = getMeta("og:title");
+
+    // Parse followers from description like "1.2M Followers, 500 Following, 320 Posts"
+    const followersMatch = ogDesc.match(/([\d,.KMk]+)\s*Followers?/i);
+    const postsMatch = ogDesc.match(/([\d,]+)\s*Posts?/i);
+
+    // Extract captions from page scripts
+    const captionMatches = html.match(/"text":"([^"]{10,300})"/g) || [];
+    const captions = captionMatches
+      .map((m) => m.replace(/"text":"/, "").replace(/"$/, ""))
+      .filter((c) => !c.startsWith("http") && c.length > 20)
+      .slice(0, 10);
+
+    const allHashtags = captions.flatMap(extractHashtags);
+
+    return {
+      handle,
+      fullName: profileData.full_name || ogTitle?.split(" (@")[0] || handle,
+      bio: profileData.biography || ogDesc || "",
+      profilePicUrl: profileData.profile_pic_url_hd || profileData.profile_pic_url || ogImage || "",
+      followersCount: profileData.edge_followed_by?.count?.toLocaleString() ||
+        followersMatch?.[1] || "—",
+      postsCount: profileData.edge_owner_to_timeline_media?.count?.toLocaleString() ||
+        postsMatch?.[1] || "—",
+      isPrivate: profileData.is_private || false,
+      recentCaptions: captions,
+      recentHashtags: [...new Set(allHashtags)].slice(0, 20),
+    };
+  } catch (e) {
+    console.error("Instagram fetch error:", e);
+    // Return minimal data if fetch fails
+    return {
+      handle,
+      fullName: handle,
+      bio: "",
+      profilePicUrl: "",
+      followersCount: "—",
+      postsCount: "—",
+      isPrivate: false,
+      recentCaptions: [],
+      recentHashtags: [],
+    };
+  }
+}
+
+
+// ────────────────────────────────────────────────────────────────────────────
+// AI Post Idea Generator via Pollinations AI (free, no key required)
+// ────────────────────────────────────────────────────────────────────────────
+
+export interface PostIdea {
+  id: string;
+  type: "educational" | "promotional" | "engagement" | "story" | "product";
+  caption: string;
+  hashtags: string[];
+  imagePrompt: string;
+  hook: string;
+}
+
+export async function generatePostIdeas(params: {
+  brandName: string;
+  brandDescription: string;
+  instagramBio: string;
+  recentCaptions: string[];
+  recentHashtags: string[];
+  niche?: string;
+}): Promise<PostIdea[]> {
+  const { brandName, brandDescription, instagramBio, recentCaptions, recentHashtags } = params;
+
+  const prompt = `You are an expert Instagram content strategist. Generate 5 high-performing Instagram post ideas for this brand.
+
+Brand: ${brandName}
+Description: ${brandDescription || "Not provided"}
+Instagram Bio: ${instagramBio || "Not provided"}
+Recent Post Samples: ${recentCaptions.slice(0, 3).join(" | ") || "None"}
+Common Hashtags: ${recentHashtags.slice(0, 10).join(", ") || "None"}
+
+Return ONLY a valid JSON array with exactly 5 objects. Each object must have:
+- "id": unique string like "idea_1"
+- "type": one of "educational", "promotional", "engagement", "story", "product"
+- "hook": a powerful opening line (max 15 words)
+- "caption": full Instagram caption (150-300 chars, engaging, with emojis)
+- "hashtags": array of 15-20 relevant hashtags (without # symbol)
+- "imagePrompt": a detailed visual description for image generation (describe the scene, style, colors)
+
+Make captions authentic, engaging, and platform-native. Mix the types across the 5 posts.`;
+
+  try {
+    const encodedPrompt = encodeURIComponent(prompt);
+    const res = await fetch(
+      `https://text.pollinations.ai/${encodedPrompt}?model=openai&json=true`,
+      { method: "GET" }
+    );
+    const text = await res.text();
+
+    // Extract JSON array from response
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) throw new Error("No JSON array found");
+
+    const ideas: PostIdea[] = JSON.parse(jsonMatch[0]);
+    return ideas.map((idea, i) => ({
+      ...idea,
+      id: idea.id || `idea_${i + 1}`,
+    }));
+  } catch (e) {
+    console.error("AI generation error:", e);
+    // Fallback ideas
+    return [
+      {
+        id: "idea_1",
+        type: "educational",
+        hook: "Did you know this about your industry?",
+        caption: `🧠 Here's something most people don't know about ${brandName}...\n\nWe believe in sharing knowledge that helps you grow. Drop a 💡 if this was helpful!`,
+        hashtags: ["tips", "didyouknow", "knowledge", "growth", "business"],
+        imagePrompt: `Clean, minimalist flat lay with text overlay, professional lighting, brand colors`,
+      },
+      {
+        id: "idea_2",
+        type: "engagement",
+        hook: "Which one would you choose?",
+        caption: `🤔 This or that? Tell us in the comments below!\n\nWe love hearing from our community. Your opinion matters to us 💬`,
+        hashtags: ["poll", "community", "thisorthat", "engagement", "share"],
+        imagePrompt: `Split image showing two contrasting options, vibrant colors, bold typography`,
+      },
+    ];
+  }
+}
+
+
+// ────────────────────────────────────────────────────────────────────────────
+// Image generation via Pollinations AI
+// ────────────────────────────────────────────────────────────────────────────
+
+export function generatePollinationsImageUrl(prompt: string, width = 1080, height = 1080): string {
+  const encodedPrompt = encodeURIComponent(
+    `${prompt}, instagram post, professional photography, high quality, 4K`
+  );
+  return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&nologo=true`;
+}

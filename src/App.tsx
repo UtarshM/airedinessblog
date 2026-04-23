@@ -37,7 +37,9 @@ import { ManagePostsPage, BrandIdentityPage } from "@/pages/Placeholders";
 import { ProjectLayout } from "@/pages/project/ProjectLayout";
 import { ProjectOverviewPage } from "@/pages/project/ProjectOverviewPage";
 import { KeywordResearchPage } from "@/pages/project/KeywordResearchPage";
-import { SocialPostsPage, SocialCalendarPage, SocialReelsPage } from "@/pages/project/SocialPages";
+import { SocialPostsPage } from "@/pages/project/SocialPages";
+import { SocialCalendarPage } from "@/pages/project/SocialCalendarPage";
+import { ComingSoonPage } from "@/pages/project/ComingSoonPage";
 import { MetaAdsPage, MetaAdsAnalyticsPage, GoogleAdsPage, GoogleAdsAnalyticsPage } from "@/pages/project/AdsPages";
 import { SeoKeywordsPage, BacklinksPage } from "@/pages/project/SeoPages";
 import { AeoPromptGenerationPage, AeoAnalyticsPage, AeoVisibilityScorePage, AeoOpportunitiesPage } from "@/pages/project/AeoPages";
@@ -92,10 +94,9 @@ const App = () => (
                 <Route path="/project/:projectId/manage-posts" element={<ProjectLayout><ManagePostsPage /></ProjectLayout>} />
                 <Route path="/project/:projectId/calendar" element={<ProjectLayout><CalendarPage /></ProjectLayout>} />
 
-                {/* Social Media */}
                 <Route path="/project/:projectId/social-posts" element={<ProjectLayout><SocialPostsPage /></ProjectLayout>} />
                 <Route path="/project/:projectId/social-calendar" element={<ProjectLayout><SocialCalendarPage /></ProjectLayout>} />
-                <Route path="/project/:projectId/social-reels" element={<ProjectLayout><SocialReelsPage /></ProjectLayout>} />
+                <Route path="/project/:projectId/social-reels" element={<ProjectLayout><ComingSoonPage title="Video / Reel Generation" description="Generate short-form video scripts and reels from your blog content." features={["AI Video Script","Reel Storyboard","Auto-captioning"]} /></ProjectLayout>} />
 
                 {/* Performance Ads */}
                 <Route path="/project/:projectId/ads/meta" element={<ProjectLayout><MetaAdsPage /></ProjectLayout>} />
