@@ -68,6 +68,7 @@ const AppSidebar = () => {
       color: "text-pink-500",
       items: [
         { to: `/project/${pid}/social-posts`, label: "Post Creation", icon: Share2 },
+        { to: `/project/${pid}/social-image`, label: "Image Generation", icon: ImageIcon },
         { to: `/project/${pid}/social-calendar`, label: "Scheduling Calendar", icon: Calendar },
         { to: `/project/${pid}/social-reels`, label: "Video / Reel Generation", icon: Video, badge: "Soon" },
       ],

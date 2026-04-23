@@ -39,6 +39,7 @@ import { ProjectOverviewPage } from "@/pages/project/ProjectOverviewPage";
 import { KeywordResearchPage } from "@/pages/project/KeywordResearchPage";
 import { SocialPostsPage } from "@/pages/project/SocialPages";
 import { SocialCalendarPage } from "@/pages/project/SocialCalendarPage";
+import { SocialImageGenerationPage } from "@/pages/project/SocialImageGenerationPage";
 import { ComingSoonPage } from "@/pages/project/ComingSoonPage";
 import { MetaAdsPage, MetaAdsAnalyticsPage, GoogleAdsPage, GoogleAdsAnalyticsPage } from "@/pages/project/AdsPages";
 import { SeoKeywordsPage, BacklinksPage } from "@/pages/project/SeoPages";
@@ -95,6 +96,7 @@ const App = () => (
                 <Route path="/project/:projectId/calendar" element={<ProjectLayout><CalendarPage /></ProjectLayout>} />
 
                 <Route path="/project/:projectId/social-posts" element={<ProjectLayout><SocialPostsPage /></ProjectLayout>} />
+                <Route path="/project/:projectId/social-image" element={<ProjectLayout><SocialImageGenerationPage /></ProjectLayout>} />
                 <Route path="/project/:projectId/social-calendar" element={<ProjectLayout><SocialCalendarPage /></ProjectLayout>} />
                 <Route path="/project/:projectId/social-reels" element={<ProjectLayout><ComingSoonPage title="Video / Reel Generation" description="Generate short-form video scripts and reels from your blog content." features={["AI Video Script","Reel Storyboard","Auto-captioning"]} /></ProjectLayout>} />
 
