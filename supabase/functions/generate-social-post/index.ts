@@ -12,16 +12,68 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const openrouterKey = Deno.env.get("OPENROUTER_API_KEY");
-    if (!openrouterKey) {
-      throw new Error("OPENROUTER_API_KEY not configured");
+    const fireworksKey = Deno.env.get("FIREWORKS_API_KEY");
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const body = await req.json();
+    const { type, prompt: userPrompt, brandName, brandDescription } = body;
+
+    // ── 1. HIGH-QUALITY IMAGE GENERATION (FIREWORKS) ─────────────────────────
+    if (type === "image") {
+      if (!fireworksKey) throw new Error("FIREWORKS_API_KEY not configured");
+      
+      console.log("Generating high-quality image via Fireworks...");
+      const res = await fetch(
+        "https://api.fireworks.ai/inference/v1/image_generation/accounts/fireworks/models/playground-v2-5-1024px-aesthetic",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${fireworksKey}`,
+            "Content-Type": "application/json",
+            Accept: "image/jpeg",
+          },
+          body: JSON.stringify({
+            prompt: userPrompt,
+            negative_prompt: "text, watermark, logo, signature, ugly, deformed, blurry, low quality, low resolution, bad anatomy, extra limbs, missing limbs, floating objects, cartoon, anime, painting",
+            height: 1024,
+            width: 1024,
+            num_inference_steps: 30,
+            guidance_scale: 7.5,
+            samples: 1,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Fireworks error: ${errorText}`);
+      }
+
+      const imageData = await res.arrayBuffer();
+      const fileName = `social/${Date.now()}.jpg`;
+
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("blog-images") // Reusing existing bucket
+        .upload(fileName, new Uint8Array(imageData), {
+          contentType: "image/jpeg",
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from("blog-images").getPublicUrl(uploadData.path);
+      return new Response(JSON.stringify({ imageUrl: publicUrl }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    const body = await req.json();
-    const { refineOnly, prompt: userPrompt, brandName, brandDescription } = body;
-
-    // Handle Prompt Refinement for Image Generation
-    if (refineOnly) {
+    // ── 2. PROMPT REFINEMENT (OPENROUTER) ────────────────────────────────────
+    if (body.refineOnly) {
+      if (!openrouterKey) throw new Error("OPENROUTER_API_KEY not configured");
       const refineSysPrompt = `You are an expert AI image prompt engineer. Your job is to take a simple image description and turn it into a high-quality, detailed prompt for photorealistic image generation.
 Include: subject, environment, lighting (golden hour, soft diffused, etc.), camera angle, and professional mood.
 Output ONLY the refined prompt, no quotes, no explanation. Maximum 40 words. 
@@ -29,10 +81,7 @@ End with keywords like: DSLR photography, 4K, sharp focus, masterpiece.`;
 
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${openrouterKey}`,
-          "Content-Type": "application/json",
-        },
+        headers: { Authorization: `Bearer ${openrouterKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "openai/gpt-4o-mini",
           messages: [
@@ -49,7 +98,8 @@ End with keywords like: DSLR photography, 4K, sharp focus, masterpiece.`;
       });
     }
 
-    // Handle Post Ideas Generation
+    // ── 3. POST IDEAS GENERATION (OPENROUTER) ────────────────────────────────
+    if (!openrouterKey) throw new Error("OPENROUTER_API_KEY not configured");
     const { instagramBio, recentCaptions, recentHashtags } = body;
     const genPrompt = `You are an expert Instagram content strategist. Generate 5 high-performing Instagram post ideas for this brand.
 
@@ -71,10 +121,7 @@ Make captions authentic, engaging, and platform-native. Mix the types across the
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${openrouterKey}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${openrouterKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "openai/gpt-4o-mini",
         messages: [{ role: "user", content: genPrompt }],

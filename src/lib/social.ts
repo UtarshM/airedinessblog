@@ -225,3 +225,13 @@ export function generatePollinationsImageUrl(prompt: string, width = 1080, heigh
   );
   return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&nologo=true`;
 }
+
+export async function generateHighQualityImage(prompt: string): Promise<string> {
+  const { data, error } = await supabase.functions.invoke("generate-social-post", {
+    body: { type: "image", prompt },
+  });
+
+  if (error) throw error;
+  if (data && data.imageUrl) return data.imageUrl;
+  throw new Error("Failed to generate image URL");
+}

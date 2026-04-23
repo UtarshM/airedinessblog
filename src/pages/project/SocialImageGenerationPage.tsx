@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ImageIcon, Loader2, Sparkles, Download, Save, RefreshCw, Send } from "lucide-react";
-import { generatePollinationsImageUrl } from "@/lib/social";
+import { generatePollinationsImageUrl, generateHighQualityImage } from "@/lib/social";
 import { SocialPostEditor } from "@/components/SocialPostEditor";
 
 export function SocialImageGenerationPage() {
@@ -53,13 +53,14 @@ export function SocialImageGenerationPage() {
     
     setGenerating(true);
     try {
-      // Small artificial delay to show loading state nicely
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const url = await generateHighQualityImage(prompt.trim());
+      setImageUrl(url);
+      toast.success("High-quality image generated!");
+    } catch (e: any) {
+      console.error("High-quality generation failed, falling back:", e);
       const url = generatePollinationsImageUrl(prompt.trim());
       setImageUrl(url);
-      toast.success("Image generated successfully!");
-    } catch (e: any) {
-      toast.error("Failed to generate image: " + e.message);
+      toast.info("Generated via fallback engine");
     } finally {
       setGenerating(false);
     }

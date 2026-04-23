@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { generatePollinationsImageUrl, PostIdea } from "@/lib/social";
+import { generatePollinationsImageUrl, generateHighQualityImage, PostIdea } from "@/lib/social";
 import {
   Instagram, Facebook, Linkedin, X, Calendar, Send, FileText,
   RefreshCw, Loader2, Hash, ImageIcon, Sparkles, Clock
@@ -65,15 +65,24 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
     }
   }, [idea, existingPost, open]);
 
-  const handleGenerateImage = () => {
+  const handleGenerateImage = async () => {
     if (!imagePrompt) {
       toast.error("Add an image prompt first");
       return;
     }
     setGeneratingImage(true);
-    const url = generatePollinationsImageUrl(imagePrompt);
-    setImageUrl(url);
-    setGeneratingImage(false);
+    try {
+      const url = await generateHighQualityImage(imagePrompt);
+      setImageUrl(url);
+      toast.success("High-quality image generated!");
+    } catch (e) {
+      console.error("Fireworks failed, falling back to Pollinations:", e);
+      const url = generatePollinationsImageUrl(imagePrompt);
+      setImageUrl(url);
+      toast.info("Generated via fallback engine");
+    } finally {
+      setGeneratingImage(false);
+    }
   };
 
   const handleAddHashtag = (e: React.KeyboardEvent) => {
