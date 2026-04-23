@@ -102,6 +102,94 @@ const PricingPage = () => {
               </Link>
             </GlowCard>
           </div>
+
+          {/* Feature Comparison Table */}
+          <div className="mt-32 max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Compare Features</h2>
+              <p className="text-gray-400">A detailed breakdown of what's included in each plan.</p>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th className="py-4 px-6 text-gray-400 font-medium">Features</th>
+                    <th className="py-4 px-6 text-white font-bold text-center">Starter Free</th>
+                    <th className="py-4 px-6 text-neon-purple font-bold text-center">Pro Plan</th>
+                    <th className="py-4 px-6 text-neon-pink font-bold text-center">Enterprise Custom</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-300">
+                  <tr className="border-b border-white/5 bg-white/[0.02]">
+                    <td className="py-4 px-6">Projects</td>
+                    <td className="py-4 px-6 text-center">1 Project</td>
+                    <td className="py-4 px-6 text-center">5 Projects</td>
+                    <td className="py-4 px-6 text-center">Unlimited</td>
+                  </tr>
+                  <tr className="border-b border-white/5">
+                    <td className="py-4 px-6">AI Blog Generation</td>
+                    <td className="py-4 px-6 text-center">5 / month</td>
+                    <td className="py-4 px-6 text-center">Unlimited</td>
+                    <td className="py-4 px-6 text-center">Unlimited</td>
+                  </tr>
+                  <tr className="border-b border-white/5">
+                    <td className="py-4 px-6">Social Media Posts</td>
+                    <td className="py-4 px-6 text-center">5 / month</td>
+                    <td className="py-4 px-6 text-center">Unlimited</td>
+                    <td className="py-4 px-6 text-center">Unlimited</td>
+                  </tr>
+                  <tr className="border-b border-white/5 bg-white/[0.02]">
+                    <td className="py-4 px-6">Site Audit & Scheduling</td>
+                    <td className="py-4 px-6 text-center"><CheckCircle2 className="w-5 h-5 text-neon-blue mx-auto" /></td>
+                    <td className="py-4 px-6 text-center"><CheckCircle2 className="w-5 h-5 text-neon-purple mx-auto" /></td>
+                    <td className="py-4 px-6 text-center"><CheckCircle2 className="w-5 h-5 text-neon-pink mx-auto" /></td>
+                  </tr>
+                  <tr className="border-b border-white/5">
+                    <td className="py-4 px-6">AEO & GEO Optimization</td>
+                    <td className="py-4 px-6 text-center text-gray-600">—</td>
+                    <td className="py-4 px-6 text-center"><CheckCircle2 className="w-5 h-5 text-neon-purple mx-auto" /></td>
+                    <td className="py-4 px-6 text-center"><CheckCircle2 className="w-5 h-5 text-neon-pink mx-auto" /></td>
+                  </tr>
+                  <tr className="border-b border-white/5 bg-white/[0.02]">
+                    <td className="py-4 px-6">Meta & Google Ads Optimization</td>
+                    <td className="py-4 px-6 text-center text-gray-600">—</td>
+                    <td className="py-4 px-6 text-center text-gray-600">—</td>
+                    <td className="py-4 px-6 text-center"><CheckCircle2 className="w-5 h-5 text-neon-pink mx-auto" /></td>
+                  </tr>
+                  <tr className="border-b border-white/5">
+                    <td className="py-4 px-6">Brand Analytics & Competitor Tracking</td>
+                    <td className="py-4 px-6 text-center text-gray-600">—</td>
+                    <td className="py-4 px-6 text-center text-gray-600">—</td>
+                    <td className="py-4 px-6 text-center"><CheckCircle2 className="w-5 h-5 text-neon-pink mx-auto" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* FAQs */}
+          <div className="mt-32 max-w-3xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+              <p className="text-gray-400">Everything you need to know about our billing and plans.</p>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                <h4 className="text-lg font-bold mb-2">Can I upgrade or downgrade my plan at any time?</h4>
+                <p className="text-gray-400 leading-relaxed">Yes! You can switch plans at any point. If you upgrade, you'll be prorated for the remainder of your billing cycle. If you downgrade, the new rate will apply at the start of your next billing cycle.</p>
+              </div>
+              <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                <h4 className="text-lg font-bold mb-2">What is AEO and GEO?</h4>
+                <p className="text-gray-400 leading-relaxed">AEO (Answer Engine Optimization) and GEO (Generative Engine Optimization) are the next evolution of SEO. Our AI optimizes your content specifically so it gets sourced and cited by AI models like ChatGPT, Perplexity, and Google Gemini.</p>
+              </div>
+              <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                <h4 className="text-lg font-bold mb-2">Do I need a credit card for the Starter Free plan?</h4>
+                <p className="text-gray-400 leading-relaxed">No credit card is required for the Starter Free plan. You can use your 5 free blogs, 5 social media posts, and run a site audit completely free to test the waters.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 

@@ -1,5 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useProjects } from "@/hooks/useProjects";
+import { CreateProjectDialog } from "@/components/CreateProjectDialog";
+import { useState } from "react";
 import {
   Edit,
   Layers,
@@ -15,16 +18,13 @@ import {
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 const AppSidebar = () => {
   const { user, signOut } = useAuth();
   const location = useLocation();
-
-  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'My';
-
-  const workspaces = [
-    { id: "1", name: `${userName}'s Workspace` }
-  ];
+  const { projects, canAddProject, currentPlan, projectLimit } = useProjects();
+  const [projectDialogOpen, setProjectDialogOpen] = useState(false);
 
   const contentLinks = [
     { to: "/generate", label: "Single Post Creation", icon: Edit },
@@ -79,48 +79,86 @@ const AppSidebar = () => {
   );
 
   return (
-    <aside className="w-64 gradient-sidebar flex flex-col min-h-screen border-r border-sidebar-border">
-      <div className="p-4 flex items-center gap-2 border-b border-sidebar-border/50">
-        <Link to="/dashboard" className="flex items-center group flex-1">
-          <img src="/fupilot.webp" alt="FUPilot Logo" className="h-8 w-auto" />
-        </Link>
-      </div>
-
-      <div className="p-4">
-        <Button className="w-full flex justify-start gap-2 shadow-sm" size="sm">
-          <Plus className="h-4 w-4" />
-          Create Workspace
-        </Button>
-      </div>
-
-      <div className="px-3 mb-6">
-        <h3 className="px-2 text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider mb-2">
-          WORKSPACES
-        </h3>
-        <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-sidebar-accent/40 text-sidebar-accent-foreground border border-sidebar-border/50">
-          <FolderOpen className="h-4 w-4 text-primary" />
-          <span className="truncate">{workspaces[0].name}</span>
+    <>
+      <aside className="w-64 gradient-sidebar flex flex-col min-h-screen border-r border-sidebar-border">
+        <div className="p-4 flex items-center gap-2 border-b border-sidebar-border/50">
+          <Link to="/dashboard" className="flex items-center group flex-1">
+            <img src="/fupilot.webp" alt="FUPilot Logo" className="h-8 w-auto" />
+          </Link>
         </div>
-      </div>
 
-      <div className="flex-1 overflow-y-auto pt-2 scrollbar-thin">
-        {renderNavSection("CONTENT", contentLinks)}
-        {renderNavSection("BRAND", brandLinks)}
-        {renderNavSection("MARKETING", marketingLinks)}
-        {renderNavSection("SETTING", settingLinks)}
-      </div>
+        <div className="px-3 py-4 mb-2">
+          <div className="flex items-center justify-between px-2 mb-2">
+            <h3 className="text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider">
+              Projects
+            </h3>
+          </div>
+          
+          <div className="space-y-1">
+            {projects.length === 0 && (
+              <div className="px-3 py-2 text-xs text-muted-foreground italic">
+                No projects yet.
+              </div>
+            )}
+            {projects.map((project) => (
+              <div key={project.id} className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-sidebar-accent/40 text-sidebar-accent-foreground border border-transparent hover:border-sidebar-border/50 transition-colors cursor-pointer group">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center shrink-0">
+                    <span className="text-xs font-bold text-primary">{project.name.charAt(0).toUpperCase()}</span>
+                  </div>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="truncate">{project.name}</span>
+                    <span className="text-[10px] text-muted-foreground truncate">{project.domain}</span>
+                  </div>
+                </div>
+                <Edit className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            ))}
+          </div>
 
-      <div className="p-3 space-y-1 border-t border-sidebar-border">
-        <ThemeToggle />
-        <button
-          onClick={signOut}
-          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors"
-        >
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </button>
-      </div>
-    </aside>
+          <div className="mt-3 px-1">
+            <Button 
+              variant="ghost" 
+              className="w-full flex justify-start gap-2 text-sm text-muted-foreground hover:text-foreground h-9 px-2"
+              onClick={() => {
+                if (canAddProject) {
+                  setProjectDialogOpen(true);
+                } else {
+                  toast.error(`Your ${currentPlan} plan is limited to ${projectLimit} project(s). Please upgrade to add more.`);
+                }
+              }}
+            >
+              <Plus className="h-4 w-4" />
+              Add Project
+            </Button>
+            {!canAddProject && (
+              <Link to="/pricing" className="block px-2 py-1 text-xs text-primary hover:underline mt-1">
+                Upgrade
+              </Link>
+            )}
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto pt-2 scrollbar-thin">
+          {renderNavSection("CONTENT", contentLinks)}
+          {renderNavSection("BRAND", brandLinks)}
+          {renderNavSection("MARKETING", marketingLinks)}
+          {renderNavSection("SETTING", settingLinks)}
+        </div>
+
+        <div className="p-3 space-y-1 border-t border-sidebar-border">
+          <ThemeToggle />
+          <button
+            onClick={signOut}
+            className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </button>
+        </div>
+      </aside>
+      <CreateProjectDialog open={projectDialogOpen} onOpenChange={setProjectDialogOpen} />
+    </>
   );
 };
 
