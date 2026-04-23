@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 // ────────────────────────────────────────────────────────────────────────────
 // Instagram Profile Scraper (public profiles via CORS proxy)
 // ────────────────────────────────────────────────────────────────────────────
@@ -160,6 +161,19 @@ Return ONLY a valid JSON array with exactly 5 objects. Each object must have:
 Make captions authentic, engaging, and platform-native. Mix the types across the 5 posts.`;
 
   try {
+    const { data, error } = await supabase.functions.invoke("generate-social-post", {
+      body: params,
+    });
+
+    if (error) throw error;
+    if (data && Array.isArray(data)) {
+      return data.map((idea, i) => ({
+        ...idea,
+        id: idea.id || `idea_${i + 1}`,
+      }));
+    }
+
+    // Fallback to Pollinations if Edge Function doesn't return data
     const encodedPrompt = encodeURIComponent(prompt);
     const res = await fetch(
       `https://text.pollinations.ai/${encodedPrompt}?model=openai&json=true`,

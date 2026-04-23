@@ -14,8 +14,36 @@ export function SocialImageGenerationPage() {
   const { project } = useProject();
   const [prompt, setPrompt] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [refining, setRefining] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
+
+  const handleRefinePrompt = async () => {
+    if (!prompt.trim()) {
+      toast.error("Enter a simple prompt first to refine it");
+      return;
+    }
+    setRefining(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-social-post", {
+        body: { 
+          refineOnly: true, 
+          prompt, 
+          brandName: project.brand_name || project.name,
+          brandDescription: project.brand_description || "" 
+        },
+      });
+      if (error) throw error;
+      if (data && data.refinedPrompt) {
+        setPrompt(data.refinedPrompt);
+        toast.success("Prompt refined with AI!");
+      }
+    } catch (e: any) {
+      toast.error("Refinement failed: " + e.message);
+    } finally {
+      setRefining(false);
+    }
+  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -82,17 +110,31 @@ export function SocialImageGenerationPage() {
               />
             </div>
             
-            <Button
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold h-12 shadow-lg shadow-pink-500/20"
-              onClick={handleGenerate}
-              disabled={!prompt.trim() || generating}
-            >
-              {generating ? (
-                <><Loader2 className="h-5 w-5 mr-2 animate-spin" /> Generating Image...</>
-              ) : (
-                <><ImageIcon className="h-5 w-5 mr-2" /> Generate Image</>
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1 border-neon-blue/30 text-neon-blue hover:bg-neon-blue/10 h-12"
+                onClick={handleRefinePrompt}
+                disabled={!prompt.trim() || refining}
+              >
+                {refining ? (
+                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Refining...</>
+                ) : (
+                  <><Sparkles className="h-4 w-4 mr-2" /> AI Refine Prompt</>
+                )}
+              </Button>
+              <Button
+                className="flex-[2] bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold h-12 shadow-lg shadow-pink-500/20"
+                onClick={handleGenerate}
+                disabled={!prompt.trim() || generating}
+              >
+                {generating ? (
+                  <><Loader2 className="h-5 w-5 mr-2 animate-spin" /> Generating Image...</>
+                ) : (
+                  <><ImageIcon className="h-5 w-5 mr-2" /> Generate Image</>
+                )}
+              </Button>
+            </div>
           </div>
           
           <div className="rounded-xl border border-white/10 bg-white/5 p-6">
