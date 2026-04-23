@@ -8,7 +8,7 @@ import {
   FileText, Layers, List, Calendar, Search, Share2, TrendingUp, Bot,
   Settings2, LogOut, Plus, ChevronDown, ChevronRight, Plug,
   BarChart2, Eye, Lightbulb, Link as LinkIcon, Video, Users,
-  Fingerprint, Globe, Edit,
+  Fingerprint, Globe, Edit, ImageIcon,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "./ui/button";
