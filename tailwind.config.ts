@@ -75,7 +75,7 @@ export default {
           2: "var(--ink-2)",
         },
         sidebar: {
-          DEFAULT: "var(--bg-2)",
+          DEFAULT: "var(--panel)",
           foreground: "var(--ink-2)",
           primary: "var(--primary)",
           "primary-foreground": "#ffffff",
