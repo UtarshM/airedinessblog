@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,123 +6,84 @@
 
 @layer base {
   :root {
-    --background: 222 30% 97%;
-    --foreground: 222 25% 8%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222 25% 8%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 25% 8%;
-
-    /* Neon blue as primary */
-    --primary: 186 100% 50%;
-    --primary-foreground: 222 25% 5%;
-
-    --secondary: 222 20% 94%;
-    --secondary-foreground: 222 25% 8%;
-
-    --muted: 222 20% 94%;
-    --muted-foreground: 222 12% 46%;
-
-    --accent: 186 100% 50%;
-    --accent-foreground: 222 25% 5%;
-
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 222 20% 88%;
-    --input: 222 20% 88%;
-    --ring: 186 100% 50%;
-
+    --bg: #ffffff;
+    --bg-2: #fafafe;
+    --panel: #ffffff;
+    --panel-2: #f7f6fb;
+    --line: #ececf1;
+    --line-2: #dcdce6;
+    --ink: #0e0c1a;
+    --ink-2: #3f3d52;
+    --muted: #7a7892;
+    --primary: #9025F2;
+    --primary-2: #7a17d6;
+    --primary-soft: #f3e8ff;
+    --primary-tint: #faf5ff;
+    --accent: #22d3ee;
+    --pink: #ec4899;
+    --yellow: #f5b500;
+    --green: #22c55e;
+    --grad: linear-gradient(90deg, #9025F2 0%, #b260ff 60%, #ec4899 100%);
+    --grad-soft: linear-gradient(135deg, rgba(144,37,242,.08) 0%, rgba(236,72,153,.08) 100%);
+    
+    /* Keep for shadcn compatibility */
+    --background: var(--bg);
+    --foreground: var(--ink);
+    --card: var(--panel);
+    --card-foreground: var(--ink);
+    --popover: var(--panel);
+    --popover-foreground: var(--ink);
+    --border: var(--line);
+    --input: var(--line);
+    --ring: var(--primary);
     --radius: 0.75rem;
-
-    --sidebar-background: 224 28% 6%;
-    --sidebar-foreground: 220 14% 75%;
-    --sidebar-primary: 186 100% 50%;
-    --sidebar-primary-foreground: 222 25% 5%;
-    --sidebar-accent: 222 25% 12%;
-    --sidebar-accent-foreground: 220 14% 90%;
-    --sidebar-border: 222 25% 14%;
-    --sidebar-ring: 186 100% 50%;
-
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
   }
 
   .dark {
-    /* Deep dark matching homepage #050505 */
-    --background: 224 28% 5%;
-    --foreground: 210 20% 95%;
-
-    --card: 224 28% 8%;
-    --card-foreground: 210 20% 95%;
-
-    --popover: 224 28% 8%;
-    --popover-foreground: 210 20% 95%;
-
-    /* Neon blue primary */
-    --primary: 186 100% 50%;
-    --primary-foreground: 224 28% 5%;
-
-    --secondary: 222 25% 13%;
-    --secondary-foreground: 210 20% 95%;
-
-    --muted: 222 25% 13%;
-    --muted-foreground: 220 10% 50%;
-
-    --accent: 186 100% 50%;
-    --accent-foreground: 224 28% 5%;
-
-    --destructive: 0 62.8% 40%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 222 25% 15%;
-    --input: 222 25% 15%;
-    --ring: 186 100% 50%;
-
-    /* Sidebar: deep dark like homepage */
-    --sidebar-background: 224 30% 4%;
-    --sidebar-foreground: 220 14% 72%;
-    --sidebar-primary: 186 100% 50%;
-    --sidebar-primary-foreground: 224 28% 5%;
-    --sidebar-accent: 222 25% 10%;
-    --sidebar-accent-foreground: 220 14% 90%;
-    --sidebar-border: 222 28% 11%;
-    --sidebar-ring: 186 100% 50%;
+    /* Currently disabled dark mode, keep variables default for now or revert to dark */
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    color: var(--ink);
+  }
+  
+  ::selection {
+    background: rgba(144,37,242,.20);
+    color: var(--ink);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.05;
   }
 }
 
 @layer utilities {
-  .gradient-primary {
-    background: linear-gradient(135deg, theme('colors.neon.blue'), theme('colors.neon.purple'));
-  }
-
-  /* Sidebar gradient: deep dark with neon blue top accent */
-  .gradient-sidebar {
-    background: linear-gradient(180deg, hsl(224 30% 5%), hsl(224 32% 3%));
-    border-right: 1px solid rgba(0, 240, 255, 0.07);
-  }
-
-  .text-gradient {
-    background: linear-gradient(135deg, theme('colors.neon.blue'), theme('colors.neon.purple'), theme('colors.neon.pink'));
+  .grad-text {
+    background: var(--grad);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
   }
-
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+    color: var(--primary);
+  }
+  
   .animate-slide-in {
     animation: slideIn 0.3s ease-out both;
   }
@@ -132,66 +93,80 @@
   }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+/* BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 14.5px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.btn-grad {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 14px 32px -12px rgba(144,37,242,.45), 0 2px 6px -2px rgba(144,37,242,.25);
+}
+.btn-grad:hover {
+  transform: translateY(-2px);
+  background: var(--primary-2);
+  box-shadow: 0 22px 44px -14px rgba(144,37,242,.55);
+}
+.btn-ghost {
+  background: #fff;
+  border-color: var(--line-2);
+  color: var(--ink);
+}
+.btn-ghost:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-tint);
+}
+.btn-light {
+  background: var(--ink);
+  color: #fff;
+  font-weight: 700;
+}
+.btn-light:hover {
+  background: #000;
+  transform: translateY(-1px);
 }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+/* Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .45; }
 }
-
-.dark .glass-card {
-  background: rgba(10, 13, 20, 0.6);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 240, 255, 0.06);
-}
-
-.premium-shadow {
-  box-shadow: 0 0 50px -12px rgba(0, 240, 255, 0.25);
-}
-
-.hover-glow:hover {
-  box-shadow: 0 0 30px -5px rgba(0, 240, 255, 0.4);
-  border-color: rgba(0, 240, 255, 0.5);
-}
-
-/* Dashboard background: matches homepage dark mesh */
-.bg-mesh {
-  background-color: #050505;
-  background-image:
-    radial-gradient(at 0% 0%, rgba(112, 0, 255, 0.1) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(0, 240, 255, 0.1) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(255, 0, 229, 0.1) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(112, 0, 255, 0.05) 0px, transparent 50%);
-}
-
-/* Active nav item neon glow */
-.nav-active {
-  background: rgba(0, 240, 255, 0.08);
-  border-left: 2px solid #00f0ff;
-  color: #00f0ff;
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes pulseGentle {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+/* REVEAL UTILITY FROM ORIGINAL TEMPLATE */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+.reveal.d1 { transition-delay: .06s; }
+.reveal.d2 { transition-delay: .12s; }
+.reveal.d3 { transition-delay: .18s; }
+.reveal.d4 { transition-delay: .24s; }
+@media (prefers-reduced-motion:reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
 }

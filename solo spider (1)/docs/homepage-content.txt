@@ -1,0 +1,2078 @@
+
+
+
+Solo Spider — Full Homepage Content
+
+Complete copy for every section. Ready to hand to design/dev.
+
+
+
+
+
+
+
+
+
+🔝 NAV BAR
+
+Logo: Solo Spider
+
+
+
+
+
+Nav links:
+
+
+
+
+
+Features
+
+Who It's For
+
+Pricing
+
+Blog
+
+SEO Audit (free tool teaser)
+
+
+
+
+
+Nav CTAs:
+
+
+
+
+
+Log in
+
+Start Free → (primary button)
+
+
+
+
+
+
+
+
+
+1. HERO SECTION
+
+Announcement pill / badge:
+
+
+
+
+
+🟢 Now live — The AI marketing OS for agencies & creators
+
+
+
+
+
+
+
+
+
+
+
+
+Headline (H1):
+
+
+
+
+
+Replace Your Entire
+Digital Marketing Team
+With One Tool
+
+
+
+
+
+
+
+
+
+
+
+
+Subheadline:
+
+
+
+
+
+Solo Spider automates everything your marketing team does — blogs, social media, SEO, and AI search visibility. One subscription. No agency retainer. No hiring headache.
+
+
+
+
+
+
+
+
+
+
+
+
+Primary CTA button:
+
+
+
+
+
+Start for Free →
+
+
+
+
+
+Secondary CTA (ghost button):
+
+
+
+
+
+See How It Works
+
+
+
+
+
+Trust line below CTAs:
+
+
+
+
+
+No credit card required · Free plan available · Set up in 5 minutes
+
+
+
+
+
+
+
+
+
+
+
+
+Social proof strip (logos or text):
+
+
+
+
+
+Trusted by 2,000+ agencies, freelancers, and solo founders
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. PROBLEM SECTION — "The Old Way Is Broken"
+
+Section label (small caps):
+
+
+
+
+
+The problem
+
+
+
+
+
+Headline:
+
+
+
+
+
+You're Paying for 6 Tools
+That Should Be One
+
+
+
+
+
+Body copy:
+
+
+
+
+
+The average digital marketer juggles Surfer SEO, Buffer, Canva, Ahrefs, a blog CMS, and a separate AI writing tool — spending ₹30,000–₹80,000 a month on subscriptions that barely talk to each other.
+
+
+
+
+
+That's before counting the hours lost copy-pasting between tools, briefing freelancers, chasing approvals, and manually posting content.
+
+
+
+
+
+Solo Spider was built to collapse the entire stack into a single, automated workflow — so you spend less time on the tools and more time on the work that actually grows your business.
+
+
+
+
+
+Visual suggestion: A crossed-out stack of 6 tool logos → arrow → Solo Spider logo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3. WHO IT'S FOR — Two Audience Split
+
+Section label:
+
+
+
+
+
+Who it's for
+
+
+
+
+
+Headline:
+
+
+
+
+
+Built for Agencies.
+Priced for Solo Creators.
+
+
+
+
+
+Sub:
+
+
+
+
+
+Solo Spider works whether you're running campaigns for 20 clients or building a brand entirely on your own.
+
+
+
+
+
+
+
+
+
+Card A — Digital Agencies (featured / highlighted)
+
+Tag: For agencies
+
+
+
+
+
+Card headline:
+
+
+
+
+
+Scale client work without scaling headcount
+
+
+
+
+
+Card body:
+
+
+
+
+
+Most agencies hit a ceiling: to take on more clients, you need more people. Solo Spider breaks that ceiling. Automate content, social, and SEO delivery across every client account — from one dashboard.
+
+
+
+
+
+Bullet benefits:
+
+
+
+
+
+Manage 10+ client brands from a single workspace
+
+Auto-generate blogs, captions, and social assets per client
+
+Schedule and publish content without touching each platform
+
+Deliver SEO audit reports clients actually understand
+
+Show up in AI search results before your competitors do (AEO/GRO)
+
+White-label reporting ready to send to clients
+
+
+
+
+
+CTA:
+
+
+
+
+
+Explore Agency Plan →
+
+
+
+
+
+
+
+
+
+Card B — Solo Creators, Founders & Freelancers
+
+Tag: For individuals
+
+
+
+
+
+Card headline:
+
+
+
+
+
+Your entire marketing team. Just you.
+
+
+
+
+
+Card body:
+
+
+
+
+
+You're wearing every hat. Solo Spider makes that sustainable. Write blogs, post to social, fix your SEO, and grow your AI search visibility — without hiring anyone or subscribing to anything else.
+
+
+
+
+
+Bullet benefits:
+
+
+
+
+
+Publish blog posts without touching a CMS
+
+Generate scroll-stopping social images and videos automatically
+
+Fix SEO issues on your site with one click
+
+Get found in ChatGPT, Gemini, and AI overview results
+
+Plan and schedule a month of content in under an hour
+
+
+
+
+
+CTA:
+
+
+
+
+
+Explore Solo Plan →
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4. FEATURES SECTION — "Six Superpowers"
+
+Section label:
+
+
+
+
+
+Everything included
+
+
+
+
+
+Headline:
+
+
+
+
+
+Six Superpowers.
+One Subscription.
+
+
+
+
+
+Sub:
+
+
+
+
+
+No integrations to configure. No freelancers to brief. No tool-switching. Everything works together because it lives in one place.
+
+
+
+
+
+
+
+
+
+Feature Module 1 — Content (Blogs)
+
+Module title: Content & Blog Automation
+
+
+
+
+
+Headline:
+
+
+
+
+
+Write Less. Publish More.
+
+
+
+
+
+Body:
+
+
+
+
+
+Solo Spider generates long-form, SEO-optimised blog posts in your brand voice — then schedules and publishes them automatically. You approve. It does everything else.
+
+
+
+
+
+Feature list:
+
+
+
+
+
+AI blog writing in your tone and niche
+
+SEO keyword targeting built into every draft
+
+One-click publish to your website or CMS
+
+Blog scheduling — set dates, forget about it
+
+Content calendar to plan weeks ahead
+
+
+
+
+
+Microcopy / proof line:
+
+
+
+
+
+Avg. time to publish a 1,200-word blog: 8 minutes
+
+
+
+
+
+
+
+
+
+Feature Module 2 — Social Media
+
+Module title: Social Media — End to End
+
+
+
+
+
+Headline:
+
+
+
+
+
+Plan It. Generate It. Post It.
+Automatically.
+
+
+
+
+
+Body:
+
+
+
+
+
+From on-brand images and short-form videos to captions and hashtags — Solo Spider handles your entire social media presence without you logging into a single platform.
+
+
+
+
+
+Feature list:
+
+
+
+
+
+AI-generated social images (Instagram, LinkedIn, X, Facebook)
+
+Short-form video creation from your blog or topic
+
+Caption writing with platform-specific formatting
+
+Post planning with AI content suggestions
+
+Bulk scheduling across all platforms at once
+
+Auto-posting — publishes on the schedule you set
+
+
+
+
+
+Microcopy / proof line:
+
+
+
+
+
+Plan and schedule a full month of social content in under 60 minutes
+
+
+
+
+
+
+
+
+
+Feature Module 3 — SEO Audit & Fixing
+
+Module title: SEO — Audit & Fix
+
+
+
+
+
+Headline:
+
+
+
+
+
+Find Every SEO Problem.
+Fix It Without a Developer.
+
+
+
+
+
+Body:
+
+
+
+
+
+Solo Spider scans your entire website for SEO issues — broken tags, slow pages, missing meta descriptions, weak internal linking — then helps you fix them without touching code.
+
+
+
+
+
+Feature list:
+
+
+
+
+
+Full site SEO audit in minutes
+
+Priority-ranked issue list (critical → low)
+
+One-click fixes for common on-page errors
+
+Meta title and description suggestions
+
+Page speed and Core Web Vitals analysis
+
+Ongoing monitoring — get alerts when new issues appear
+
+
+
+
+
+Microcopy / proof line:
+
+
+
+
+
+Most users fix their top 10 SEO issues in under 30 minutes
+
+
+
+
+
+
+
+
+
+Feature Module 4 — AEO & GRO Analysis
+
+Module title: AEO & GRO — Be Found in AI Search
+
+
+
+
+
+Headline:
+
+
+
+
+
+Google Is Changing.
+Your Visibility Strategy Should Too.
+
+
+
+
+
+Body:
+
+
+
+
+
+AI-powered search is here. ChatGPT, Gemini, and Google's AI Overviews are now answering questions directly — and most brands are invisible in those answers. Solo Spider helps you show up.
+
+
+
+
+
+What is AEO? (tooltip or expandable)
+
+
+
+
+
+Answer Engine Optimisation (AEO) — optimising your content to appear in AI-generated answers, not just search results.
+
+
+
+
+
+What is GRO? (tooltip or expandable)
+
+
+
+
+
+Generative Result Optimisation (GRO) — tracking and improving your visibility in AI search engines like ChatGPT, Gemini, and Perplexity.
+
+
+
+
+
+Feature list:
+
+
+
+
+
+Track how often your brand appears in AI answers
+
+Identify which questions your content should answer
+
+AEO content suggestions tailored to your industry
+
+GRO score — see how visible you are vs. competitors
+
+Structured data recommendations for AI-readability
+
+
+
+
+
+Microcopy / proof line:
+
+
+
+
+
+Early adopters are 5x more visible in AI search. Don't be last.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5. HOW IT WORKS — Process / Steps
+
+Section label:
+
+
+
+
+
+How it works
+
+
+
+
+
+Headline:
+
+
+
+
+
+From Setup to Running on
+Autopilot — in One Day
+
+
+
+
+
+Sub:
+
+
+
+
+
+You don't need a marketing degree, a developer, or a full team. Just connect your accounts and let Solo Spider do the rest.
+
+
+
+
+
+
+
+
+
+
+
+
+Step 1 Icon/number: 01
+
+
+
+
+
+Step title: Connect your channels Step body:
+
+
+
+
+
+Link your website, social accounts, and any existing CMS. Solo Spider pulls in your brand voice, existing content, and target audience automatically.
+
+
+
+
+
+
+
+
+
+
+
+
+Step 2 Icon/number: 02
+
+
+
+
+
+Step title: Set your goals Step body:
+
+
+
+
+
+Tell Solo Spider what you want to achieve — more blog traffic, stronger social presence, better rankings, or AI search visibility. It builds your content strategy around your goals.
+
+
+
+
+
+
+
+
+
+
+
+
+Step 3 Icon/number: 03
+
+
+
+
+
+Step title: Review and approve Step body:
+
+
+
+
+
+Solo Spider generates your blogs, social posts, and SEO fixes. You review, tweak if you like, and hit approve. Or set it to fully auto — your call.
+
+
+
+
+
+
+
+
+
+
+
+
+Step 4 Icon/number: 04
+
+
+
+
+
+Step title: Watch it run Step body:
+
+
+
+
+
+Content goes live. Posts publish. SEO improves. AI search visibility grows. You get weekly reports showing exactly what's working — and what Solo Spider is doing about what isn't.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6. NUMBERS / PROOF SECTION
+
+Section label:
+
+
+
+
+
+By the numbers
+
+
+
+
+
+Headline:
+
+
+
+
+
+Real Results.
+Not Marketing Fluff.
+
+
+
+
+
+
+
+
+
+
+
+
+Stat 1:
+
+
+
+
+
+10x Faster content production vs. doing it manually
+
+
+
+
+
+Stat 2:
+
+
+
+
+
+6 tools Replaced by a single Solo Spider subscription
+
+
+
+
+
+Stat 3:
+
+
+
+
+
+80% Reduction in time spent on repetitive marketing tasks
+
+
+
+
+
+Stat 4:
+
+
+
+
+
+5 mins Average setup time to publish your first blog
+
+
+
+
+
+Stat 5:
+
+
+
+
+
+₹40,000+ Avg. monthly tool cost replaced by one Solo Spider plan
+
+
+
+
+
+Stat 6:
+
+
+
+
+
+2,000+ Agencies and creators already using Solo Spider
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7. COMPARISON TABLE SECTION
+
+Section label:
+
+
+
+
+
+vs. the old way
+
+
+
+
+
+Headline:
+
+
+
+
+
+Stop Paying for a Stack.
+Start Using a System.
+
+
+
+
+
+Sub:
+
+
+
+
+
+Here's what Solo Spider replaces — and what none of those tools can do together.
+
+
+
+
+
+
+
+
+
+
+
+
+Capability
+
+Solo Spider
+
+Surfer SEO
+
+Buffer
+
+Canva Pro
+
+Ahrefs
+
+ChatGPT alone
+
+Blog writing & publishing
+
+✅
+
+❌
+
+❌
+
+❌
+
+❌
+
+Partial
+
+Blog scheduling
+
+✅
+
+❌
+
+❌
+
+❌
+
+❌
+
+❌
+
+Social image generation
+
+✅
+
+❌
+
+❌
+
+✅
+
+❌
+
+❌
+
+Social video generation
+
+✅
+
+❌
+
+❌
+
+Partial
+
+❌
+
+❌
+
+Social scheduling & posting
+
+✅
+
+❌
+
+✅
+
+❌
+
+❌
+
+❌
+
+SEO audit & fixes
+
+✅
+
+✅
+
+❌
+
+❌
+
+✅
+
+❌
+
+AEO analysis
+
+✅
+
+❌
+
+❌
+
+❌
+
+❌
+
+❌
+
+GRO / AI search visibility
+
+✅
+
+❌
+
+❌
+
+❌
+
+❌
+
+❌
+
+All-in-one dashboard
+
+✅
+
+❌
+
+❌
+
+❌
+
+❌
+
+❌
+
+Typical monthly cost
+
+₹X,XXX
+
+₹8,000+
+
+₹3,500+
+
+₹2,000+
+
+₹15,000+
+
+₹1,600+
+
+
+
+
+
+Caption below table:
+
+
+
+
+
+Prices approximate. Solo Spider replaces all five — for less than the cost of one.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8. TESTIMONIALS / SOCIAL PROOF
+
+Section label:
+
+
+
+
+
+What people are saying
+
+
+
+
+
+Headline:
+
+
+
+
+
+Agencies and Creators Who Made the Switch
+
+
+
+
+
+
+
+
+
+
+
+
+Testimonial 1 — Agency owner
+
+
+
+
+
+"We cancelled Surfer, Buffer, and Canva in the same week. Solo Spider does everything they did — faster, cheaper, and without three different logins."
+
+
+
+
+
+— Priya M., Founder, digital content agency · Mumbai ★★★★★
+
+
+
+
+
+
+
+
+
+
+
+
+Testimonial 2 — Solo founder
+
+
+
+
+
+"I'm a solopreneur running a D2C brand. Before Solo Spider, marketing took 3 hours a day. Now it takes 20 minutes. I genuinely don't know how I did it without this."
+
+
+
+
+
+— Rahul D., Founder · Ahmedabad ★★★★★
+
+
+
+
+
+
+
+
+
+
+
+
+Testimonial 3 — Freelancer
+
+
+
+
+
+"I use Solo Spider for 6 clients. The content quality is good enough that two clients thought I'd hired a writer. I hadn't — I just had the right tool."
+
+
+
+
+
+— Sneha K., Freelance digital marketer · Bengaluru ★★★★★
+
+
+
+
+
+
+
+
+
+
+
+
+Testimonial 4 — Marketing manager
+
+
+
+
+
+"The AEO and GRO features alone are worth the subscription. No other tool even tracks AI search visibility. We're way ahead of our competitors because of it."
+
+
+
+
+
+— Arjun T., Head of Growth, SaaS startup · Pune ★★★★★
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9. PRICING PREVIEW SECTION
+
+Section label:
+
+
+
+
+
+Pricing
+
+
+
+
+
+Headline:
+
+
+
+
+
+One Price.
+Everything Included.
+
+
+
+
+
+Sub:
+
+
+
+
+
+No feature gating. No per-seat pricing surprises. Pick the plan that fits your volume and get access to every single Solo Spider capability.
+
+
+
+
+
+
+
+
+
+
+
+
+Plan 1 — Free Plan name: Starter Tag: Free forever For: Solo creators just getting started
+
+
+
+
+
+Included:
+
+
+
+
+
+5 blog posts/month
+
+20 social posts/month
+
+Basic SEO audit (1 website)
+
+AEO insights (limited)
+
+1 connected social account
+
+
+
+
+
+CTA: Get started free →
+
+
+
+
+
+
+
+
+
+
+
+
+Plan 2 — Solo (recommended for individuals) Tag: Most popular for solo creators Price: ₹X,XXX/month (or annual pricing)
+
+
+
+
+
+Included:
+
+
+
+
+
+Unlimited blog posts
+
+Unlimited social content
+
+Full SEO audit + auto-fix
+
+AEO & GRO dashboard
+
+5 social accounts
+
+Priority support
+
+
+
+
+
+CTA: Start Solo plan →
+
+
+
+
+
+
+
+
+
+
+
+
+Plan 3 — Agency Tag: Best for teams & client work Price: ₹X,XXX/month
+
+
+
+
+
+Included:
+
+
+
+
+
+Everything in Solo
+
+25+ client workspaces
+
+White-label reports
+
+Bulk content scheduling
+
+Team collaboration tools
+
+Dedicated onboarding call
+
+
+
+
+
+CTA: Talk to us →
+
+
+
+
+
+
+
+
+
+
+
+
+Below pricing cards:
+
+
+
+
+
+All plans include a 14-day free trial. No credit card required.
+Annual billing saves 30%.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10. FAQ SECTION
+
+Section label:
+
+
+
+
+
+Common questions
+
+
+
+
+
+Headline:
+
+
+
+
+
+Everything You Want to Know
+Before You Sign Up
+
+
+
+
+
+
+
+
+
+
+
+
+Q1: Do I need any technical skills to use Solo Spider?
+
+
+
+
+
+Not at all. Solo Spider is designed to be used without any coding or technical knowledge. If you can use Gmail, you can use Solo Spider. Setup takes under 5 minutes.
+
+
+
+
+
+
+
+
+
+
+
+
+Q2: Will the content actually sound like me?
+
+
+
+
+
+Yes. Solo Spider learns your brand voice from your existing content, website, and the preferences you set during onboarding. You can always edit and refine drafts before publishing — but most users find they barely need to.
+
+
+
+
+
+
+
+
+
+
+
+
+Q3: What platforms does Solo Spider post to?
+
+
+
+
+
+Instagram, LinkedIn, X (Twitter), Facebook, and more. Blog publishing works with WordPress, Webflow, Wix, and custom CMS setups via API.
+
+
+
+
+
+
+
+
+
+
+
+
+Q4: What's AEO and GRO — do I really need it?
+
+
+
+
+
+AEO (Answer Engine Optimisation) and GRO (Generative Result Optimisation) help you appear in AI-generated search results — like Google's AI Overviews, ChatGPT, and Gemini answers. AI search is growing rapidly. Brands that optimise for it now will have a significant advantage. Yes, you need it.
+
+
+
+
+
+
+
+
+
+
+
+
+Q5: How is Solo Spider different from just using ChatGPT?
+
+
+
+
+
+ChatGPT can write — but it can't publish, schedule, audit, post, or track your SEO and AI visibility. Solo Spider wraps powerful AI writing with an end-to-end marketing workflow. It's the difference between having an ingredient and having a meal.
+
+
+
+
+
+
+
+
+
+
+
+
+Q6: Can I manage multiple clients or brands?
+
+
+
+
+
+Yes. The Agency plan supports 25+ separate client workspaces, each with their own brand settings, content calendars, and reports. You can manage everything without ever logging out.
+
+
+
+
+
+
+
+
+
+
+
+
+Q7: Is there a free trial?
+
+
+
+
+
+Yes — every paid plan comes with a 14-day free trial. No credit card required. You can also use the Starter plan for free, forever.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+11. FINAL CTA SECTION
+
+Section label:
+
+
+
+
+
+Ready to switch?
+
+
+
+
+
+Headline:
+
+
+
+
+
+Fire Your Marketing Stack.
+Keep the Results.
+
+
+
+
+
+Body:
+
+
+
+
+
+Join 2,000+ agencies and creators who replaced their entire digital marketing workflow with Solo Spider. Less cost. Less complexity. More output.
+
+
+
+
+
+
+
+
+
+
+
+
+Primary CTA:
+
+
+
+
+
+Start Free — No Card Needed →
+
+
+
+
+
+Secondary CTA:
+
+
+
+
+
+Book a 20-Minute Demo (for agencies)
+
+
+
+
+
+Trust signals below CTAs:
+
+
+
+
+
+✓ Free plan available, always
+✓ 14-day trial on all paid plans
+✓ Cancel anytime, no questions asked
+✓ Setup in under 5 minutes
+✓ Used by 2,000+ marketers across India
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+12. FOOTER
+
+Tagline:
+
+
+
+
+
+Solo Spider — Replace Your Entire Digital Marketing Team With One Tool
+
+
+
+
+
+
+
+
+
+
+
+
+Column 1 — Product
+
+
+
+
+
+Features
+
+Pricing
+
+Changelog
+
+Roadmap
+
+Free SEO Audit Tool
+
+
+
+
+
+Column 2 — Use Cases
+
+
+
+
+
+For Digital Agencies
+
+For Solo Creators
+
+For Freelancers
+
+For D2C Brands
+
+For SaaS Startups
+
+
+
+
+
+Column 3 — Resources
+
+
+
+
+
+Blog
+
+Help Center
+
+API Docs
+
+Case Studies
+
+Glossary (AEO, GRO, SEO)
+
+
+
+
+
+Column 4 — Company
+
+
+
+
+
+About Us
+
+Contact
+
+Privacy Policy
+
+Terms of Service
+
+Careers
+
+
+
+
+
+
+
+
+
+
+
+
+Bottom strip:
+
+
+
+
+
+© 2025 Solo Spider. All rights reserved.
+Made for marketers who'd rather be growing than managing tools.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+📝 COPYWRITING NOTES FOR DESIGN TEAM
+
+
+Tone of voice
+
+Direct, confident, zero fluff
+
+Speak to pain first, solution second
+
+Use "you" constantly — this is about the reader, not the product
+
+Avoid jargon unless explaining it (AEO, GRO get tooltips)
+
+Indian market-aware but globally readable
+
+
+CTA rules
+
+Every section has at least one CTA
+
+Primary = "Start Free →" (self-serve, low friction)
+
+Secondary = "Book a Demo" (agencies, higher intent)
+
+Never use "Learn More" alone — always pair with context
+
+
+Conversion priority order
+
+Agencies → Demo call (higher LTV, needs hand-holding)
+
+Solopreneurs → Free trial (self-serve, quick convert)
+
+Freelancers → Free plan (grow into paid)
+
+
+SEO keywords to include on page (naturally)
+
+digital marketing automation tool
+
+AI content generation for agencies
+
+social media automation India
+
+SEO audit tool
+
+AEO optimisation
+
+GRO — AI search visibility
+
+replace Buffer Canva Surfer SEO
+
+blog automation tool
+
+social media scheduling tool India
+
+
+
+

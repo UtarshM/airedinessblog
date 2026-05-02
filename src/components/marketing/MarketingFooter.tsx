@@ -1,71 +1,67 @@
 import { Link } from "react-router-dom";
-import { Sparkles, Twitter, Linkedin, Github } from "lucide-react";
 
 export const MarketingFooter = () => {
   return (
-    <footer className="bg-[#050505] border-t border-white/10 pt-20 pb-10">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
-          <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-6">
-              <div className="bg-neon-blue/10 p-2 rounded-lg border border-neon-blue/20">
-                <Sparkles className="w-5 h-5 text-neon-blue" />
-              </div>
-              <span className="font-bold text-xl tracking-tight text-white">
-                CoAgent<span className="text-neon-purple">.ai</span>
-              </span>
+    <footer className="bg-[#0e0c1a] border-t border-white/10 pt-20 pb-8 text-white/70 mt-auto">
+      <div className="max-w-[1240px] mx-auto px-7">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr] gap-8 lg:gap-12 mb-16">
+          <div className="flex flex-col gap-4">
+            <Link to="/" className="mb-2">
+              <img src="/assets/solospider-logo.png" alt="Solo Spider" className="h-[34px] w-auto block filter brightness-0 invert" />
             </Link>
-            <p className="text-gray-400 mb-6 max-w-sm">
-              The world's first autonomous execution platform. Stop hiring assistants. Start deploying agents.
+            <p className="text-[14px] text-white/65 max-w-[320px] leading-[1.6]">
+              Solo Spider — Replace Your Entire Digital Marketing Team With One Tool.
             </p>
-            <div className="flex items-center gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-neon-blue transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-neon-purple transition-colors">
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-neon-pink transition-colors">
-                <Github className="w-5 h-5" />
-              </a>
+          </div>
+
+          <div>
+            <h6 className="font-display text-[13px] font-bold text-white mb-[18px] tracking-[.02em] uppercase">Product</h6>
+            <div className="flex flex-col gap-[11px] text-[14px]">
+              <Link to="/features" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Features</Link>
+              <Link to="/pricing" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Pricing</Link>
+              <Link to="/changelog" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Changelog</Link>
+              <Link to="/roadmap" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Roadmap</Link>
+              <Link to="/seo-audit" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Free SEO Audit Tool</Link>
             </div>
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-6">Product</h4>
-            <ul className="flex flex-col gap-4">
-              <li><Link to="/features" className="text-gray-400 hover:text-white transition-colors">Features</Link></li>
-              <li><Link to="/pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</Link></li>
-              <li><Link to="/use-cases" className="text-gray-400 hover:text-white transition-colors">Use Cases</Link></li>
-              <li><Link to="/auth" className="text-gray-400 hover:text-white transition-colors">Login</Link></li>
-            </ul>
+            <h6 className="font-display text-[13px] font-bold text-white mb-[18px] tracking-[.02em] uppercase">Use Cases</h6>
+            <div className="flex flex-col gap-[11px] text-[14px]">
+              <Link to="/use-cases/agencies" className="text-white/65 hover:text-[#c5a3ff] transition-colors">For Digital Agencies</Link>
+              <Link to="/use-cases/solo" className="text-white/65 hover:text-[#c5a3ff] transition-colors">For Solo Creators</Link>
+              <Link to="/use-cases/freelancers" className="text-white/65 hover:text-[#c5a3ff] transition-colors">For Freelancers</Link>
+              <Link to="/use-cases/d2c" className="text-white/65 hover:text-[#c5a3ff] transition-colors">For D2C Brands</Link>
+              <Link to="/use-cases/saas" className="text-white/65 hover:text-[#c5a3ff] transition-colors">For SaaS Startups</Link>
+            </div>
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-6">Company</h4>
-            <ul className="flex flex-col gap-4">
-              <li><Link to="/about" className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
-              <li><Link to="/blog" className="text-gray-400 hover:text-white transition-colors">Blog</Link></li>
-              <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link></li>
-            </ul>
+            <h6 className="font-display text-[13px] font-bold text-white mb-[18px] tracking-[.02em] uppercase">Resources</h6>
+            <div className="flex flex-col gap-[11px] text-[14px]">
+              <Link to="/blog" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Blog</Link>
+              <Link to="/help" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Help Center</Link>
+              <Link to="/docs" className="text-white/65 hover:text-[#c5a3ff] transition-colors">API Docs</Link>
+              <Link to="/case-studies" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Case Studies</Link>
+              <Link to="/glossary" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Glossary (AEO, GRO, SEO)</Link>
+            </div>
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-6">Legal</h4>
-            <ul className="flex flex-col gap-4">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
-            </ul>
+            <h6 className="font-display text-[13px] font-bold text-white mb-[18px] tracking-[.02em] uppercase">Company</h6>
+            <div className="flex flex-col gap-[11px] text-[14px]">
+              <Link to="/about" className="text-white/65 hover:text-[#c5a3ff] transition-colors">About Us</Link>
+              <Link to="/contact" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Contact</Link>
+              <Link to="/privacy" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Privacy Policy</Link>
+              <Link to="/terms" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Terms of Service</Link>
+              <Link to="/careers" className="text-white/65 hover:text-[#c5a3ff] transition-colors">Careers</Link>
+            </div>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-gray-500 text-sm text-center md:text-left">
-            © {new Date().getFullYear()} CoAgent.ai. All rights reserved.
-          </p>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span>Built for the future of work.</span>
-          </div>
+        <div className="flex justify-between flex-wrap gap-[14px] pt-[30px] border-t border-white/10 text-[13px] text-white/55">
+          <span>© 2025 Solo Spider. All rights reserved.</span>
+          <span>Made for marketers who'd rather be growing than managing tools.</span>
         </div>
       </div>
     </footer>

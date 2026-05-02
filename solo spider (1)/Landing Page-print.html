@@ -1,0 +1,1230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>solospider — SEO AI Co-Agents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbfaf7;
+    --paper:#ffffff;
+    --ink:#0d0d0f;
+    --ink-2:#3a3a3f;
+    --muted:#8a8a92;
+    --line:#ececea;
+    --line-2:#e3e2dd;
+    --warm:#fdf3ec;
+    --brand:#ff6a3d;
+    --brand-deep:#e8552a;
+    --brand-soft:#ffe6d8;
+    --brand-tint:oklch(0.86 0.10 38);
+    --brand-ink:oklch(0.45 0.16 35);
+    /* legacy aliases all map to brand for unified theme */
+    --mint:var(--brand-soft);
+    --mint-ink:var(--brand-ink);
+    --coral:var(--brand-soft);
+    --coral-ink:var(--brand-ink);
+    --lav:var(--brand-soft);
+    --lav-ink:var(--brand-ink);
+    --lemon:var(--brand-soft);
+    --lemon-ink:var(--brand-ink);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  h1,h2,h3,h4,h5,h6{font-family:'Inter Tight','Inter',system-ui,sans-serif;font-weight:700;letter-spacing:-0.02em;margin:0;color:var(--ink)}
+  h1{font-size:88px;line-height:0.98;letter-spacing:-0.04em;font-weight:800}
+  h2{font-size:56px;line-height:1.05;letter-spacing:-0.03em}
+  h3{font-size:24px;line-height:1.15}
+  p{margin:0;color:var(--ink-2);line-height:1.55}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:999px;font-weight:600;font-size:15px;border:1px solid transparent;cursor:pointer;transition:.18s}
+  .btn-light{background:#fff;color:var(--ink);border:1px solid var(--line-2)}
+  .btn-light:hover{border-color:var(--brand);color:var(--brand)}
+  .btn-dark{background:var(--brand);color:#fff}
+  .btn-dark:hover{background:var(--brand-deep)}
+  .btn-coral{background:var(--brand);color:#fff}
+  .btn-coral:hover{background:var(--brand-deep)}
+
+  /* SCROLL REVEAL */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1),filter .9s ease;will-change:opacity,transform}
+  .reveal.from-l{transform:translateX(-30px)}
+  .reveal.from-r{transform:translateX(30px)}
+  .reveal.scale{transform:scale(.96);filter:blur(2px)}
+  .reveal.in{opacity:1!important;transform:none!important;filter:none!important}
+  .reveal.delay-1{transition-delay:.08s}
+  .reveal.delay-2{transition-delay:.16s}
+  .reveal.delay-3{transition-delay:.24s}
+  .reveal.delay-4{transition-delay:.32s}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1!important;transform:none!important;transition:none!important;filter:none!important}html{scroll-behavior:auto}}
+  @keyframes ftFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .ft-1.in{animation:ftFloat 6s ease-in-out infinite}
+  .ft-2.in{animation:ftFloat 7s ease-in-out infinite .8s}
+  .ft-3.in{animation:ftFloat 5.5s ease-in-out infinite 1.4s}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;background:#fff;border:1px solid var(--line-2)}
+  .dot{width:6px;height:6px;border-radius:99px;background:var(--ink)}
+
+  /* NAV */
+  nav.top{position:sticky;top:0;z-index:50;background:rgba(251,250,247,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  nav.top .row{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo img{height:36px;width:auto;display:block}
+  .foot .logo img{filter:brightness(0) invert(1)}
+  .nav-links{display:flex;gap:32px;font-size:14px;color:var(--ink-2);font-weight:500}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-cta{display:flex;align-items:center;gap:12px}
+
+  /* HERO */
+  .hero{padding:80px 0 60px;position:relative;overflow:hidden;background-color:var(--bg)}
+  .hero .web-bg{position:absolute;inset:0;pointer-events:none;display:flex;justify-content:center;align-items:flex-start;padding-top:0;opacity:.28;z-index:0}
+  .hero .web-bg svg{width:min(1700px,160%);height:auto}
+  .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 55% at 50% 50%, rgba(251,250,247,.55) 0%, var(--bg) 80%);pointer-events:none;z-index:1}
+  .hero > *{position:relative;z-index:2}
+  /* HERO SEARCH */
+  .hero-search{max-width:640px;margin:32px auto 0;background:#fff;border:1px solid var(--line-2);border-radius:18px;padding:8px 8px 8px 22px;box-shadow:0 18px 40px -20px rgba(15,15,20,.10),0 6px 16px -10px rgba(15,15,20,.05);text-align:left}
+  .hero-search input{flex:1;border:none;outline:none;background:transparent;font-size:16px;font-family:inherit;color:var(--ink);padding:6px 0;width:100%}
+  .hero-search input::placeholder{color:#aaa}
+  .hero-search .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .hero-search .send{width:42px;height:42px;border-radius:99px;background:var(--brand);color:#fff;border:none;display:grid;place-items:center;cursor:pointer;font-size:16px;transition:.18s;flex-shrink:0}
+  .hero-search .send:hover{background:var(--brand-deep)}
+  .try-row{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:22px;flex-wrap:wrap}
+  .try-row .cap{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;font-family:'Inter Tight';font-weight:700;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;border:1px solid rgba(0,0,0,.06);box-shadow:0 4px 14px -8px rgba(15,15,20,.10);transition:.18s}
+  .try-row .cap:hover{transform:translateY(-2px);box-shadow:0 8px 18px -8px rgba(15,15,20,.18)}
+  .try-row .cap.c-y{background:#fff5cc;color:#8a6d00}
+  .try-row .cap.c-p{background:#ffd6e0;color:#a8174a}
+  .try-row .cap.c-b{background:#cfeefb;color:#0a5e85}
+  .try-row .cap.c-g{background:#cdefd8;color:#0d6a3a}
+  .try-row .cap.c-o{background:#ffd9c5;color:#a83410}
+  .try-row .cap .dot{width:8px;height:8px;border-radius:99px}
+  .try-row .cap.c-y .dot{background:#f5c518}
+  .try-row .cap.c-p .dot{background:#e91e63}
+  .try-row .cap.c-b .dot{background:#37b6e3}
+  .try-row .cap.c-g .dot{background:#2db26b}
+  .try-row .cap.c-o .dot{background:var(--brand)}
+  .trusted{margin-top:18px;font-size:12px;color:var(--muted);text-align:center}
+  .hero-grid{display:grid;grid-template-columns:1fr;gap:48px;text-align:center;align-items:center}
+  .hero h1 .accent{font-style:italic;font-weight:400;color:var(--ink);position:relative}
+  .hero h1 .accent::after{content:"";position:absolute;left:0;right:0;bottom:8px;height:14px;background:var(--brand-soft);z-index:-1;border-radius:4px}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;background:#fff;border:1px solid var(--line-2);font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:28px}
+  .pulse{width:8px;height:8px;border-radius:99px;background:var(--brand);box-shadow:0 0 0 4px rgba(255,106,61,.18)}
+  .hero-sub{max-width:640px;margin:24px auto 0;font-size:18px;color:var(--ink-2)}
+  .hero-cta{display:flex;justify-content:center;gap:12px;margin-top:36px;flex-wrap:wrap}
+  .hero-meta{display:flex;justify-content:center;gap:32px;margin-top:36px;flex-wrap:wrap}
+  .hero-meta .item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);font-weight:500}
+  .check{width:18px;height:18px;border-radius:99px;background:var(--mint);display:grid;place-items:center;color:var(--mint-ink);font-size:11px;font-weight:800}
+
+  /* floating tags around hero */
+  .float-tag{position:absolute;background:#fff;border:1px solid var(--line-2);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 30px rgba(15,15,20,.06);font-size:13px;font-weight:600}
+  .float-tag .ico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:13px}
+  .ft-1{top:140px;left:6%}
+  .ft-2{top:230px;right:5%}
+  .ft-3{top:380px;left:8%}
+  @media (max-width:900px){.float-tag{display:none}}
+
+  /* DOMAIN SECTION (from image 2) */
+  .domain{background:var(--warm);padding:96px 0 120px;border-top:1px solid var(--line);position:relative;overflow:hidden}
+  .domain .center{text-align:center;max-width:780px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+  .domain h2{font-size:56px;text-align:center;letter-spacing:-0.03em}
+  .domain .sub{margin-top:14px;font-size:18px;color:var(--ink-2)}
+  .domain-form{margin:36px auto 0;display:flex;gap:10px;justify-content:center;align-items:center;max-width:620px;width:100%}
+  .domain-input{flex:1;background:#fff;border:1px solid var(--line-2);border-radius:14px;padding:16px 20px;font-size:15px;font-family:inherit;outline:none}
+  .domain-input:focus{border-color:var(--ink)}
+  .start-here{position:relative;display:inline-flex;align-items:center;gap:6px}
+  .start-here .label{font-family:'Inter Tight';font-weight:800;font-style:italic;color:var(--brand);font-size:18px;letter-spacing:-0.01em;transform:rotate(-6deg)}
+  .arrow-curve{width:42px;height:24px;color:var(--brand)}
+
+  .domain-layout{display:grid;grid-template-columns:280px 1fr;gap:40px;margin-top:80px;align-items:start}
+  @media (max-width:1000px){.domain-layout{grid-template-columns:1fr}}
+  .steps{display:flex;flex-direction:column;gap:36px;padding-top:24px;position:relative}
+  .step{display:grid;grid-template-columns:48px 1fr;gap:14px;align-items:start;position:relative}
+  .step .num{font-family:'Inter Tight';font-size:42px;font-weight:800;color:var(--brand);line-height:1;letter-spacing:-0.04em}
+  .step h4{font-family:'Inter Tight';font-size:20px;font-weight:700;margin-bottom:6px}
+  .step p{font-size:14px;color:var(--ink-2)}
+  .step .hi{background:linear-gradient(transparent 60%, var(--brand-soft) 60%);padding:0 2px}
+  .step-line{position:absolute;left:18px;top:34px;bottom:34px;width:1px;background:repeating-linear-gradient(to bottom,var(--line-2) 0 4px,transparent 4px 8px)}
+
+  /* dashboard mock */
+  .dash{background:#fff;border-radius:18px;border:1px solid var(--line);box-shadow:0 30px 60px -20px rgba(15,15,20,.12),0 8px 20px -12px rgba(15,15,20,.05);overflow:hidden}
+  .dash-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);background:#fafaf8}
+  .dash-bar .left{display:flex;align-items:center;gap:14px}
+  .dots{display:flex;gap:6px}
+  .dots span{width:10px;height:10px;border-radius:99px;background:#e6e6e2}
+  .pill{padding:5px 12px;border-radius:99px;border:1px solid var(--line-2);font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+  .dash-body{display:grid;grid-template-columns:180px 1fr;min-height:520px}
+  .side{border-right:1px solid var(--line);padding:18px 14px;background:#fcfbf9}
+  .side .group{margin-bottom:18px}
+  .side .label{font-size:10px;font-weight:700;letter-spacing:0.12em;color:var(--muted);text-transform:uppercase;padding:0 8px;margin-bottom:6px}
+  .side a{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;font-size:13px;color:var(--ink-2);border-radius:8px;font-weight:500;cursor:pointer}
+  .side a:hover{background:#fff}
+  .side a.active{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 0 0 1px var(--line-2)}
+  .side a .car{color:var(--muted);font-size:11px}
+  .main{padding:22px;display:flex;flex-direction:column;gap:20px}
+  .main-head{display:flex;align-items:center;justify-content:space-between}
+  .main-head .l{display:flex;align-items:center;gap:12px}
+  .main-head h5{font-family:'Inter Tight';font-size:22px;font-weight:700}
+  .main-head .r{display:flex;gap:10px}
+
+  .top-ops{}
+  .top-ops .ttl{font-family:'Inter Tight';font-weight:700;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink);margin-bottom:12px}
+  .ops-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .op{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;background:#fff;min-height:140px}
+  .op .row1{display:flex;justify-content:space-between;align-items:center}
+  .tag{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:0.04em}
+  .tag.issue{background:#fff1e8;color:#d24a16}
+  .tag.opt{background:#e8f0ff;color:#1f59c4}
+  .prio{font-size:10px;color:var(--muted);font-weight:600}
+  .op p.txt{font-size:12px;color:var(--ink);line-height:1.4;flex:1}
+  .op p.txt .b{font-weight:700}
+  .op .ctrl{display:flex;justify-content:space-between;align-items:center}
+  .feed{display:flex;gap:8px;color:var(--muted)}
+  .ico-btn{width:22px;height:22px;border-radius:6px;border:1px solid var(--line-2);display:grid;place-items:center;font-size:11px;cursor:pointer;background:#fff}
+  .start-btn{font-size:10px;font-weight:700;color:var(--brand);border:1px solid var(--brand-soft);padding:5px 10px;border-radius:6px;background:#fff;letter-spacing:0.06em}
+  .done-check{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-weight:600}
+  .done-check .box{width:11px;height:11px;border:1px solid var(--line-2);border-radius:3px}
+
+  .twocol{display:grid;grid-template-columns:1fr 1.2fr;gap:18px}
+  .panel{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff}
+  .panel h6{font-family:'Inter Tight';font-size:13px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;margin-bottom:6px}
+  .panel .desc{font-size:11px;color:var(--muted);line-height:1.4;margin-bottom:14px}
+  .kw-stat{display:flex;gap:18px;margin-bottom:10px}
+  .kw-stat .n{font-family:'Inter Tight';font-size:22px;font-weight:700}
+  .kw-stat .l{font-size:11px;color:var(--muted)}
+  .pie-row{display:grid;grid-template-columns:90px 1fr;gap:14px;align-items:center}
+  .pie{width:90px;height:90px;border-radius:99px;background:conic-gradient(#ffd2c1 0 84%,#bfead0 84% 90%,#ffe8a8 90% 95%,#d8ccf2 95% 100%)}
+  .legend{display:flex;flex-direction:column;gap:6px;font-size:11px}
+  .legend .lr{display:flex;justify-content:space-between;align-items:center;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .legend .sw{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:6px}
+  .traffic-num{font-family:'Inter Tight';font-size:26px;font-weight:700;margin:8px 0 14px}
+  .chart{height:120px;border-radius:8px;position:relative;background:linear-gradient(180deg,rgba(191,234,208,.4),rgba(191,234,208,0));overflow:hidden}
+  .chart svg{width:100%;height:100%}
+  .chart .pin{position:absolute;background:var(--ink);color:#fff;font-size:10px;padding:4px 7px;border-radius:5px;font-weight:600;top:18px;right:36%}
+
+  /* PROBLEM */
+  .problem{padding:120px 0;background:var(--bg)}
+  .problem .head{text-align:center;max-width:820px;margin:0 auto}
+  .problem h2 .red{color:#e0492a;font-style:italic;font-weight:600}
+  .problem .lead{margin-top:18px;font-size:16px;color:var(--ink-2);max-width:640px;margin-left:auto;margin-right:auto}
+  .stat-row{margin-top:64px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media (max-width:900px){.stat-row{grid-template-columns:1fr}}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px;position:relative;overflow:hidden}
+  .stat .ico{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;margin-bottom:24px;font-weight:800}
+  .stat .num{font-family:'Inter Tight','Inter',system-ui,sans-serif;font-size:64px;font-weight:800;letter-spacing:-0.04em;line-height:1;color:var(--ink)}
+  .stat .lab{margin-top:12px;font-size:14px;color:var(--ink-2);max-width:260px}
+
+  /* SOLUTION */
+  .solution{padding:120px 0;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .sol-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+  @media (max-width:900px){.sol-grid{grid-template-columns:1fr}}
+  .sol-eyebrow{font-family:'Inter Tight';font-weight:700;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:var(--brand);margin-bottom:18px}
+  .sol-grid h2 i{font-style:italic;font-weight:500}
+  .sol-grid .lead{margin:24px 0 28px;font-size:17px}
+  .sol-list{display:flex;flex-direction:column;gap:14px}
+  .sol-list .li{display:flex;align-items:flex-start;gap:12px;font-size:15px;color:var(--ink)}
+  .sol-list .li .c{flex-shrink:0;width:22px;height:22px;border-radius:99px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800;margin-top:2px}
+  .agent-card{background:#fafaf7;border:1px solid var(--line);border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:14px;position:relative}
+  .agent-row{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .agent-row .l{display:flex;align-items:center;gap:12px}
+  .agent-ico{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:13px}
+  .agent-row .name{font-weight:600;font-size:14px}
+  .agent-row .sub{font-size:11px;color:var(--muted)}
+  .agent-status{font-family:'JetBrains Mono';font-size:10px;letter-spacing:0.1em;background:var(--mint);color:var(--mint-ink);padding:4px 8px;border-radius:6px;font-weight:600}
+  .agent-status.r{background:var(--coral);color:#5a1a05}
+
+  /* Section heads — unified */
+  .features .head, .outcomes .head, .how .head, .pricing .head{text-align:center;max-width:760px;margin:0 auto 64px}
+  .features .head p, .outcomes .head p, .how .head p, .pricing .head p{margin-top:18px;font-size:17px;color:var(--ink-2);line-height:1.55}
+
+  /* OUTCOMES */
+  .outcomes{padding:120px 0;background:var(--bg)}
+  .outcomes .head{text-align:center;max-width:760px;margin:0 auto 64px}
+  .outcomes h2 i{font-style:italic;font-weight:500}
+  .out-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:24px;overflow:hidden}
+  @media (max-width:900px){.out-grid{grid-template-columns:1fr}}
+  .out-card{background:#fff;padding:48px 44px 36px;display:flex;flex-direction:column;gap:24px;min-height:380px;position:relative;overflow:hidden}
+  .out-card .copy{max-width:460px}
+  .out-card h3{font-size:24px;line-height:1.2;margin-bottom:10px;letter-spacing:-0.02em}
+  .out-card p{font-size:14px;color:var(--ink-2);line-height:1.55}
+  .out-card .blob{position:absolute;border-radius:50%;filter:blur(40px);opacity:.55;z-index:0;pointer-events:none}
+  .out-card > *{position:relative;z-index:1}
+  .out-mock{margin-top:auto;display:flex;align-items:flex-end;justify-content:center;min-height:170px;position:relative}
+
+  /* outcome mock atoms */
+  .om-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:0 12px 28px -16px rgba(15,15,20,.18),0 4px 10px -6px rgba(15,15,20,.06);font-size:11px}
+  .om-card .lab{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.04em;display:flex;align-items:center;gap:6px}
+  .om-card .big{font-family:'Inter Tight';font-weight:700;font-size:22px;letter-spacing:-0.02em;margin-top:2px;color:var(--ink)}
+  .om-card .delta{font-size:10px;color:#0d8a4a;font-weight:600;margin-top:2px}
+  .om-card .delta.dn{color:#c44}
+
+  /* mini sparkline */
+  .om-spark{height:46px;margin-top:8px}
+
+  /* card 1 — Find SEO gems */
+  .out-1 .blob{background:oklch(0.92 0.06 200);width:280px;height:280px;left:-60px;bottom:-60px}
+  .out-1 .om-line{width:300px}
+  .out-1 .om-stack{display:flex;flex-direction:column;gap:8px;width:120px}
+
+  /* card 2 — AI prompts */
+  .out-2 .blob{background:oklch(0.92 0.06 290);width:300px;height:240px;right:-50px;bottom:-40px}
+  .out-2 .om-list{width:170px}
+  .out-2 .om-list ul{margin:6px 0 0;padding:0;list-style:none}
+  .out-2 .om-list li{display:flex;justify-content:space-between;align-items:center;font-size:10px;padding:3px 0;color:var(--ink-2)}
+  .out-2 .om-list li::before{content:"";width:14px;height:14px;border-radius:3px;background:var(--brand-soft);margin-right:6px;flex-shrink:0}
+  .out-2 .om-list li span{flex:1;color:var(--ink)}
+  .out-2 .om-list li b{font-weight:600;color:var(--muted);font-size:10px}
+  .out-2 .om-radar{width:170px;display:flex;align-items:center;justify-content:center}
+
+  /* card 3 — Search intent funnel */
+  .out-3 .blob{background:oklch(0.92 0.07 60);width:280px;height:240px;left:-40px;bottom:-40px}
+  .out-3 .om-funnel{width:280px}
+  .out-3 .om-funnel .row{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:10px}
+  .out-3 .om-funnel .bar{height:18px;border-radius:4px;flex-shrink:0}
+  .out-3 .om-funnel .row.active{font-weight:700}
+  .out-3 .om-funnel .row.muted{opacity:.4}
+
+  /* card 4 — Local search */
+  .out-4 .blob{background:oklch(0.94 0.06 90);width:300px;height:240px;right:-40px;bottom:-40px}
+  .out-4 .om-sel{width:240px;background:#fff;border:1px solid var(--line);border-radius:10px}
+  .out-4 .om-sel .sel{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:1px solid var(--line);font-size:11px}
+  .out-4 .om-sel .opt{display:flex;align-items:center;gap:8px;padding:7px 10px;font-size:11px;border-bottom:1px solid var(--line)}
+  .out-4 .om-sel .opt:last-child{border:none}
+  .out-4 .om-sel .opt .flag{width:14px;height:10px;background:linear-gradient(to bottom,#b22,#fff,#22b);border-radius:1px;flex-shrink:0}
+
+  /* card 5 — Content velocity */
+  .out-5 .blob{background:oklch(0.93 0.06 350);width:280px;height:240px;left:-40px;bottom:-40px}
+  .out-5 .om-bars{display:flex;align-items:flex-end;gap:8px;height:120px;width:280px}
+  .out-5 .om-bars .bar{flex:1;background:var(--brand-soft);border-radius:6px 6px 2px 2px;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;font-size:9px;font-weight:600;color:var(--brand-ink)}
+  .out-5 .om-bars .bar.tall{background:var(--brand)}
+
+  /* card 6 — Reporting */
+  .out-6 .blob{background:oklch(0.93 0.05 150);width:280px;height:240px;right:-40px;bottom:-40px}
+  .out-6 .om-report{width:280px}
+  .out-6 .om-report .row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;font-size:11px;border-bottom:1px solid var(--line)}
+  .out-6 .om-report .row:last-child{border:none}
+  .out-6 .om-report .pct{font-family:'Inter Tight';font-weight:700;font-size:13px;color:var(--ink)}
+
+  /* PRICING */
+  .pricing{padding:120px 0;background:#0d0d0f;color:#fff;position:relative;overflow:hidden;border-top:1px solid rgba(255,255,255,.08)}
+  .pricing::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 12% 8%, rgba(255,106,61,.22) 0, transparent 42%),radial-gradient(circle at 88% 92%, rgba(255,106,61,.16) 0, transparent 45%);pointer-events:none}
+  .pricing > *{position:relative}
+  .pricing .head{text-align:center;max-width:760px;margin:0 auto 56px}
+  .pricing .head .mono{color:var(--brand)}
+  .pricing .head h2{color:#fff;font-size:56px;letter-spacing:-0.03em;text-transform:none}
+  .pricing .head p{color:rgba(255,255,255,.65);margin-top:14px;font-size:17px}
+  .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch;max-width:1100px;margin:0 auto}
+  @media (max-width:1000px){.pricing-grid{grid-template-columns:1fr}}
+  .price-card{background:#1a1a1f;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:32px 28px;display:flex;flex-direction:column;gap:18px;position:relative;transition:.2s;box-shadow:0 18px 40px -28px rgba(0,0,0,.6);color:rgba(255,255,255,.85)}
+  .price-card:hover{border-color:var(--brand);transform:translateY(-2px)}
+  .price-card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .price-card h3{color:#fff;font-size:22px;font-family:'Inter Tight';font-weight:700;letter-spacing:-0.02em;line-height:1.15;margin:0}
+  .price-card .save{background:rgba(255,106,61,.16);color:var(--brand);border:1px solid rgba(255,106,61,.30);padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;white-space:nowrap;letter-spacing:0}
+  .price-card .start{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:0.14em;font-weight:600}
+  .price-card .price{font-family:'Inter Tight';font-weight:800;font-size:48px;line-height:1;letter-spacing:-0.03em;color:#fff}
+  .price-card .price small{font-size:14px;color:rgba(255,255,255,.55);font-weight:500;letter-spacing:0;margin-left:4px}
+  .price-card .desc{font-size:14px;color:rgba(255,255,255,.70);line-height:1.55}
+  .price-card .pbtn{display:block;text-align:center;padding:13px 16px;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;transition:.18s;margin-top:auto;border:1px solid rgba(255,255,255,.18);color:#fff;background:transparent}
+  .price-card .pbtn:hover{border-color:var(--brand);color:var(--brand);background:rgba(255,106,61,.06)}
+  .price-card.featured{border-color:var(--brand);background:linear-gradient(180deg,var(--brand) 0%,var(--brand-deep) 100%);box-shadow:0 30px 60px -20px rgba(255,106,61,.55),0 10px 20px -12px rgba(15,15,20,.30)}
+  .price-card.featured h3{color:#fff}
+  .price-card.featured .save{background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.30)}
+  .price-card.featured .start{color:rgba(255,255,255,.75)}
+  .price-card.featured .price{color:#fff}
+  .price-card.featured .price small{color:rgba(255,255,255,.75)}
+  .price-card.featured .desc{color:rgba(255,255,255,.85)}
+  .price-card.featured .pbtn{background:#fff;border-color:#fff;color:var(--brand-deep)}
+  .price-card.featured .pbtn:hover{background:var(--ink);border-color:var(--ink);color:#fff}
+  .price-card .recommended{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--brand);color:#fff;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;padding:7px 16px;border-radius:99px;white-space:nowrap;box-shadow:0 8px 20px -8px rgba(255,106,61,.5)}
+  .price-card.custom{background:#1a1a1f;color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.08)}
+  .price-card.custom h3{color:#fff}
+  .price-card.custom .start{color:rgba(255,255,255,.55)}
+  .price-card.custom .price{color:#fff;font-size:34px;letter-spacing:-0.01em}
+  .price-card.custom .desc{color:rgba(255,255,255,.70)}
+  .price-card.custom .pbtn{background:transparent;color:#fff;border-color:rgba(255,255,255,.18)}
+  .price-card.custom .pbtn:hover{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+  /* FEATURES (legacy, unused now) */
+  .features{padding:120px 0;background:var(--bg)}
+  .features .head{text-align:center;max-width:720px;margin:0 auto 64px}
+  .features h2 i{font-style:italic;font-weight:500}
+  .feat-grid{display:grid;grid-template-columns:320px 1fr;gap:24px}
+  @media (max-width:900px){.feat-grid{grid-template-columns:1fr}}
+  .feat-list{display:flex;flex-direction:column;gap:10px}
+  .feat-list .item{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:.15s;font-weight:600;font-size:15px}
+  .feat-list .item:hover{border-color:var(--ink)}
+  .feat-list .item.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .feat-list .item .ico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;font-weight:800;font-size:12px}
+  .feat-list .item.on .ico{background:rgba(255,255,255,.12);color:#fff}
+  .feat-detail{background:#fff;border:1px solid var(--line);border-radius:20px;padding:36px;min-height:380px;display:flex;flex-direction:column}
+  .feat-detail .ttl{display:flex;align-items:center;gap:12px;margin:0 0 20px;flex-wrap:wrap}
+  .feat-detail h3{font-size:30px;letter-spacing:-0.02em;line-height:1.1;margin:0}
+  .feat-detail .lead{font-size:15px;margin:0 0 24px;max-width:560px;display:block;clear:both}
+  .feat-bullets{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+  .feat-bullets .b{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--ink)}
+  .feat-bullets .b .n{font-family:'JetBrains Mono';font-size:11px;color:var(--muted);font-weight:600;letter-spacing:0.08em;margin-top:2px}
+  .feat-cta{margin-top:auto;padding-top:24px;display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
+  .feat-cta .arr{width:24px;height:24px;border-radius:99px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:11px}
+
+  /* HOW IT WORKS */
+  .how{padding:120px 0;background:#fff;border-top:1px solid var(--line)}
+  .how .head{text-align:center;max-width:680px;margin:0 auto 56px}
+  .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media (max-width:900px){.how-grid{grid-template-columns:1fr}}
+  .how-card{background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:14px;min-height:240px;position:relative}
+  .how-card .top{display:flex;justify-content:space-between;align-items:flex-start}
+  .how-card .num{font-family:'Inter Tight';font-size:14px;font-weight:700;color:var(--muted);letter-spacing:0.1em}
+  .how-card .ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:14px}
+  .how-card h3{font-size:22px;margin-top:auto}
+  .how-card p{font-size:14px}
+
+  /* CTA */
+  .cta{padding:140px 0;background:var(--ink);color:#fff;position:relative;overflow:hidden}
+  .cta::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 20% 20%, rgba(255,255,255,.04) 0, transparent 40%),radial-gradient(circle at 80% 80%, rgba(255,255,255,.03) 0, transparent 40%);pointer-events:none}
+  .cta .center{text-align:center;max-width:760px;margin:0 auto;position:relative}
+  .cta h2{color:#fff;font-size:64px;letter-spacing:-0.03em}
+  .cta h2 .y{color:var(--brand)}
+  .cta p{color:rgba(255,255,255,.65);margin-top:18px;font-size:17px}
+  .cta-btns{margin-top:40px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .cta .btn-light{background:#fff;color:var(--ink);border-color:#fff}
+
+  /* FOOTER */
+  footer{background:var(--ink);color:rgba(255,255,255,.6);padding:60px 0 40px;border-top:1px solid rgba(255,255,255,.08)}
+  .foot{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px}
+  @media (max-width:900px){.foot{grid-template-columns:1fr 1fr}}
+  .foot h6{color:#fff;font-family:'Inter Tight';font-size:13px;font-weight:700;margin-bottom:14px;letter-spacing:0.04em}
+  .foot a{display:block;font-size:13px;padding:5px 0;color:rgba(255,255,255,.6)}
+  .foot a:hover{color:#fff}
+  .foot-brand p{color:rgba(255,255,255,.55);font-size:13px;margin-top:14px;max-width:280px}
+  .foot .logo{color:#fff}
+  .foot .logo .logo-mark{background:#fff;color:var(--ink)}
+  .foot-bot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.08);margin-top:48px;padding-top:24px;font-size:12px}
+
+  /* logos strip */
+  .logos{padding:24px 0 40px;border-top:1px solid var(--line);background:var(--bg)}
+  .logos .lab{text-align:center;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:24px}
+  .logo-row{display:flex;justify-content:center;gap:56px;flex-wrap:wrap;align-items:center;font-family:'Inter Tight';font-weight:700;font-size:18px;color:#9a9a9f;letter-spacing:-0.02em}
+
+  @media (max-width:700px){
+    h1{font-size:54px}
+    h2{font-size:38px}
+    .domain h2{font-size:38px}
+    .cta h2{font-size:44px}
+  }
+
+  /* PRINT */
+  @page{size:A4 portrait;margin:0}
+  @media print{
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    html,body{background:#fbfaf7!important}
+    nav.top{position:static!important;border-bottom:1px solid var(--line)!important;background:#fff!important}
+    .reveal{opacity:1!important;transform:none!important;filter:none!important;animation:none!important;transition:none!important}
+    .ft-1,.ft-2,.ft-3{animation:none!important}
+    section,.hero,.domain,.problem,.solution,.outcomes,.pricing,.how,.cta,footer{break-inside:avoid;page-break-inside:avoid}
+    section{break-before:page;page-break-before:always}
+    .hero{break-before:auto;page-break-before:auto}
+    .domain,.problem,.outcomes,.pricing,.cta{break-before:page;page-break-before:always}
+    .out-card,.price-card,.how-card,.stat,.step,.feat-detail{break-inside:avoid;page-break-inside:avoid}
+    h1,h2,h3,h4{break-after:avoid;page-break-after:avoid}
+    a{text-decoration:none!important;color:inherit!important}
+    .hero-search,.domain-form,.try-row{display:none!important}
+    /* hide tweaks panel container if present */
+    #__tweaks-root,[data-tweaks-panel]{display:none!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top">
+  <div class="wrap row">
+    <div class="logo">
+      <img src="assets/solospider-logo.png" alt="solospider" />
+    </div>
+    <div class="nav-links">
+      <a>Features</a>
+      <a>Who It's For</a>
+      <a>Pricing</a>
+      <a>Blog</a>
+      <a>SEO Audit</a>
+    </div>
+    <div class="nav-cta">
+      <a style="font-size:14px;font-weight:500;color:var(--ink-2)">Log in</a>
+      <a class="btn btn-dark">Start Free →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="web-bg" aria-hidden="true">
+    <svg viewBox="-500 -50 1000 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin slice">
+      <g stroke="#8a8a90" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.5">
+        <!-- 24 radial spokes from anchor at top-center (0,0), spreading downward -->
+        <g id="spokes">
+          <line x1="0" y1="0" x2="-560" y2="40"/>
+          <line x1="0" y1="0" x2="-540" y2="110"/>
+          <line x1="0" y1="0" x2="-500" y2="180"/>
+          <line x1="0" y1="0" x2="-450" y2="250"/>
+          <line x1="0" y1="0" x2="-380" y2="320"/>
+          <line x1="0" y1="0" x2="-300" y2="380"/>
+          <line x1="0" y1="0" x2="-220" y2="430"/>
+          <line x1="0" y1="0" x2="-140" y2="470"/>
+          <line x1="0" y1="0" x2="-60" y2="495"/>
+          <line x1="0" y1="0" x2="0" y2="500"/>
+          <line x1="0" y1="0" x2="60" y2="495"/>
+          <line x1="0" y1="0" x2="140" y2="470"/>
+          <line x1="0" y1="0" x2="220" y2="430"/>
+          <line x1="0" y1="0" x2="300" y2="380"/>
+          <line x1="0" y1="0" x2="380" y2="320"/>
+          <line x1="0" y1="0" x2="450" y2="250"/>
+          <line x1="0" y1="0" x2="500" y2="180"/>
+          <line x1="0" y1="0" x2="540" y2="110"/>
+          <line x1="0" y1="0" x2="560" y2="40"/>
+        </g>
+        <!-- concentric arcs (sagging slightly to look web-like) -->
+        <g id="arcs" stroke-width="0.9">
+          <path d="M -90 70 Q 0 95 90 70"/>
+          <path d="M -160 130 Q 0 168 160 130"/>
+          <path d="M -230 195 Q 0 240 230 195"/>
+          <path d="M -300 260 Q 0 312 300 260"/>
+          <path d="M -370 320 Q 0 380 370 320"/>
+          <path d="M -440 380 Q 0 445 440 380"/>
+          <path d="M -510 435 Q 0 505 510 435"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+  <div class="float-tag ft-1 reveal scale delay-2">
+    <div class="ico" style="background:var(--mint);color:var(--mint-ink)">↑</div>
+    <div>
+      <div style="font-size:11px;color:var(--muted);font-weight:500">Blogs published</div>
+      <div>+128 this month</div>
+    </div>
+  </div>
+  <div class="float-tag ft-2 reveal scale delay-3">
+    <div class="ico" style="background:var(--lav);color:var(--lav-ink)">◆</div>
+    <div>
+      <div style="font-size:11px;color:var(--muted);font-weight:500">Tools replaced</div>
+      <div>6 → 1</div>
+    </div>
+  </div>
+  <div class="float-tag ft-3 reveal scale delay-4">
+    <div class="ico" style="background:var(--coral);color:var(--coral-ink)">∿</div>
+    <div>
+      <div style="font-size:11px;color:var(--muted);font-weight:500">Setup time</div>
+      <div>Under 5 min</div>
+    </div>
+  </div>
+
+  <div class="wrap hero-grid">
+    <div>
+      <div class="hero-eyebrow reveal"><span class="pulse"></span> Now live — The AI marketing OS for agencies &amp; creators</div>
+      <h1 class="reveal delay-1" style="width: 900px; text-align: center; margin-left: auto; margin-right: auto;">Replace Your Entire Digital Marketing Team with <span class="accent">One Tool</span></h1>
+      <p class="hero-sub reveal delay-2">Solo Spider automates everything your marketing team does — blogs, social media, SEO, and AI search visibility. One subscription. No agency retainer. No hiring headache.</p>
+
+      <form class="hero-search reveal delay-3" onsubmit="event.preventDefault()">
+        <div class="row">
+          <input type="text" placeholder="Ask solospider to audit, rank or write for..." />
+          <button class="send" type="submit" aria-label="Send">↑</button>
+        </div>
+      </form>
+      <div class="try-row reveal delay-3">
+        <span class="cap c-y"><span class="dot"></span>SEO</span>
+        <span class="cap c-p"><span class="dot"></span>AEO</span>
+        <span class="cap c-b"><span class="dot"></span>GEO</span>
+        <span class="cap c-g"><span class="dot"></span>Paid Ads</span>
+        <span class="cap c-o"><span class="dot"></span>Social Media Automation</span>
+      </div>
+
+      <div class="hero-cta reveal delay-4">
+        <a class="btn btn-dark">Start for Free →</a>
+        <a class="btn btn-light">See How It Works</a>
+      </div>
+      <div class="hero-meta reveal delay-4">
+        <div class="item"><span class="check">✓</span> No credit card required</div>
+        <div class="item"><span class="check">✓</span> Free plan available</div>
+        <div class="item"><span class="check">✓</span> Set up in 5 minutes</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<div class="logos">
+  <div class="wrap">
+    <div class="lab reveal">Trusted by 2,000+ agencies, freelancers, and solo founders</div>
+    <div class="logo-row reveal delay-1">
+      <span style="font-style:italic">Loomstack</span>
+      <span>GLOBAL</span>
+      <span style="letter-spacing:.2em">RUN/TIDE</span>
+      <span style="font-family:serif">acentire</span>
+      <span>/forest</span>
+      <span style="font-weight:800">NORTHWAVE</span>
+    </div>
+  </div>
+</div>
+
+<!-- DOMAIN / DASHBOARD (image 2 section) -->
+<section class="domain">
+  <div class="wrap">
+    <div class="center">
+      <span class="chip reveal" style="background:#fff"><span class="dot" style="background:var(--brand)"></span> Setup</span>
+      <h2 class="reveal delay-1" style="margin-top:18px">From setup to running on autopilot — in one day.</h2>
+      <p class="sub reveal delay-2">You don't need a marketing degree, a developer, or a full team. Connect your accounts and let Solo Spider do the rest.</p>
+      <div class="domain-form reveal delay-3">
+        <div class="start-here">
+          <span class="label">Try it!</span>
+          <svg class="arrow-curve" viewBox="0 0 42 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <path d="M2 4 C 14 22, 28 22, 38 14"/>
+            <path d="M32 11 L 38 14 L 35 19"/>
+          </svg>
+        </div>
+        <input class="domain-input" placeholder="Enter your website URL to begin" value="" />
+        <button class="btn btn-coral">Get Started Free</button>
+      </div>
+    </div>
+
+    <div class="domain-layout">
+      <div class="steps reveal from-l">
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="num">1</div>
+          <div>
+            <h4>Connect your channels</h4>
+            <p>Link your <span class="hi">website &amp; socials</span>. We pull in your brand voice automatically.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="num">2</div>
+          <div>
+            <h4>Set your goals</h4>
+            <p>Tell us what to grow — <span class="hi">traffic, social, AI visibility</span>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="num">3</div>
+          <div>
+            <h4>Review and approve</h4>
+            <p>Approve drafts in one click. Or set fully auto — your call.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD MOCK -->
+      <div class="dash reveal scale delay-2">
+        <div class="dash-bar">
+          <div class="left">
+            <div class="dots"><span></span><span></span><span></span></div>
+            <span class="pill" style="background:#fff">solospider.ai <span style="color:var(--muted)">▾</span></span>
+            <span class="pill" style="background:#fff">🇺🇸 EN</span>
+          </div>
+          <div class="left">
+            <span class="pill">Services ▾</span>
+            <span class="pill" style="background:var(--ink);color:#fff;border-color:var(--ink)">Plans &amp; Pricing</span>
+          </div>
+        </div>
+        <div class="dash-body">
+          <div class="side">
+            <div class="group">
+              <div class="label">Workspace</div>
+              <a class="active">Dashboard</a>
+              <a>Rank Tracking <span class="car">›</span></a>
+              <a>SEO Opportunities</a>
+              <a>My Workspace</a>
+              <a>Chrome Extension</a>
+            </div>
+            <div class="group">
+              <div class="label">Tools</div>
+              <a>Site Audit</a>
+              <a>Keyword Research <span class="car">›</span></a>
+              <a>Traffic Estimation <span class="car">›</span></a>
+              <a>Backlinks <span class="car">›</span></a>
+              <a>Labs <span class="car">›</span></a>
+              <a>AI Writer</a>
+            </div>
+          </div>
+          <div class="main">
+            <div class="main-head">
+              <div class="l">
+                <h5>Dashboard</h5>
+                <span class="pill" style="background:#fff">● neilpatel.com ▾</span>
+              </div>
+              <div class="r">
+                <span class="pill" style="background:#fff">✎ Edit Project</span>
+                <span class="pill" style="background:#fff">⊕ Add Project</span>
+              </div>
+            </div>
+
+            <div class="top-ops">
+              <div class="ttl">Top SEO Opportunities</div>
+              <div class="ops-row">
+                <div class="op">
+                  <div class="row1"><span class="tag issue">SEO ISSUE ⓘ</span><span class="prio">⚑ Priority 1</span></div>
+                  <p class="txt"><span class="b">212 pages</span> with broken links</p>
+                  <div class="ctrl"><div class="feed"><span class="ico-btn">▲</span><span class="ico-btn">▼</span></div><span class="start-btn">START</span></div>
+                </div>
+                <div class="op">
+                  <div class="row1"><span class="tag opt">OPTIMIZE ⓘ</span><span class="prio">⚑ Priority 2</span></div>
+                  <p class="txt"><span class="b">This page</span> has potential to rank higher for <i>"why include a noindex tag"</i></p>
+                  <div class="ctrl"><div class="done-check"><span class="box"></span> Mark as done</div><span class="start-btn">START</span></div>
+                </div>
+                <div class="op">
+                  <div class="row1"><span class="tag opt">OPTIMIZE ⓘ</span><span class="prio">⚑ Priority 3</span></div>
+                  <p class="txt"><span class="b">This page</span> can rank for <i>"post on facebook and instagram same time"</i></p>
+                  <div class="ctrl"><div class="done-check"><span class="box"></span> Mark as done</div><span class="start-btn">START</span></div>
+                </div>
+                <div class="op">
+                  <div class="row1"><span class="tag opt">OPTIMIZE ⓘ</span><span class="prio">⚑ Priority 4</span></div>
+                  <p class="txt"><span class="b">This page</span> can rank for <i>"how many blogs to post per month"</i></p>
+                  <div class="ctrl"><div class="done-check"><span class="box"></span> Mark as done</div><span class="start-btn">START</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="twocol">
+              <div class="panel">
+                <h6>Keyword Rankings</h6>
+                <div class="desc">Summary of how your tracked keywords are ranking on Google. <b>FEB 01 — MAR 03 2026</b></div>
+                <div class="kw-stat">
+                  <div><div class="n">0</div><div class="l">Keywords moved up</div></div>
+                  <div><div class="n">0</div><div class="l">Keywords moved down</div></div>
+                </div>
+                <div class="pie-row">
+                  <div class="pie"></div>
+                  <div class="legend">
+                    <div class="lr"><span><span class="sw" style="background:var(--brand)"></span>Top 3</span><b>0</b></div>
+                    <div class="lr"><span><span class="sw" style="background:var(--brand-tint)"></span>Top 10</span><b>0</b></div>
+                    <div class="lr"><span><span class="sw" style="background:var(--brand-soft)"></span>Top 100</span><b>0</b></div>
+                    <div class="lr"><span><span class="sw" style="background:#f1ece8"></span>Not ranking</span><b>42</b></div>
+                  </div>
+                </div>
+              </div>
+              <div class="panel">
+                <h6>Estimated Traffic Value</h6>
+                <div class="desc">The estimated value of your site's organic traffic at a given moment in time, based on Google Ads CPC. <b>FEB 01 — MAR 03 2026</b></div>
+                <div class="traffic-num">US$ 4,120,250</div>
+                <div class="chart">
+                  <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0" stop-color="#ff6a3d" stop-opacity=".4"/>
+                        <stop offset="1" stop-color="#ff6a3d" stop-opacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M0 90 C 40 80, 80 88, 120 70 S 200 30, 240 35 300 50, 340 28 400 18, 400 18 L 400 120 L 0 120 Z" fill="url(#g)"/>
+                    <path d="M0 90 C 40 80, 80 88, 120 70 S 200 30, 240 35 300 50, 340 28 400 18, 400 18" stroke="#ff6a3d" stroke-width="2" fill="none"/>
+                    <circle cx="240" cy="35" r="4" fill="#ff6a3d"/>
+                  </svg>
+                  <div class="pin">FEB 10–16: $3.7M</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="wrap">
+    <div class="head reveal">
+      <div class="mono" style="margin-bottom:18px">— The problem</div>
+      <h2>You're paying for <span class="red">6 tools</span> that should be <span class="red">one</span>.</h2>
+      <p class="lead">The average marketer juggles Surfer SEO, Buffer, Canva, Ahrefs, a CMS, and a separate AI writer — spending ₹30,000–₹80,000/month on subscriptions that barely talk to each other. Solo Spider collapses the entire stack into a single, automated workflow.</p>
+    </div>
+    <div class="stat-row">
+      <div class="stat reveal delay-1">
+        <div class="ico" style="background:var(--coral);color:var(--coral-ink)">⏱</div>
+        <div class="num">10×</div>
+        <div class="lab">Faster content production vs. doing it manually across separate tools.</div>
+      </div>
+      <div class="stat reveal delay-2">
+        <div class="ico" style="background:var(--lav);color:var(--lav-ink)">$</div>
+        <div class="num">₹40k+</div>
+        <div class="lab">Avg. monthly tool cost replaced by a single Solo Spider subscription.</div>
+      </div>
+      <div class="stat reveal delay-3">
+        <div class="ico" style="background:var(--mint);color:var(--mint-ink)">%</div>
+        <div class="num">80%</div>
+        <div class="lab">Reduction in time spent on repetitive marketing &amp; tool-switching.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution">
+  <div class="wrap sol-grid">
+    <div class="reveal from-l">
+      <div class="sol-eyebrow">— Who it's for</div>
+      <h2>Built for agencies. <i>Priced for solo creators.</i></h2>
+      <p class="lead">Solo Spider works whether you're running campaigns for 20 clients or building a brand entirely on your own — from one dashboard, one subscription, and zero hiring headache.</p>
+      <div class="sol-list">
+        <div class="li"><div class="c">✓</div> Manage 25+ client workspaces from a single account</div>
+        <div class="li"><div class="c">✓</div> Auto-generate blogs, captions, images &amp; video per client</div>
+        <div class="li"><div class="c">✓</div> White-label SEO &amp; AI-search reports clients understand</div>
+        <div class="li"><div class="c">✓</div> Show up in ChatGPT, Gemini and Google AI Overviews</div>
+      </div>
+    </div>
+    <div class="agent-card reveal from-r">
+      <div class="mono" style="margin-bottom:6px">live workspace</div>
+      <div class="agent-row">
+        <div class="l">
+          <div class="agent-ico" style="background:var(--mint);color:var(--mint-ink)">✎</div>
+          <div><div class="name">Blog automation</div><div class="sub">Drafting "Best D2C tools for 2026"</div></div>
+        </div>
+        <span class="agent-status">RUNNING</span>
+      </div>
+      <div class="agent-row">
+        <div class="l">
+          <div class="agent-ico" style="background:var(--lav);color:var(--lav-ink)">◎</div>
+          <div><div class="name">Social media</div><div class="sub">14 posts queued across IG, LinkedIn, X</div></div>
+        </div>
+        <span class="agent-status">SCHEDULED</span>
+      </div>
+      <div class="agent-row">
+        <div class="l">
+          <div class="agent-ico" style="background:var(--coral);color:var(--coral-ink)">⌕</div>
+          <div><div class="name">SEO audit &amp; fix</div><div class="sub">12 issues fixed in last hour</div></div>
+        </div>
+        <span class="agent-status r">REVIEW</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOMES -->
+<section class="outcomes">
+  <div class="wrap">
+    <div class="head reveal">
+      <div class="mono" style="margin-bottom:18px">— Everything included</div>
+      <h2>Six superpowers. <i>One subscription.</i></h2>
+      <p style="margin-top:18px">No integrations to configure. No freelancers to brief. No tool-switching. Everything works together because it lives in one place.</p>
+    </div>
+    <div class="out-grid">
+      <!-- 1: Find SEO gems -->
+      <div class="out-card out-1 reveal">
+        <div class="blob"></div>
+        <div class="copy">
+          <h3>Write less. Publish more.</h3>
+          <p>Long-form, SEO-optimised blog posts in your brand voice — then scheduled and published automatically. You approve. We do everything else.</p>
+        </div>
+        <div class="out-mock">
+          <div class="om-card om-line" style="width:240px">
+            <div class="lab"><span style="width:14px;height:14px;border-radius:50%;background:linear-gradient(45deg,#4285f4,#ea4335,#fbbc05,#34a853);display:inline-block"></span>Search volume</div>
+            <div class="big">9.9M</div>
+            <svg class="om-spark" viewBox="0 0 200 46" preserveAspectRatio="none"><polyline points="0,38 25,32 50,34 75,22 100,28 125,16 150,20 175,8 200,12" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="om-stack" style="margin-left:10px">
+            <div class="om-card"><div class="lab">SEO difficulty</div><div class="big" style="font-size:18px">88</div><div class="delta dn">Hard</div></div>
+            <div class="om-card"><div class="lab">Top-page traffic</div><div class="big" style="font-size:18px">50.5K</div><div class="delta">+12%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2: AI prompts -->
+      <div class="out-card out-2 reveal delay-1">
+        <div class="blob"></div>
+        <div class="copy">
+          <h3>Plan it. Generate it. Post it.</h3>
+          <p>On-brand images, short-form video, captions and hashtags — Solo Spider handles your entire social presence without you logging into a single platform.</p>
+        </div>
+        <div class="out-mock">
+          <div class="om-card om-list">
+            <div class="lab">Brands mentioned</div>
+            <ul>
+              <li><span>Acme</span><b>42%</b></li>
+              <li><span>Loomstack</span><b>28%</b></li>
+              <li><span>Pavlov</span><b>18%</b></li>
+              <li><span>Northwind</span><b>9%</b></li>
+              <li><span>Other</span><b>3%</b></li>
+            </ul>
+          </div>
+          <div class="om-card om-radar" style="margin-left:10px">
+            <svg width="130" height="130" viewBox="0 0 130 130">
+              <g transform="translate(65 65)">
+                <polygon points="0,-50 43,-25 43,25 0,50 -43,25 -43,-25" fill="none" stroke="#ddd" stroke-width="1"/>
+                <polygon points="0,-30 26,-15 26,15 0,30 -26,15 -26,-15" fill="none" stroke="#ddd" stroke-width="1"/>
+                <polygon points="0,-44 38,-20 36,22 0,42 -32,15 -34,-22" fill="oklch(0.85 0.15 290 / 0.45)" stroke="oklch(0.55 0.20 290)" stroke-width="1.5"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3: Search intent -->
+      <div class="out-card out-3 reveal">
+        <div class="blob"></div>
+        <div class="copy">
+          <h3>Find every SEO problem. Fix it without a developer.</h3>
+          <p>Scans your entire site for broken tags, slow pages, missing meta and weak internal linking — then helps you fix them without touching code.</p>
+        </div>
+        <div class="out-mock">
+          <div class="om-card om-funnel">
+            <div class="lab" style="text-transform:uppercase;letter-spacing:0.06em">Search intent</div>
+            <p style="font-size:11px;color:var(--ink-2);margin-top:4px;line-height:1.4">Main intent is informational — users are seeking knowledge or details on this topic.</p>
+            <div class="row active"><div class="bar" style="width:100%;background:var(--brand)"></div></div>
+            <div style="font-size:10px;font-weight:700;color:var(--brand);margin-left:0">Informational</div>
+            <div class="row"><div class="bar" style="width:75%;background:#f0d9c8"></div></div>
+            <div style="font-size:10px;color:var(--muted)">Commercial</div>
+            <div class="row muted"><div class="bar" style="width:50%;background:#eee"></div></div>
+            <div style="font-size:10px;color:var(--muted)">Transactional</div>
+            <div class="row muted"><div class="bar" style="width:30%;background:#eee"></div></div>
+            <div style="font-size:10px;color:var(--muted)">Navigational</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4: Local search -->
+      <div class="out-card out-4 reveal delay-1">
+        <div class="blob"></div>
+        <div class="copy">
+          <h3>Be found in AI search.</h3>
+          <p>ChatGPT, Gemini and Google AI Overviews now answer questions directly. AEO + GRO make sure your brand shows up in those answers — not just on page one.</p>
+        </div>
+        <div class="out-mock">
+          <div class="om-sel">
+            <div class="sel"><span><b>Location</b></span><span style="color:var(--muted)">▾</span></div>
+            <div class="sel" style="font-weight:600"><span style="display:flex;align-items:center;gap:8px"><span class="flag"></span>Jacksonville</span><span></span></div>
+            <div class="opt"><span class="flag"></span>Jacksonville, Florida, United States</div>
+            <div class="opt"><span class="flag"></span>Jacksonville Beach, Florida, US</div>
+            <div class="opt"><span class="flag"></span>Jacksonville, Alabama, United States</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5: Content velocity -->
+      <div class="out-card out-5 reveal">
+        <div class="blob"></div>
+        <div class="copy">
+          <h3>Ship 10× the content.</h3>
+          <p>Briefs, drafts, social posts and ad copy — generated, edited and scheduled while your team sleeps. Approve in one click.</p>
+        </div>
+        <div class="out-mock">
+          <div class="om-card" style="width:300px">
+            <div class="lab">Articles published / week</div>
+            <div class="om-bars" style="margin-top:10px">
+              <div class="bar" style="height:30%">2</div>
+              <div class="bar" style="height:45%">4</div>
+              <div class="bar" style="height:60%">7</div>
+              <div class="bar tall" style="height:78%;color:#fff">11</div>
+              <div class="bar tall" style="height:90%;color:#fff">18</div>
+              <div class="bar tall" style="height:100%;color:#fff">24</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6: Reporting -->
+      <div class="out-card out-6 reveal delay-1">
+        <div class="blob"></div>
+        <div class="copy">
+          <h3>Reports your CFO loves.</h3>
+          <p>Weekly digests with the only metrics that matter: rankings, traffic value, AI-search visibility. Delivered to Slack — no dashboards required.</p>
+        </div>
+        <div class="out-mock">
+          <div class="om-card om-report">
+            <div class="lab" style="padding:0 10px 8px;border-bottom:1px solid var(--line)">Weekly digest — Mon 9:00am</div>
+            <div class="row"><span>Top 3 rankings</span><span class="pct" style="color:var(--brand)">+18</span></div>
+            <div class="row"><span>Organic clicks</span><span class="pct">42.1k <small style="color:#0d8a4a;font-size:11px">+12%</small></span></div>
+            <div class="row"><span>Backlinks earned</span><span class="pct">+148</span></div>
+            <div class="row"><span>Traffic value</span><span class="pct">$4.12M</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing" style="background-color: #0d0d0f">
+  <div class="wrap">
+    <div class="head reveal">
+      <div class="mono" style="margin-bottom:18px">— Pricing</div>
+      <h2>Perfect plan to grow.</h2>
+      <p>A fraction of the cost of a human employee. 10× the output. Zero onboarding time.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <div class="top"><h3>Starter</h3><span class="save">Free forever</span></div>
+        <div class="start">For solo creators getting started</div>
+        <div class="price">₹0<small>/month</small></div>
+        <div class="desc">5 blog posts &amp; 20 social posts/month. Basic SEO audit. Limited AEO insights. 1 social account.</div>
+        <a class="pbtn">Get started free →</a>
+      </div>
+      <div class="price-card featured reveal delay-1">
+        <span class="recommended">Most popular</span>
+        <div class="top"><h3>Solo</h3><span class="save">Save 30% yearly</span></div>
+        <div class="start">For founders, freelancers &amp; creators</div>
+        <div class="price">₹4,999<small>/month</small></div>
+        <div class="desc">Unlimited blog &amp; social content. Full SEO audit + auto-fix. AEO &amp; GRO dashboard. 5 social accounts.</div>
+        <a class="pbtn">Start Solo plan →</a>
+      </div>
+      <div class="price-card custom reveal delay-2">
+        <div class="top"><h3>Agency</h3></div>
+        <div class="start">For teams &amp; client work</div>
+        <div class="price">Custom</div>
+        <div class="desc">Everything in Solo + 25 client workspaces, white-label reports, bulk scheduling, dedicated onboarding.</div>
+        <a class="pbtn">Talk to us →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="wrap">
+    <div class="head reveal">
+      <div class="mono" style="margin-bottom:18px">— How it works</div>
+      <h2>From setup to autopilot — in <i>one day</i>.</h2>
+    </div>
+    <div class="how-grid">
+      <div class="how-card reveal delay-1">
+        <div class="top"><span class="num">01</span><div class="ico" style="background:var(--mint);color:var(--mint-ink)">⊞</div></div>
+        <h3>Connect your channels</h3>
+        <p>Link your website, social accounts and CMS. Solo Spider learns your brand voice automatically.</p>
+      </div>
+      <div class="how-card reveal delay-2">
+        <div class="top"><span class="num">02</span><div class="ico" style="background:var(--coral);color:var(--coral-ink)">◐</div></div>
+        <h3>Set your goals</h3>
+        <p>Tell us what to grow — traffic, social, rankings or AI search visibility. We build the strategy.</p>
+      </div>
+      <div class="how-card reveal delay-3">
+        <div class="top"><span class="num">03</span><div class="ico" style="background:var(--lav);color:var(--lav-ink)">▣</div></div>
+        <h3>Review &amp; watch it run</h3>
+        <p>Approve drafts in one click — or set fully auto. Content publishes, SEO improves, reports land in Slack.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="wrap center">
+    <h2 class="reveal">Fire your <span class="y">marketing stack</span>.<br/>Keep the results.</h2>
+    <p class="reveal delay-1">Join 2,000+ agencies and creators who replaced their entire digital marketing workflow with Solo Spider. Less cost. Less complexity. More output.</p>
+    <div class="cta-btns reveal delay-2">
+      <a class="btn btn-coral">Start Free — No Card Needed →</a>
+      <a class="btn" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.2)">Book a 20-min demo</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="foot-brand">
+        <div class="logo"><img src="assets/solospider-logo.png" alt="solospider" /></div>
+        <p>Replace your entire digital marketing team with one tool. Built for marketers who'd rather be growing than managing tools.</p>
+      </div>
+      <div>
+        <h6>Product</h6>
+        <a>Features</a><a>Pricing</a><a>Changelog</a><a>Free SEO Audit</a>
+      </div>
+      <div>
+        <h6>Use cases</h6>
+        <a>For Agencies</a><a>For Solo Creators</a><a>For Freelancers</a><a>For D2C Brands</a>
+      </div>
+      <div>
+        <h6>Company</h6>
+        <a>About</a><a>Blog</a><a>Privacy</a><a>Terms</a>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <span>© 2026 Solo Spider. All rights reserved.</span>
+      <span>Made for marketers who'd rather be growing than managing tools.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const FEATS = [
+    {t:"Content Generation",c:"var(--coral)",ic:"var(--coral-ink)",ico:"✎",
+     d:"Autonomous research, writing and updates that turn keyword opportunities into ranked, on-brand articles — across every channel.",
+     b:[["01","SEO-optimized briefs"],["02","Long-form drafts in your voice"],["03","Auto internal-link weaving"],["04","Pushes to your CMS"]]},
+    {t:"Social Media Manager",c:"var(--lav)",ic:"var(--lav-ink)",ico:"◎",
+     d:"Repurpose every published article into LinkedIn, X and Instagram posts — scheduled, A/B tested, and tracked back to organic uplift.",
+     b:[["01","Multi-channel scheduling"],["02","Hook variants A/B tested"],["03","Reply-bot for comments"],["04","Attribution to traffic"]]},
+    {t:"Performance Ads",c:"var(--mint)",ic:"var(--mint-ink)",ico:"$",
+     d:"Auto-generate Google and Meta ad variants from your top SEO pages. Re-allocate spend toward whichever creative compounds traffic.",
+     b:[["01","Creative auto-spin"],["02","Daily bid adjustments"],["03","ROAS reporting"],["04","Pause underperformers"]]},
+    {t:"SEO Optimization",c:"var(--lemon)",ic:"var(--lemon-ink)",ico:"⌕",
+     d:"Continuously audits your site, fixes on-page issues, and surfaces every quick-win keyword you can rank for this month.",
+     b:[["01","Live site auditor"],["02","Keyword cannibalization fix"],["03","Schema auto-injection"],["04","Core Web Vitals patches"]]},
+    {t:"Backlink Outreach",c:"var(--coral)",ic:"var(--coral-ink)",ico:"↗",
+     d:"Finds high-authority targets, drafts personalised pitches, and runs follow-ups until links land — without spamming inboxes.",
+     b:[["01","DA-filtered prospect lists"],["02","Personalised cold emails"],["03","3-step follow-up sequences"],["04","Live link-tracker"]]},
+    {t:"Reporting & Insights",c:"var(--lav)",ic:"var(--lav-ink)",ico:"⌗",
+     d:"Plain-English Monday reports delivered to Slack and email. No more digging through five dashboards before standup.",
+     b:[["01","Slack-native delivery"],["02","Plain-English summary"],["03","Goal-based deltas"],["04","Stakeholder views"]]},
+  ];
+
+  function renderFeat(i){
+    const det = document.getElementById('featDetail');
+    if(!det) return;
+    const f = FEATS[i];
+    det.innerHTML = `
+      <div class="ttl">
+        <div class="ico" style="background:${f.c};color:${f.ic};width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-weight:800">${f.ico}</div>
+        <h3>${f.t}</h3>
+      </div>
+      <p class="lead">${f.d}</p>
+      <div class="feat-bullets">
+        ${f.b.map(([n,t])=>`<div class="b"><span class="n">${n}</span><span>${t}</span></div>`).join('')}
+      </div>
+      <div class="feat-cta">Configure agent <span class="arr">→</span></div>
+    `;
+  }
+  renderFeat(0);
+  document.querySelectorAll('#featList .item').forEach(el=>{
+    el.addEventListener('click',()=>{
+      document.querySelectorAll('#featList .item').forEach(x=>x.classList.remove('on'));
+      el.classList.add('on');
+      renderFeat(+el.dataset.i);
+    });
+  });
+  // Scroll reveal with safety fallbacks
+  (function(){
+    const els = document.querySelectorAll('.reveal');
+    // Reveal above-the-fold immediately
+    function vh(){ return window.innerHeight || document.documentElement.clientHeight; }
+    function inView(el){
+      const r = el.getBoundingClientRect();
+      return r.top < vh() - 40 && r.bottom > 0;
+    }
+    function activate(el){ el.classList.add('in'); }
+
+    // Initial pass: anything currently in viewport gets revealed now
+    els.forEach(el=>{ if(inView(el)) activate(el); });
+
+    // IntersectionObserver for the rest
+    if('IntersectionObserver' in window){
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){ activate(e.target); io.unobserve(e.target); }
+        });
+      },{threshold:0.08, rootMargin:"0px 0px -40px 0px"});
+      els.forEach(el=>{ if(!el.classList.contains('in')) io.observe(el); });
+    }
+
+    // Scroll-event fallback (covers iframe / preview quirks where IO may not fire)
+    function scan(){
+      els.forEach(el=>{ if(!el.classList.contains('in') && inView(el)) activate(el); });
+    }
+    window.addEventListener('scroll', scan, {passive:true});
+    window.addEventListener('resize', scan);
+
+    // Safety net: after 1.2s, reveal anything still hidden
+    setTimeout(()=>{ els.forEach(el=>{ if(!el.classList.contains('in')) activate(el); }); }, 1200);
+  })();
+</script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "brandColor": "#9025f2",
+  "heroHeadline": "Replace Your Entire Digital Marketing Team with One Tool",
+  "heroSub": "Solo Spider automates everything your marketing team does — blogs, social media, SEO, and AI search visibility. One subscription. No agency retainer. No hiring headache.",
+  "domainTitle": "From setup to running on autopilot — in one day.",
+  "showFloatingTags": false,
+  "showGridBg": true,
+  "radius": 20
+}/*EDITMODE-END*/;
+
+function hexToDeep(hex){
+  // simple darken by mixing with black 18%
+  const c = hex.replace('#','');
+  const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
+  const mix = (v)=>Math.max(0,Math.round(v*0.82));
+  const h = (v)=>v.toString(16).padStart(2,'0');
+  return '#'+h(mix(r))+h(mix(g))+h(mix(b));
+}
+function hexToSoft(hex){
+  const c = hex.replace('#','');
+  const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
+  const mix = (v)=>Math.round(v + (255-v)*0.78);
+  const h = (v)=>v.toString(16).padStart(2,'0');
+  return '#'+h(mix(r))+h(mix(g))+h(mix(b));
+}
+
+function TweaksApp(){
+  const [t, setTweak] = window.useTweaks(TWEAK_DEFAULTS);
+
+  React.useEffect(()=>{
+    const r = document.documentElement.style;
+    r.setProperty('--brand', t.brandColor);
+    r.setProperty('--brand-deep', hexToDeep(t.brandColor));
+    r.setProperty('--brand-soft', hexToSoft(t.brandColor));
+    document.querySelectorAll('.dash, .stat, .panel, .feat-detail, .agent-card, .how-card, .hero-search').forEach(el=>{
+      el.style.borderRadius = t.radius + 'px';
+    });
+    document.querySelectorAll('.float-tag').forEach(el=>{
+      el.style.display = t.showFloatingTags ? '' : 'none';
+    });
+    const hero = document.querySelector('.hero');
+    if(hero){
+      const web = hero.querySelector('.web-bg');
+      if(web) web.style.display = t.showGridBg ? '' : 'none';
+    }
+    const h1 = document.querySelector('.hero h1');
+    if(h1){
+      const headline = (t.heroHeadline||'').replace(/</g,'&lt;');
+      const lines = headline.split(/\n/);
+      let html;
+      if(lines.length>1){
+        html = lines[0] + '<br/>' + lines.slice(1).join(' ');
+      } else {
+        html = headline;
+      }
+      html = html.replace(/(One AI Platform|co-?agents?\.?)/i,'<span class="accent">$1</span>');
+      h1.innerHTML = html;
+    }
+    const sub = document.querySelector('.hero-sub');
+    if(sub) sub.textContent = t.heroSub;
+    const dt = document.querySelector('.domain h2');
+    if(dt) dt.textContent = t.domainTitle;
+  },[t]);
+
+  return (
+    <window.TweaksPanel title="Tweaks">
+      <window.TweakSection title="Brand">
+        <window.TweakColor label="Brand color" value={t.brandColor} onChange={v=>setTweak('brandColor',v)} />
+        <window.TweakSlider label="Card radius" value={t.radius} min={0} max={32} step={1} onChange={v=>setTweak('radius',v)} />
+      </window.TweakSection>
+      <window.TweakSection title="Hero">
+        <window.TweakText label="Headline" value={t.heroHeadline} onChange={v=>setTweak('heroHeadline',v)} />
+        <window.TweakText label="Subhead" value={t.heroSub} onChange={v=>setTweak('heroSub',v)} />
+        <window.TweakToggle label="Floating stat tags" value={t.showFloatingTags} onChange={v=>setTweak('showFloatingTags',v)} />
+        <window.TweakToggle label="Grid background" value={t.showGridBg} onChange={v=>setTweak('showGridBg',v)} />
+      </window.TweakSection>
+      <window.TweakSection title="Domain section">
+        <window.TweakText label="Title" value={t.domainTitle} onChange={v=>setTweak('domainTitle',v)} />
+      </window.TweakSection>
+    </window.TweaksPanel>
+  );
+}
+const tRoot = document.createElement('div');
+document.body.appendChild(tRoot);
+ReactDOM.createRoot(tRoot).render(<TweaksApp/>);
+</script>
+<script>
+  // Force reveal animations to final state immediately
+  document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+  // Auto-print once everything is ready
+  (async function(){
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch(e){}
+    await new Promise(r => window.addEventListener('load', r, { once:true }));
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+    setTimeout(() => window.print(), 700);
+  })();
+</script>
+</body>
+</html>
