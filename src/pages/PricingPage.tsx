@@ -64,9 +64,10 @@ const PricingPage = () => {
               
               <h3 className="font-display text-[22px] font-bold tracking-tight text-ink relative z-10">Pro Plan</h3>
               <p className="text-[14px] text-ink-2 mb-6 min-h-[48px] relative z-10">A full autonomous team for growing startups and agencies.</p>
-              <div className="mb-4 relative z-10">
-                <span className="font-display font-black text-[54px] leading-none tracking-tight text-primary">${annual ? '119' : '149'}</span>
-                <span className="text-[14px] font-medium text-muted tracking-normal ml-1.5 font-sans">/mo</span>
+              <div className="mb-4 relative z-10 flex items-baseline gap-2">
+                {!annual && <span className="font-display font-bold text-3xl text-muted line-through opacity-60">$199</span>}
+                <span className="font-display font-black text-[54px] leading-none tracking-tight text-primary">$149</span>
+                <span className="text-[14px] font-medium text-muted tracking-normal font-sans">/mo</span>
               </div>
               <ul className="flex flex-col gap-3 mb-8 flex-grow text-[14px] text-ink-2 border-t border-line pt-5 relative z-10">
                 <li className="flex items-start gap-2.5"><CheckCircle2 className="w-[18px] h-[18px] text-primary shrink-0 mt-0.5" /><span className="font-semibold text-ink">Everything in Starter Free</span></li>
