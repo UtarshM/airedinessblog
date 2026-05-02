@@ -18,6 +18,7 @@ import UseCasesPage from "@/pages/UseCasesPage";
 import AboutPage from "@/pages/AboutPage";
 import ContactPage from "@/pages/ContactPage";
 import BlogPage from "@/pages/BlogPage";
+import SeoAuditPage from "@/pages/SeoAuditPage";
 import NotFound from "./pages/NotFound";
 
 // Legacy dashboard pages
@@ -65,6 +66,7 @@ const App = () => (
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/blog" element={<BlogPage />} />
+              <Route path="/seo-audit" element={<SeoAuditPage />} />
               <Route path="/pricing" element={<PricingPage />} />
               <Route path="/agents" element={<AgentsPage />} />
               <Route path="/auth" element={<AuthPage />} />

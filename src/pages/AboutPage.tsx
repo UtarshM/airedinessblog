@@ -1,8 +1,10 @@
 import { MarketingNavbar } from "@/components/marketing/MarketingNavbar";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { Sparkles, Brain, Cpu, Globe2 } from "lucide-react";
+import { useReveal } from "@/hooks/useReveal";
 
 const AboutPage = () => {
+  useReveal();
   return (
     <div className="min-h-screen bg-bg-2 text-ink">
       <MarketingNavbar />

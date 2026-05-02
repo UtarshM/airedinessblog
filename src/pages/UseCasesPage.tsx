@@ -1,8 +1,10 @@
 import { MarketingNavbar } from "@/components/marketing/MarketingNavbar";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { Briefcase, Building2, Rocket } from "lucide-react";
+import { useReveal } from "@/hooks/useReveal";
 
 const UseCasesPage = () => {
+  useReveal();
   return (
     <div className="min-h-screen bg-bg-2 text-ink">
       <MarketingNavbar />

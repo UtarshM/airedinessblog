@@ -1,8 +1,10 @@
 import { MarketingNavbar } from "@/components/marketing/MarketingNavbar";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { Mail, MessageSquare, Phone } from "lucide-react";
+import { useReveal } from "@/hooks/useReveal";
 
 const ContactPage = () => {
+  useReveal();
   return (
     <div className="min-h-screen bg-bg-2 text-ink">
       <MarketingNavbar />

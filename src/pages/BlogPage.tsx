@@ -2,8 +2,10 @@ import { MarketingNavbar } from "@/components/marketing/MarketingNavbar";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useReveal } from "@/hooks/useReveal";
 
 const BlogPage = () => {
+  useReveal();
   return (
     <div className="min-h-screen bg-bg-2 text-ink">
       <MarketingNavbar />

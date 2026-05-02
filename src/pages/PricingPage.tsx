@@ -3,9 +3,11 @@ import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useReveal } from "@/hooks/useReveal";
 
 const PricingPage = () => {
   const [annual, setAnnual] = useState(true);
+  useReveal();
 
   return (
     <div className="min-h-screen bg-bg-2 text-ink">
