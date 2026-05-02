@@ -38,10 +38,10 @@ export const ProcessSection = () => {
         <div className="text-center mb-16 space-y-4">
           <h2 className="text-[#00FF66] font-bold tracking-widest text-sm uppercase">Strategic Partnership</h2>
           <h3 className="text-4xl md:text-5xl font-black tracking-tight">
-            How <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF66] to-blue-500">SoloWeb</span> Works
+            How <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF66] to-blue-500">Solo Spider</span> Works
           </h3>
           <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
-            SoloWeb is more than a tool; it’s your strategic partner. Powered by a proprietary marketing LLM and autonomous AI agents, it integrates seamlessly into your workflow to boost precision, efficiency, and impact.
+            Solo Spider is more than a tool; it’s your strategic partner. Powered by a proprietary marketing LLM and autonomous AI agents, it integrates seamlessly into your workflow to boost precision, efficiency, and impact.
           </p>
         </div>
 

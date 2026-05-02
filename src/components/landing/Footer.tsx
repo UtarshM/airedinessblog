@@ -8,10 +8,10 @@ export const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                     <div className="col-span-1 md:col-span-1">
                         <Link to="/" className="flex items-center space-x-2 mb-6">
-                            <img src="/soloweb-logo.png" alt="SoloWeb Logo" className="h-8 w-auto" />
+                            <img src="/assets/solospider-logo.png" alt="Solo Spider Logo" className="h-8 w-auto" />
                         </Link>
                         <p className="text-muted-foreground text-sm mb-6 max-w-xs">
-                            Win customers in the Agentic Web. SoloWeb identifies content that drives AI visibility and creates it for you automatically.
+                            Win customers in the Agentic Web. Solo Spider identifies content that drives AI visibility and creates it for you automatically.
                         </p>
                         <div className="flex space-x-4">
                             <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
@@ -62,7 +62,7 @@ export const Footer = () => {
 
                 <div className="pt-8 border-t border-border/40 text-center space-y-2">
                     <p className="text-sm text-muted-foreground">
-                        &copy; {new Date().getFullYear()} SoloWeb. All rights reserved.
+                        &copy; {new Date().getFullYear()} Solo Spider. All rights reserved.
                     </p>
                     <p className="text-[10px] text-muted-foreground/30 font-mono uppercase tracking-[0.2em]">
                         Build v4.0.0 - Premium Autonomous Deployment - Verified for teampression.com

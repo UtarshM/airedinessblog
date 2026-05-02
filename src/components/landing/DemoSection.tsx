@@ -14,7 +14,7 @@ export const DemoSection = () => {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF66] to-blue-500">Walkthrough?</span>
               </h3>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-lg">
-                See how SoloWeb can fit your exact needs with a 1:1 live demo. No obligations, just results.
+                See how Solo Spider can fit your exact needs with a 1:1 live demo. No obligations, just results.
               </p>
             </div>
 

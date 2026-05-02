@@ -182,7 +182,7 @@ const IntegrationsPage = () => {
 
                     <AppCard
                         title="Framer"
-                        description="Sync your Framer CMS with SoloWeb to maintain AI visibility on your site."
+                        description="Sync your Framer CMS with Solo Spider to maintain AI visibility on your site."
                         icon={BookOpen}
                         platformId="framer"
                         comingSoon={true}

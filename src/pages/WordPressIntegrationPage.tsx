@@ -144,7 +144,7 @@ const WordPressIntegrationPage = () => {
                                 <div className="pt-1">
                                     <p className="font-semibold text-foreground">Generate the Password</p>
                                     <p className="text-sm text-muted-foreground mt-1 mb-3">
-                                        Scroll down to the <strong>Application Passwords</strong> section. Enter a name (e.g. "SoloWeb") and click "Add New Application Password".
+                                        Scroll down to the <strong>Application Passwords</strong> section. Enter a name (e.g. "Solo Spider") and click "Add New Application Password".
                                     </p>
                                 </div>
                             </div>

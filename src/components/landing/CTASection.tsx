@@ -13,7 +13,7 @@ export const CTASection = () => {
                     Deploy Your First <br /> AI Agent Today
                 </h2>
                 <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-                    Stop Managing Tools. Start Scaling. Let SoloWeb autonomously grow your business 24/7.
+                    Stop Managing Tools. Start Scaling. Let Solo Spider autonomously grow your business 24/7.
                 </p>
 
                 <div className="flex flex-col sm:flex-row justify-center items-center gap-4">

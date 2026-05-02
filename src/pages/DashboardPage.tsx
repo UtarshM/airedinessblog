@@ -142,7 +142,7 @@ const DashboardPage = () => {
       {/* Welcome Header */}
       <div className="flex items-center justify-between border-b pb-4">
         <div>
-          <h1 className="text-2xl font-bold">Welcome back to <span className="text-gradient">SoloWeb</span></h1>
+          <h1 className="font-display text-2xl font-bold">Welcome back to <span className="text-primary font-black tracking-tight">Solo Spider</span></h1>
           <p className="text-muted-foreground text-sm mt-1">Your AI-powered marketing platform. Select a project to get started.</p>
         </div>
         <div className="flex items-center gap-4">

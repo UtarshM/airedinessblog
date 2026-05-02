@@ -34,7 +34,7 @@ export const HowItWorksSection = () => {
                             </span>
                         </h2>
                         <p className="text-lg text-muted-foreground mb-8">
-                            Softwares used to be a tool you operated. SoloWeb is a workforce that operates itself. 
+                            Softwares used to be a tool you operated. Solo Spider is a workforce that operates itself. 
                         </p>
 
                         <div className="space-y-8 mt-12">

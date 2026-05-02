@@ -110,7 +110,7 @@ const ShopifyIntegrationPage = () => {
                                 <div className="pt-1">
                                     <p className="font-semibold text-foreground">Create a New App</p>
                                     <p className="text-sm text-muted-foreground mt-1">
-                                        Click <strong>Apps → Create app</strong>. Name it something like "SoloWeb AI" and continue.
+                                        Click <strong>Apps → Create app</strong>. Name it something like "Solo Spider AI" and continue.
                                     </p>
                                 </div>
                             </div>

@@ -131,14 +131,11 @@ const AppSidebar = () => {
 
   return (
     <>
-      <aside className="w-64 gradient-sidebar flex flex-col min-h-screen border-r border-sidebar-border">
+      <aside className="w-64 bg-sidebar flex flex-col min-h-screen border-r border-sidebar-border">
         {/* Logo */}
-        <div className="p-4 flex items-center gap-2 border-b border-sidebar-border/50" style={{borderBottomColor: 'rgba(0,240,255,0.08)'}}>
+        <div className="p-4 flex items-center gap-2 border-b border-sidebar-border">
           <Link to="/dashboard" className="flex items-center gap-2.5 group flex-1">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#00f0ff] to-[#7000ff] flex items-center justify-center shrink-0">
-              <span className="text-sm font-black text-white">S</span>
-            </div>
-            <span className="text-lg font-black tracking-tight text-gradient">SoloWeb</span>
+            <img src="/assets/solospider-logo.png" alt="Solo Spider" className="h-[28px] w-auto" />
           </Link>
         </div>
 

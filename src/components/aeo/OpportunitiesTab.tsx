@@ -74,7 +74,7 @@ export const OpportunitiesTab = () => {
                         <div className="bg-background rounded-lg p-4 border shadow-sm text-sm space-y-3">
                             <p className="font-medium text-xs text-muted-foreground uppercase">Generated Outreach: SearchEngineLand</p>
                             <p className="leading-relaxed">
-                                "Hi Team,<br/><br/>I noticed your recent article on AEO tools cited legacy softwares but missed the modern stack. We recently launched SoloWeb, which is currently dominating Perplexity charts for 'programmatic seo'.<br/><br/>Would you be open to an addendum?"
+                                "Hi Team,<br/><br/>I noticed your recent article on AEO tools cited legacy softwares but missed the modern stack. We recently launched Solo Spider, which is currently dominating Perplexity charts for 'programmatic seo'.<br/><br/>Would you be open to an addendum?"
                             </p>
                         </div>
                         <Button className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
