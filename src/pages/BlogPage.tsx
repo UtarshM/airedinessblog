@@ -78,7 +78,7 @@ const BlogPage = () => {
             ].map((post, i) => (
               <div key={i} className={`bg-white flex flex-col border border-line rounded-3xl p-6 group cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-300 reveal ${i === 0 ? 'd1' : i === 1 ? 'd2' : 'd3'}`}>
                 <div className="h-48 rounded-2xl bg-bg-2 mb-6 relative overflow-hidden flex items-center justify-center border border-line group-hover:border-primary/20 transition-colors">
-                   <span className="font-display font-black text-3xl text-ink/20 relative z-10 tracking-tighter">SoloWeb</span>
+                   <span className="font-display font-black text-3xl text-ink/20 relative z-10 tracking-tighter">Solo Spider</span>
                 </div>
                 <div className="flex items-center gap-3 mb-3">
                   <span className={`px-2.5 py-1 ${post.bg} ${post.color} rounded-full text-[10px] font-black uppercase tracking-widest`}>{post.category}</span>

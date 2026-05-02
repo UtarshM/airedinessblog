@@ -85,28 +85,31 @@ const AuthPage = () => {
   return (
     <div className="flex min-h-screen">
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 gradient-sidebar items-center justify-center p-12">
-        <div className="max-w-md text-center">
+      <div className="hidden lg:flex lg:w-1/2 bg-bg-2 border-r border-line items-center justify-center p-12 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[150px] rounded-full pointer-events-none translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-pink/5 blur-[150px] rounded-full pointer-events-none -translate-x-1/2 translate-y-1/2" />
+        
+        <div className="max-w-md text-center relative z-10">
           <div className="flex items-center justify-center mb-8">
-            <img src="/soloweb-logo.png" alt="SoloWeb Logo" className="h-12 w-auto" />
+            <img src="/assets/solospider-logo.png" alt="Solo Spider" className="h-[42px] w-auto" />
           </div>
-          <p className="text-lg" style={{ color: "hsl(220 14% 70%)" }}>
-            Generate SEO-optimized blog content section-by-section with AI. Built for Indian SEO agencies.
+          <p className="text-lg text-ink-2">
+            Hire Autonomy. Not a team. The autonomous execution layer for every business on earth.
           </p>
         </div>
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-sm">
-          <div className="flex items-center mb-2 lg:hidden">
-            <img src="/soloweb-logo.png" alt="SoloWeb Logo" className="h-8 w-auto" />
+          <div className="flex items-center mb-6 lg:hidden">
+            <img src="/assets/solospider-logo.png" alt="Solo Spider" className="h-[34px] w-auto" />
           </div>
-          <h2 className="text-2xl font-bold mb-1">
+          <h2 className="font-display text-[26px] font-bold tracking-tight text-ink mb-1">
             {isLogin ? "Welcome back" : "Create your account"}
           </h2>
-          <p className="text-muted-foreground mb-6">
-            {isLogin ? "Sign in to your account" : "Get started with SoloWeb"}
+          <p className="text-[15px] text-ink-2 mb-8">
+            {isLogin ? "Sign in to your account" : "Get started with Solo Spider"}
           </p>
 
           <div className="space-y-4">

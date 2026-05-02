@@ -98,7 +98,7 @@ const AgentsPage = () => {
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF66] to-blue-500">At Your Fingertips</span>
                         </h1>
                         <p className="text-gray-400 text-xl max-w-3xl mx-auto">
-                            Welcome to the heart of SoloWeb – your personal team of AI marketing experts. Each member is a fusion of cutting-edge AI and deep industry knowledge, tailored to autonomously revolutionize your brand's presence.
+                            Welcome to the heart of Solo Spider – your personal team of AI marketing experts. Each member is a fusion of cutting-edge AI and deep industry knowledge, tailored to autonomously revolutionize your brand's presence.
                         </p>
                     </div>
                 </section>
