@@ -91,7 +91,7 @@ const AuthPage = () => {
         
         <div className="max-w-md text-center relative z-10">
           <div className="flex items-center justify-center mb-8">
-            <img src="/assets/solospider-logo.png" alt="Solo Spider" className="h-[42px] w-auto" />
+            <img src="/assets/solospider-logo.png" alt="Solo Spider" className="h-[42px] w-auto dark:invert dark:brightness-200" />
           </div>
           <p className="text-lg text-ink-2">
             Hire Autonomy. Not a team. The autonomous execution layer for every business on earth.
@@ -103,7 +103,7 @@ const AuthPage = () => {
       <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-sm">
           <div className="flex items-center mb-6 lg:hidden">
-            <img src="/assets/solospider-logo.png" alt="Solo Spider" className="h-[34px] w-auto" />
+            <img src="/assets/solospider-logo.png" alt="Solo Spider" className="h-[34px] w-auto dark:invert dark:brightness-200" />
           </div>
           <h2 className="font-display text-[26px] font-bold tracking-tight text-ink mb-1">
             {isLogin ? "Welcome back" : "Create your account"}

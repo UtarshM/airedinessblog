@@ -40,7 +40,14 @@
   }
 
   .dark {
-    /* Currently disabled dark mode, keep variables default for now or revert to dark */
+    --bg: #0e0c1a;
+    --bg-2: #161426;
+    --panel: #1a182d;
+    --panel-2: #232138;
+    --line: #2a2842;
+    --line-2: #3f3d52;
+    --ink: #ffffff;
+    --ink-2: #a3a1bc;
   }
 
   * {

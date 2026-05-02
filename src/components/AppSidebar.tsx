@@ -135,7 +135,7 @@ const AppSidebar = () => {
         {/* Logo */}
         <div className="p-4 flex items-center gap-2 border-b border-sidebar-border">
           <Link to="/dashboard" className="flex items-center gap-2.5 group flex-1">
-            <img src="/assets/solospider-logo.png" alt="Solo Spider" className="h-[28px] w-auto" />
+            <img src="/assets/solospider-logo.png" alt="Solo Spider" className="h-[28px] w-auto dark:invert dark:brightness-200" />
           </Link>
         </div>
 
