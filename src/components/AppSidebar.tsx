@@ -141,7 +141,7 @@ const AppSidebar = () => {
 
         {/* Projects Section */}
         <div className="px-3 py-3 border-b border-sidebar-border/50">
-          <h3 className="px-2 text-[10px] font-bold text-sidebar-foreground/40 uppercase tracking-widest mb-2">
+          <h3 className="px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
             Projects
           </h3>
           <div className="space-y-1">
@@ -221,7 +221,7 @@ const AppSidebar = () => {
                       "w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition-colors",
                       hasActive
                         ? "text-foreground bg-sidebar-accent/30"
-                        : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/20"
+                        : "text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/20"
                     )}
                   >
                     <SectionIcon className={cn("h-3.5 w-3.5 shrink-0", section.color)} />
@@ -245,7 +245,7 @@ const AppSidebar = () => {
                               "flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium transition-all",
                               active
                                 ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                                : "text-sidebar-foreground/70 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
+                                : "text-muted-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
                             )}
                           >
                             <Icon className={cn("h-3.5 w-3.5 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
