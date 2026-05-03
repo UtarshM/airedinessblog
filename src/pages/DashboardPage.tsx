@@ -142,32 +142,25 @@ const DashboardPage = () => {
       {/* Welcome Header */}
       <div className="flex items-center justify-between border-b border-line pb-4">
         <div>
-          <h1 className="font-display text-[26px] md:text-3xl font-extrabold tracking-tight mb-1">
-            Welcome back to <span className="grad-text">Solo Spider</span>
+          <h1 className="text-2xl font-bold tracking-tight text-ink mb-1">
+            Welcome back to Solo Spider
           </h1>
           <p className="text-muted-foreground text-sm font-medium">Your AI-powered marketing platform. Select a project to get started.</p>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="default" className="btn-grad border-0">Quick Tour</Button>
+          <Button variant="default" className="shadow-sm">Quick Tour</Button>
         </div>
       </div>
 
       {/* Plan Info Card */}
       {credits && (
-        <div className="bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl border border-primary/10 rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[60px] -z-10 translate-x-1/2 -translate-y-1/2"></div>
-
+        <div className="bg-card border border-line rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-sm">
           <div className="space-y-1">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Current Plan</span>
-              {credits.total === 5 ? (
-                <Badge variant="outline" className="bg-muted text-muted-foreground">Starter Plan</Badge>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 py-0.5 px-2.5 rounded-full bg-primary/5 border border-primary/20 text-[11px] font-medium text-primary-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(144,37,242,0.65)] animate-pulse-gentle"></span>
-                  {credits.total === 30 ? "Pro Plan" : "Scale Plan"}
-                </span>
-              )}
+              <Badge variant="secondary" className="font-medium bg-muted text-muted-foreground">
+                {credits.total === 5 ? "Starter Plan" : credits.total === 30 ? "Pro Plan" : "Scale Plan"}
+              </Badge>
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold">{credits.remaining}</span>
@@ -178,13 +171,13 @@ const DashboardPage = () => {
             </p>
           </div>
 
-          <div className="flex-shrink-0 w-full md:w-auto z-10 relative">
+          <div className="flex-shrink-0 w-full md:w-auto">
             {credits.total === 5 ? (
-              <Button asChild className="w-full md:w-auto btn-grad border-0">
+              <Button asChild className="w-full md:w-auto shadow-sm">
                 <Link to="/pricing">Upgrade to Pro</Link>
               </Button>
             ) : (
-              <Button asChild variant="outline" className="w-full md:w-auto shadow-sm border-primary/20 text-primary hover:bg-primary/5">
+              <Button asChild variant="outline" className="w-full md:w-auto shadow-sm">
                 <Link to="/pricing">Renew Plan</Link>
               </Button>
             )}
@@ -201,7 +194,7 @@ const DashboardPage = () => {
       {/* Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Create Post */}
-        <Link to="/generate" className="p-6 rounded-xl border border-primary/10 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-md hover:border-primary/30 transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
+        <Link to="/generate" className="p-6 rounded-xl border border-line bg-card shadow-sm hover:shadow-md transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
           <div>
             <div className="flex items-center gap-3 mb-3">
               <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -217,7 +210,7 @@ const DashboardPage = () => {
         </Link>
 
         {/* Bulk Creation */}
-        <Link to="/bulk-generate" className="p-6 rounded-xl border border-emerald-500/10 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-md hover:border-emerald-500/30 transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
+        <Link to="/bulk-generate" className="p-6 rounded-xl border border-line bg-card shadow-sm hover:shadow-md transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
           <div>
             <div className="flex items-center gap-3 mb-3">
               <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
@@ -233,7 +226,7 @@ const DashboardPage = () => {
         </Link>
 
         {/* Brand Identity */}
-        <Link to="/brand-identity" className="p-6 rounded-xl border border-purple-500/10 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-md hover:border-purple-500/30 transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
+        <Link to="/brand-identity" className="p-6 rounded-xl border border-line bg-card shadow-sm hover:shadow-md transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
           <div>
             <div className="flex items-center gap-3 mb-3">
               <div className="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">

@@ -131,7 +131,7 @@ const AppSidebar = () => {
 
   return (
     <>
-      <aside className="w-64 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl flex flex-col min-h-screen border-r border-sidebar-border relative z-10">
+      <aside className="w-64 bg-panel flex flex-col min-h-screen border-r border-sidebar-border relative z-10">
         {/* Logo */}
         <div className="p-4 flex items-center gap-2 border-b border-sidebar-border">
           <Link to="/dashboard" className="flex items-center gap-2.5 group flex-1">
@@ -162,13 +162,13 @@ const AppSidebar = () => {
                     className={cn(
                       "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all text-left",
                       isActive
-                        ? "bg-primary/10 text-primary border border-primary/20"
+                        ? "bg-sidebar-accent text-sidebar-foreground border border-line shadow-sm"
                         : "text-sidebar-foreground hover:bg-sidebar-accent/50"
                     )}
                   >
                     <div className={cn(
                       "w-6 h-6 rounded flex items-center justify-center text-xs font-bold shrink-0",
-                      isActive ? "bg-primary text-primary-foreground" : "bg-primary/20 text-primary"
+                      isActive ? "bg-primary text-primary-foreground" : "bg-sidebar-accent text-muted-foreground"
                     )}>
                       {(project.brand_name || project.name).charAt(0).toUpperCase()}
                     </div>
@@ -242,14 +242,13 @@ const AppSidebar = () => {
                             key={item.to}
                             to={item.to}
                             className={cn(
-                              "flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-all relative overflow-hidden",
+                              "flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-all rounded-md",
                               active
-                                ? "text-primary bg-primary/10 rounded-r-md border-l-2 border-primary"
-                                : "text-muted-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-foreground rounded-md"
+                                ? "bg-sidebar-accent text-sidebar-foreground"
+                                : "text-muted-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
                             )}
                           >
-                            {active && <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent pointer-events-none"></div>}
-                            <Icon className={cn("h-3.5 w-3.5 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
+                            <Icon className={cn("h-3.5 w-3.5 shrink-0", active ? "text-foreground" : "text-muted-foreground")} />
                             <span className="flex-1 truncate">{item.label}</span>
                             {item.badge && (
                               <span className="text-[9px] font-bold bg-amber-500/10 text-amber-500 px-1.5 py-0.5 rounded-full uppercase">
