@@ -131,7 +131,7 @@ const AppSidebar = () => {
 
   return (
     <>
-      <aside className="w-64 bg-sidebar flex flex-col min-h-screen border-r border-sidebar-border">
+      <aside className="w-64 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl flex flex-col min-h-screen border-r border-sidebar-border relative z-10">
         {/* Logo */}
         <div className="p-4 flex items-center gap-2 border-b border-sidebar-border">
           <Link to="/dashboard" className="flex items-center gap-2.5 group flex-1">
@@ -242,12 +242,13 @@ const AppSidebar = () => {
                             key={item.to}
                             to={item.to}
                             className={cn(
-                              "flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium transition-all",
+                              "flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-all relative overflow-hidden",
                               active
-                                ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                                : "text-muted-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
+                                ? "text-primary bg-primary/10 rounded-r-md border-l-2 border-primary"
+                                : "text-muted-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-foreground rounded-md"
                             )}
                           >
+                            {active && <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent pointer-events-none"></div>}
                             <Icon className={cn("h-3.5 w-3.5 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
                             <span className="flex-1 truncate">{item.label}</span>
                             {item.badge && (
