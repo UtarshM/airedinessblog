@@ -134,8 +134,8 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0 bg-[#0a0d14] border-white/10">
-        <DialogHeader className="px-6 py-4 border-b border-white/10 flex-shrink-0">
+      <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0 bg-card border-line shadow-lg">
+        <DialogHeader className="px-6 py-4 border-b border-line flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <DialogTitle className="text-lg font-bold">
@@ -152,7 +152,7 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
 
         <div className="flex flex-1 overflow-hidden">
           {/* Left: Editor */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-5 border-r border-white/10">
+          <div className="flex-1 overflow-y-auto p-6 space-y-5 border-r border-line">
             {/* Platform */}
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground uppercase tracking-wider">Platform</Label>
@@ -166,8 +166,8 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
                       className={cn(
                         "flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold border transition-all",
                         platform === p.id
-                          ? `bg-gradient-to-r ${p.color} text-white border-transparent`
-                          : "border-white/10 text-muted-foreground hover:border-white/20"
+                          ? `bg-primary text-primary-foreground shadow-sm border-transparent`
+                          : "border-input text-muted-foreground hover:border-line hover:bg-muted/50"
                       )}
                     >
                       <Icon className="h-3.5 w-3.5" /> {p.label}
@@ -179,8 +179,8 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
 
             {/* Hook */}
             {idea?.hook && (
-              <div className="bg-neon-blue/5 border border-neon-blue/20 rounded-lg px-4 py-3">
-                <p className="text-xs text-neon-blue font-semibold mb-1 flex items-center gap-1.5">
+              <div className="bg-primary/5 border border-primary/20 rounded-lg px-4 py-3">
+                <p className="text-xs text-primary font-semibold mb-1 flex items-center gap-1.5">
                   <Sparkles className="h-3.5 w-3.5" /> Hook
                 </p>
                 <p className="text-sm font-bold">{idea.hook}</p>
@@ -195,7 +195,7 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
                 onChange={(e) => setCaption(e.target.value)}
                 placeholder="Write your caption..."
                 rows={6}
-                className="bg-white/5 border-white/10 resize-none text-sm"
+                className="bg-muted/50 border-input resize-none text-sm"
               />
               <p className="text-xs text-muted-foreground text-right">{caption.length} chars</p>
             </div>
@@ -205,12 +205,12 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
               <Label className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                 <Hash className="h-3.5 w-3.5" /> Hashtags
               </Label>
-              <div className="flex flex-wrap gap-1.5 p-3 rounded-lg bg-white/5 border border-white/10 min-h-[60px]">
+              <div className="flex flex-wrap gap-1.5 p-3 rounded-lg bg-muted/50 border border-input min-h-[60px]">
                 {hashtags.map((tag) => (
                   <span
                     key={tag}
                     onClick={() => setHashtags(hashtags.filter((h) => h !== tag))}
-                    className="px-2 py-0.5 rounded-full bg-neon-blue/10 text-neon-blue text-xs cursor-pointer hover:bg-red-500/20 hover:text-red-400 transition-colors"
+                    className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs cursor-pointer hover:bg-red-500/20 hover:text-red-400 transition-colors"
                   >
                     #{tag} ×
                   </span>
@@ -236,14 +236,14 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
                   value={imagePrompt}
                   onChange={(e) => setImagePrompt(e.target.value)}
                   placeholder="Describe the image for AI generation..."
-                  className="bg-white/5 border-white/10 text-sm"
+                  className="bg-muted/50 border-input text-sm"
                 />
                 <Button
                   onClick={handleGenerateImage}
                   disabled={!imagePrompt || generatingImage}
                   size="sm"
                   variant="outline"
-                  className="shrink-0 border-neon-blue/30 text-neon-blue hover:bg-neon-blue/10"
+                  className="shrink-0 border-primary/30 text-primary hover:bg-primary/5"
                 >
                   {generatingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                 </Button>
@@ -259,7 +259,7 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
                 type="datetime-local"
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
-                className="bg-white/5 border-white/10 text-sm"
+                className="bg-muted/50 border-input text-sm"
               />
             </div>
           </div>
@@ -269,9 +269,9 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Preview</p>
 
             {/* Instagram mock */}
-            <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+            <div className="rounded-xl border border-line bg-card shadow-sm overflow-hidden">
               {/* Image */}
-              <div className="aspect-square bg-gradient-to-br from-[#0a0d14] to-[#1a1d28] flex items-center justify-center relative overflow-hidden">
+              <div className="aspect-square bg-muted/30 flex items-center justify-center relative overflow-hidden">
                 {imageUrl ? (
                   <img
                     src={imageUrl}
@@ -290,10 +290,10 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
               {/* Caption preview */}
               <div className="p-3 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600" />
+                  <div className="w-6 h-6 rounded-full bg-primary/20" />
                   <span className="text-xs font-bold">your_brand</span>
                 </div>
-                <p className="text-xs text-gray-300 leading-relaxed line-clamp-4">
+                <p className="text-xs text-foreground leading-relaxed line-clamp-4">
                   {fullCaption || "Your caption will appear here..."}
                 </p>
               </div>
@@ -302,7 +302,7 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
             {/* Actions */}
             <div className="space-y-2 pt-2">
               <Button
-                className="w-full bg-gradient-to-r from-[#00f0ff] to-[#7000ff] text-white font-semibold"
+                className="w-full shadow-sm"
                 onClick={() => handleSave("scheduled")}
                 disabled={saving}
               >
@@ -311,7 +311,7 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
               </Button>
               <Button
                 variant="outline"
-                className="w-full border-white/10 text-muted-foreground hover:text-foreground"
+                className="w-full border-input text-muted-foreground hover:bg-muted"
                 onClick={() => handleSave("draft")}
                 disabled={saving}
               >
@@ -320,7 +320,7 @@ export function SocialPostEditor({ open, onOpenChange, projectId, idea, existing
               </Button>
               <Button
                 variant="outline"
-                className="w-full border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
+                className="w-full border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
                 onClick={() => handleSave("published")}
                 disabled={saving}
               >

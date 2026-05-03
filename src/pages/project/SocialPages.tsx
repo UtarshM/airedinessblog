@@ -141,8 +141,8 @@ export function SocialPostsPage() {
   if (step === "connect") {
     return (
       <div className="p-8 max-w-xl mx-auto flex flex-col items-center justify-center min-h-[500px] text-center">
-        <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center mb-6 shadow-lg shadow-pink-500/20">
-          <Instagram className="h-10 w-10 text-white" />
+        <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+          <Instagram className="h-10 w-10 text-primary" />
         </div>
         <h1 className="text-2xl font-bold mb-2">Connect Your Instagram</h1>
         <p className="text-muted-foreground text-sm mb-8 leading-relaxed">
@@ -150,7 +150,7 @@ export function SocialPostsPage() {
         </p>
         <div className="w-full space-y-3">
           <div className="flex gap-2">
-            <div className="flex items-center px-3 rounded-l-lg border border-r-0 border-white/10 bg-white/5 text-muted-foreground text-sm">
+            <div className="flex items-center px-3 rounded-l-lg border border-r-0 border-input bg-muted/50 text-muted-foreground text-sm">
               @
             </div>
             <Input
@@ -158,11 +158,11 @@ export function SocialPostsPage() {
               onChange={(e) => setIgInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleConnect()}
               placeholder="yourbrand or instagram.com/yourbrand"
-              className="rounded-l-none bg-white/5 border-white/10 text-sm"
+              className="rounded-l-none text-sm"
             />
           </div>
           <Button
-            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold"
+            className="w-full shadow-sm"
             onClick={handleConnect}
             disabled={!igInput.trim()}
           >
@@ -178,9 +178,9 @@ export function SocialPostsPage() {
     return (
       <div className="p-8 flex flex-col items-center justify-center min-h-[500px] text-center">
         <div className="relative h-20 w-20 mb-6">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 animate-pulse opacity-30" />
-          <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
-            <Loader2 className="h-10 w-10 text-white animate-spin" />
+          <div className="absolute inset-0 rounded-full bg-primary/20 animate-pulse" />
+          <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Loader2 className="h-10 w-10 text-primary animate-spin" />
           </div>
         </div>
         <h2 className="text-xl font-bold mb-2">Scanning Instagram Profile...</h2>
@@ -195,7 +195,7 @@ export function SocialPostsPage() {
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/10 pb-4">
+      <div className="flex items-center justify-between border-b border-line pb-4">
         <div>
           <h1 className="text-2xl font-bold">Social Media Posts</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Create and schedule Instagram content with AI</p>
@@ -205,7 +205,7 @@ export function SocialPostsPage() {
             <Button
               variant="outline"
               size="sm"
-              className="border-white/10 text-muted-foreground"
+              className="text-muted-foreground"
               onClick={() => { setStep("connect"); setIgInput(""); }}
             >
               <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Change Account
@@ -214,7 +214,7 @@ export function SocialPostsPage() {
             <Button
               variant="outline"
               size="sm"
-              className="border-white/10 text-muted-foreground"
+              className="text-muted-foreground"
               onClick={() => { setStep("connect"); setIgInput(""); }}
             >
               <Instagram className="h-3.5 w-3.5 mr-1.5" /> Connect Instagram
@@ -222,7 +222,7 @@ export function SocialPostsPage() {
           )}
           <Button
             size="sm"
-            className="bg-gradient-to-r from-[#00f0ff] to-[#7000ff] text-white"
+            className="shadow-sm"
             onClick={() => { setSelectedIdea(null); setEditPost(null); setEditorOpen(true); }}
           >
             <Plus className="h-3.5 w-3.5 mr-1.5" /> New Post
@@ -232,22 +232,22 @@ export function SocialPostsPage() {
 
       {/* Instagram Profile Card OR Default Generate Card */}
       {profile ? (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-5 flex items-start gap-5">
+        <div className="rounded-xl border border-line bg-card shadow-sm p-5 flex items-start gap-5">
           <div className="relative shrink-0">
             {profile.profilePicUrl ? (
               <img
                 src={profile.profilePicUrl}
                 alt={profile.handle}
-                className="h-16 w-16 rounded-full object-cover border-2 border-pink-500"
+                className="h-16 w-16 rounded-full object-cover border border-line"
                 onError={(e: any) => { e.target.style.display = "none"; }}
               />
             ) : (
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white">
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
                 {profile.handle.charAt(0).toUpperCase()}
               </div>
             )}
-            <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-pink-500 flex items-center justify-center">
-              <Instagram className="h-2.5 w-2.5 text-white" />
+            <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-primary flex items-center justify-center border-2 border-card">
+              <Instagram className="h-2.5 w-2.5 text-primary-foreground" />
             </div>
           </div>
           <div className="flex-1 min-w-0">
@@ -265,7 +265,7 @@ export function SocialPostsPage() {
             </div>
           </div>
           <Button
-            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white shrink-0"
+            className="shrink-0 shadow-sm"
             onClick={handleGenerateIdeas}
             disabled={generatingIdeas}
           >
@@ -274,7 +274,7 @@ export function SocialPostsPage() {
           </Button>
         </div>
       ) : (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 flex flex-col sm:flex-row items-center gap-5 justify-between">
+        <div className="rounded-xl border border-line bg-card shadow-sm p-6 flex flex-col sm:flex-row items-center gap-5 justify-between">
           <div>
             <h3 className="font-bold text-lg mb-1">Generate AI Post Ideas</h3>
             <p className="text-sm text-muted-foreground">
@@ -282,7 +282,7 @@ export function SocialPostsPage() {
             </p>
           </div>
           <Button
-            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white shrink-0 shadow-lg shadow-pink-500/20"
+            className="shrink-0 shadow-sm"
             onClick={handleGenerateIdeas}
             disabled={generatingIdeas}
           >
@@ -297,7 +297,7 @@ export function SocialPostsPage() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-neon-blue" /> AI Post Ideas
+              <Sparkles className="h-5 w-5 text-primary" /> AI Post Ideas
             </h2>
             <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleGenerateIdeas}>
               <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Regenerate
@@ -307,7 +307,7 @@ export function SocialPostsPage() {
           {generatingIdeas ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[1,2,3,4,5].map(i => (
-                <div key={i} className="h-40 rounded-xl border border-white/10 bg-white/5 animate-pulse" />
+                <div key={i} className="h-40 rounded-xl border border-line bg-card shadow-sm animate-pulse" />
               ))}
             </div>
           ) : (
@@ -317,15 +317,15 @@ export function SocialPostsPage() {
                   key={idea.id}
                   onClick={() => { setSelectedIdea(idea); setEditPost(null); setEditorOpen(true); }}
                   className={cn(
-                    "p-5 rounded-xl border cursor-pointer transition-all hover:shadow-lg hover:shadow-neon-blue/5 group",
-                    TYPE_COLORS[idea.type] || "border-white/10 bg-white/5"
+                    "p-5 rounded-xl border cursor-pointer transition-all hover:shadow-md bg-card shadow-sm group",
+                    TYPE_COLORS[idea.type] || "border-line"
                   )}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <Badge className={cn("text-xs capitalize", TYPE_BADGE[idea.type] || "bg-muted text-muted-foreground")}>
                       {idea.type}
                     </Badge>
-                    <span className="text-xs text-neon-blue opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                    <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                       Use this <ArrowRight className="h-3 w-3" />
                     </span>
                   </div>
@@ -354,9 +354,9 @@ export function SocialPostsPage() {
             {savedPosts.map((post: any) => (
               <div
                 key={post.id}
-                className="flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 group hover:border-white/20 transition-all"
+                className="flex items-center gap-4 p-4 rounded-xl border border-line bg-card shadow-sm group hover:border-primary/20 transition-all"
               >
-                <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-white/10">
+                <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-muted/50 border border-line">
                   {post.image_url ? (
                     <img src={post.image_url} alt="" className="w-full h-full object-cover" />
                   ) : (
@@ -386,7 +386,7 @@ export function SocialPostsPage() {
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => { setEditPost(post); setSelectedIdea(null); setEditorOpen(true); }}
-                    className="p-2 rounded-lg hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
+                    className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Edit2 className="h-3.5 w-3.5" />
                   </button>
@@ -405,11 +405,11 @@ export function SocialPostsPage() {
 
       {/* Empty state when dashboard but no posts/ideas */}
       {step === "dashboard" && savedPosts.length === 0 && (
-        <div className="text-center py-12 border border-dashed border-white/10 rounded-xl">
-          <Sparkles className="h-10 w-10 mx-auto mb-3 text-neon-blue/40" />
+        <div className="text-center py-12 border border-dashed border-line rounded-xl bg-card shadow-sm">
+          <Sparkles className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30" />
           <p className="text-muted-foreground text-sm mb-4">Ready to create your first post?</p>
           <Button
-            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white"
+            className="shadow-sm"
             onClick={handleGenerateIdeas}
           >
             <Sparkles className="h-4 w-4 mr-2" /> Generate Post Ideas with AI

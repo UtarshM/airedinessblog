@@ -87,9 +87,9 @@ export function SocialImageGenerationPage() {
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">
       {/* Header */}
-      <div className="border-b border-white/10 pb-4">
+      <div className="border-b border-line pb-4">
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <ImageIcon className="h-6 w-6 text-pink-500" /> AI Image Generation
+          <ImageIcon className="h-6 w-6 text-primary" /> AI Image Generation
         </h1>
         <p className="text-sm text-muted-foreground mt-1">Create stunning visuals for your social media posts instantly.</p>
       </div>
@@ -97,24 +97,24 @@ export function SocialImageGenerationPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left: Input */}
         <div className="space-y-6">
-          <div className="rounded-xl border border-white/10 bg-white/5 p-6 space-y-4">
+          <div className="rounded-xl border border-line bg-card shadow-sm p-6 space-y-4">
             <div>
               <Label className="text-sm font-semibold flex items-center gap-2 mb-2">
-                <Sparkles className="h-4 w-4 text-neon-blue" /> Describe your image
+                <Sparkles className="h-4 w-4 text-primary" /> Describe your image
               </Label>
               <Textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="e.g. A modern office setup with a neon glowing laptop, cinematic lighting, photorealistic, 4k..."
                 rows={5}
-                className="bg-black/20 border-white/10 resize-none"
+                className="bg-muted/50 border-input resize-none"
               />
             </div>
             
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                className="flex-1 border-neon-blue/30 text-neon-blue hover:bg-neon-blue/10 h-12"
+                className="flex-1 border-primary text-primary hover:bg-primary/5 h-12"
                 onClick={handleRefinePrompt}
                 disabled={!prompt.trim() || refining}
               >
@@ -125,7 +125,7 @@ export function SocialImageGenerationPage() {
                 )}
               </Button>
               <Button
-                className="flex-[2] bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold h-12 shadow-lg shadow-pink-500/20"
+                className="flex-[2] shadow-sm h-12"
                 onClick={handleGenerate}
                 disabled={!prompt.trim() || generating}
               >
@@ -138,7 +138,7 @@ export function SocialImageGenerationPage() {
             </div>
           </div>
           
-          <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+          <div className="rounded-xl border border-line bg-card shadow-sm p-6">
             <h3 className="font-bold mb-3 text-sm flex items-center gap-2">
               <LightbulbIcon className="h-4 w-4 text-amber-400" /> Tips for great prompts
             </h3>
@@ -153,9 +153,9 @@ export function SocialImageGenerationPage() {
 
         {/* Right: Output */}
         <div className="space-y-4">
-          <div className="aspect-square rounded-2xl border border-white/10 bg-black/40 overflow-hidden relative flex flex-col items-center justify-center">
+          <div className="aspect-square rounded-2xl border border-line bg-muted/30 overflow-hidden relative flex flex-col items-center justify-center">
             {generating ? (
-              <div className="flex flex-col items-center text-neon-blue animate-pulse">
+              <div className="flex flex-col items-center text-primary animate-pulse">
                 <Sparkles className="h-12 w-12 mb-4" />
                 <p className="font-semibold">AI is creating your masterpiece...</p>
               </div>
@@ -177,13 +177,13 @@ export function SocialImageGenerationPage() {
             <div className="flex gap-3">
               <Button
                 variant="outline"
-                className="flex-1 border-white/10 bg-white/5 hover:bg-white/10"
+                className="flex-1 border-input bg-card hover:bg-muted"
                 onClick={handleDownload}
               >
                 <Download className="h-4 w-4 mr-2" /> Download
               </Button>
               <Button
-                className="flex-1 bg-gradient-to-r from-[#00f0ff] to-[#7000ff] text-white"
+                className="flex-1 shadow-sm"
                 onClick={() => setEditorOpen(true)}
               >
                 <Send className="h-4 w-4 mr-2" /> Create Post with Image
