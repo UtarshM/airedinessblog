@@ -5,6 +5,42 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+const STORAGE_BUCKET = "blog_images";
+const DEFAULT_OPENROUTER_IMAGE_MODEL = "google/gemini-2.5-flash-image-preview";
+
+function pollinationsImageUrl(prompt: string, width = 1024, height = 1024): string {
+  const encodedPrompt = encodeURIComponent(
+    `${prompt}, instagram post, professional photography, high quality, 4K`
+  );
+  return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&nologo=true`;
+}
+
+function decodeBase64ToBytes(base64: string): Uint8Array {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+async function uploadImageBytes(
+  supabase: any,
+  bytes: Uint8Array,
+  fileName: string,
+  contentType = "image/png"
+): Promise<string> {
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .upload(fileName, bytes, {
+      contentType,
+      upsert: true,
+    });
+
+  if (uploadError) throw uploadError;
+  const { data: { publicUrl } } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(uploadData.path);
+  return publicUrl;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -16,6 +52,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const openrouterKey = Deno.env.get("OPENROUTER_API_KEY");
     const fireworksKey = Deno.env.get("FIREWORKS_API_KEY");
+    const openrouterImageModel = Deno.env.get("OPENROUTER_IMAGE_MODEL") || DEFAULT_OPENROUTER_IMAGE_MODEL;
 
     const supabase = createClient(supabaseUrl, supabaseKey);
     const body = await req.json();
@@ -23,50 +60,94 @@ serve(async (req) => {
 
     // ── 1. HIGH-QUALITY IMAGE GENERATION (FIREWORKS) ─────────────────────────
     if (type === "image") {
-      if (!fireworksKey) throw new Error("FIREWORKS_API_KEY not configured");
-      
-      console.log("Generating high-quality image via Fireworks...");
-      const res = await fetch(
-        "https://api.fireworks.ai/inference/v1/image_generation/accounts/fireworks/models/playground-v2-5-1024px-aesthetic",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${fireworksKey}`,
-            "Content-Type": "application/json",
-            Accept: "image/jpeg",
-          },
-          body: JSON.stringify({
-            prompt: userPrompt,
-            negative_prompt: "text, watermark, logo, signature, ugly, deformed, blurry, low quality, low resolution, bad anatomy, extra limbs, missing limbs, floating objects, cartoon, anime, painting",
-            height: 1024,
-            width: 1024,
-            num_inference_steps: 30,
-            guidance_scale: 7.5,
-            samples: 1,
-          }),
-        }
-      );
+      const safePrompt = (userPrompt || "").trim() || "High-quality social media creative image";
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Fireworks error: ${errorText}`);
+      // 1) OpenRouter first (cloud-grade generation via your API key)
+      if (openrouterKey) {
+        try {
+          const openrouterRes = await fetch("https://openrouter.ai/api/v1/images/generations", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${openrouterKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: openrouterImageModel,
+              prompt: safePrompt,
+              size: "1024x1024",
+              n: 1,
+            }),
+          });
+
+          if (openrouterRes.ok) {
+            const imagePayload = await openrouterRes.json();
+            const first = imagePayload?.data?.[0];
+            const fileName = `social/${Date.now()}-openrouter.png`;
+
+            if (first?.b64_json) {
+              const bytes = decodeBase64ToBytes(first.b64_json);
+              const publicUrl = await uploadImageBytes(supabase, bytes, fileName, "image/png");
+              return new Response(JSON.stringify({ imageUrl: publicUrl, provider: "openrouter" }), {
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              });
+            }
+
+            if (first?.url) {
+              return new Response(JSON.stringify({ imageUrl: first.url, provider: "openrouter" }), {
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              });
+            }
+          } else {
+            const openrouterErr = await openrouterRes.text();
+            console.warn("OpenRouter image generation failed:", openrouterErr);
+          }
+        } catch (e) {
+          console.warn("OpenRouter image generation exception:", e);
+        }
       }
 
-      const imageData = await res.arrayBuffer();
-      const fileName = `social/${Date.now()}.jpg`;
+      // 2) Fireworks fallback
+      if (fireworksKey) {
+        try {
+          console.log("Generating high-quality image via Fireworks fallback...");
+          const res = await fetch(
+            "https://api.fireworks.ai/inference/v1/image_generation/accounts/fireworks/models/playground-v2-5-1024px-aesthetic",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${fireworksKey}`,
+                "Content-Type": "application/json",
+                Accept: "image/jpeg",
+              },
+              body: JSON.stringify({
+                prompt: safePrompt,
+                negative_prompt: "text, watermark, logo, signature, ugly, deformed, blurry, low quality, low resolution, bad anatomy, extra limbs, missing limbs, floating objects, cartoon, anime, painting",
+                height: 1024,
+                width: 1024,
+                num_inference_steps: 30,
+                guidance_scale: 7.5,
+                samples: 1,
+              }),
+            }
+          );
 
-      // Upload to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("blog-images") // Reusing existing bucket
-        .upload(fileName, new Uint8Array(imageData), {
-          contentType: "image/jpeg",
-          upsert: true,
-        });
+          if (res.ok) {
+            const imageData = await res.arrayBuffer();
+            const fileName = `social/${Date.now()}-fireworks.jpg`;
+            const publicUrl = await uploadImageBytes(supabase, new Uint8Array(imageData), fileName, "image/jpeg");
+            return new Response(JSON.stringify({ imageUrl: publicUrl, provider: "fireworks" }), {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+          const fwErr = await res.text();
+          console.warn("Fireworks image generation failed:", fwErr);
+        } catch (e) {
+          console.warn("Fireworks image generation exception:", e);
+        }
+      }
 
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage.from("blog-images").getPublicUrl(uploadData.path);
-      return new Response(JSON.stringify({ imageUrl: publicUrl }), {
+      // 3) Final fallback
+      return new Response(JSON.stringify({ imageUrl: pollinationsImageUrl(safePrompt), provider: "pollinations" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
