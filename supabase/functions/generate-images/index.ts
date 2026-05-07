@@ -7,14 +7,6 @@ const corsHeaders = {
 };
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
-const STORAGE_BUCKET = "blog_images";
-
-function pollinationsImageUrl(prompt: string, width = 1344, height = 768): string {
-    const encodedPrompt = encodeURIComponent(
-        `${prompt}, professional photography, high quality, 4K`
-    );
-    return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&nologo=true`;
-}
 
 // Generate an image prompt via Groq
 async function generatePrompt(topic: string, context: string): Promise<string> {
@@ -50,8 +42,8 @@ async function generateAndUpload(
 ): Promise<string | null> {
     const key = Deno.env.get("FIREWORKS_API_KEY");
     if (!key) {
-        console.warn("FIREWORKS_API_KEY not set, using Pollinations fallback URL");
-        return pollinationsImageUrl(prompt, width, height);
+        console.error("FIREWORKS_API_KEY not set");
+        return null;
     }
 
     console.log(`Generating image: ${prompt.substring(0, 60)}...`);
@@ -90,7 +82,7 @@ async function generateAndUpload(
 
         // Upload to Supabase Storage
         const { data, error } = await supabase.storage
-            .from(STORAGE_BUCKET)
+            .from("blog-images")
             .upload(fileName, uint8Array, {
                 contentType: "image/jpeg",
                 upsert: true,
@@ -101,7 +93,7 @@ async function generateAndUpload(
             return null;
         }
 
-        const { data: { publicUrl } } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(data.path);
+        const { data: { publicUrl } } = supabase.storage.from("blog-images").getPublicUrl(data.path);
         console.log(`Uploaded: ${publicUrl}`);
         return publicUrl;
     } catch (e) {
